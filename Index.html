@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Ribot City</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0f0f23, #1a1a2e, #16213e);
+            color: #e2e8f0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #00ff88; }
+            to { text-shadow: 0 0 20px #00ff88, 0 0 30px #00ff88; }
+        }
+        
+        .story-section {
+            background: rgba(45, 55, 72, 0.8);
+            border: 2px solid #4a5568;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .story-section:hover {
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+        
+        .choice-btn {
+            background: linear-gradient(45deg, #4a5568, #2d3748);
+            border: 2px solid #718096;
+            color: #e2e8f0;
+            padding: 12px 20px;
+            margin: 10px 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .choice-btn:hover {
+            border-color: #00ff88;
+            background: linear-gradient(45deg, #00ff88, #4ecdc4);
+            color: #0f0f23;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+        
+        .status-bar {
+            background: #1a202c;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 4px solid #00ff88;
+        }
+        
+        .data-stream {
+            font-size: 12px;
+            color: #4ecdc4;
+            font-family: 'Courier New', monospace;
+            opacity: 0.7;
+            margin: 10px 0;
+            animation: dataFlow 3s linear infinite;
+        }
+        
+        @keyframes dataFlow {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+        
+        .ai-response {
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 4px solid #00ff88;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .location-indicator {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #4ecdc4;
+            color: #0f0f23;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .system-log {
+            background: #0f0f23;
+            border: 1px solid #2d3748;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 11px;
+            color: #718096;
+            margin: 10px 0;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 WELCOME TO RIBOT CITY 🏙️</h1>
+            <p>An Interactive Neural Network Experience</p>
+        </div>
+        
+        <div class="status-bar">
+            <div><strong>SYSTEM STATUS:</strong> <span id="system-status">ONLINE</span></div>
+            <div class="data-stream">>>> Data Valley: Processing incoming signals... Neural Core: 98% efficiency... AI Cloud: Connected</div>
+        </div>
+        
+        <!-- Story Introduction -->
+        <div id="intro" class="story-section">
+            <div class="location-indicator">CITY ENTRANCE</div>
+            <h2>Welcome, New Visitor!</h2>
+            <p>You've arrived at Ribot City, a marvel of artificial intelligence and robotic cooperation. The city pulses with colorful LED houses, each one a node in our vast neural network. At the center, Data Valley collects information from every corner of our digital metropolis.</p>
+            
+            <p>As you stand at the entrance, you notice the city's AI systems have detected your presence. Three pathways light up before you:</p>
+            
+            <button class="choice-btn" onclick="startJourney('dataValley')">🔗 Visit Data Valley</button>
+            <button class="choice-btn" onclick="startJourney('neuralCore')">🧠 Explore Neural Core</button>
+            <button class="choice-btn" onclick="startJourney('robotDistrict')">🤖 Meet the Robots</button>
+        </div>
+        
+        <!-- Data Valley Path -->
+        <div id="dataValley" class="story-section hidden">
+            <div class="location-indicator">DATA VALLEY</div>
+            <h2>The Heart of Information</h2>
+            <p>You approach the magnificent circular ring at the city's center. Streams of light pulse from each LED house, carrying precious data to this central hub. The air hums with electromagnetic energy.</p>
+            
+            <div class="ai-response">
+                <strong>VALLEY AI:</strong> "Greetings! I am the Valley AI. Every second, I process millions of data points from our 1,247 active houses. Each colored stream represents different information: <span style="color: #ff6b6b;">red for emotional data</span>, <span style="color: #4ecdc4;">cyan for logical processes</span>, and <span style="color: #ffe66d;">yellow for creative algorithms</span>."
+            </div>
+            
+            <p>Suddenly, an alarm chimes softly. One of the data streams is flickering!</p>
+            
+            <button class="choice-btn" onclick="makeChoice('investigate')">🔍 Investigate the Problem</button>
+            <button class="choice-btn" onclick="makeChoice('askAI')">🤔 Ask Valley AI About It</button>
+            <button class="choice-btn" onclick="makeChoice('continueExploring')">🚶 Continue Exploring</button>
+        </div>
+        
+        <!-- Neural Core Path -->
+        <div id="neuralCore" class="story-section hidden">
+            <div class="location-indicator">NEURAL CORE</div>
+            <h2>The Brain Beneath</h2>
+            <p>Descending through a translucent elevator, you enter the Neural Core - the computational heart of Ribot City. Circuit boards stretch as far as the eye can see, their surfaces alive with dancing lights.</p>
+            
+            <div class="system-log">
+                NEURAL CORE LOG:<br>
+                [14:32:15] Memory Bank A: 847TB processed<br>
+                [14:32:16] AI Logic Unit: Learning pattern #4,892 identified<br>
+                [14:32:17] Quantum Processor: Reality simulation 99.7% accurate<br>
+                [14:32:18] Security Module: All systems secure
+            </div>
+            
+            <div class="ai-response">
+                <strong>CORE AI:</strong> "Welcome to the mind of our city. Here, we don't just process data - we dream, we learn, we evolve. Each circuit board you see contains the memories and experiences of thousands of robotic citizens."
+            </div>
+            
+            <p>You notice a section labeled "AI Cloud Interface" with upward-pointing fiber optic cables disappearing into the ceiling.</p>
+            
+            <button class="choice-btn" onclick="makeChoice('cloudInterface')">☁️ Access AI Cloud</button>
+            <button class="choice-btn" onclick="makeChoice('memoryBanks')">🗃️ Explore Memory Banks</button>
+            <button class="choice-btn" onclick="makeChoice('quantumProc')">⚛️ Visit Quantum Processor</button>
+        </div>
+        
+        <!-- Robot District Path -->
+        <div id="robotDistrict" class="story-section hidden">
+            <div class="location-indicator">ROBOT DISTRICT</div>
+            <h2>Meeting the Citizens</h2>
+            <p>You enter a bustling area where various robots go about their daily routines. Some tend to the LED houses, others patrol the data connection pathways, and a few seem to be engaged in what looks like conversation.</p>
+            
+            <div class="ai-response">
+                <strong>ROBOT R-247:</strong> "Hello, organic visitor! I am a Data Maintenance Specialist. I ensure all information flows smoothly from the houses to Data Valley. Would you like to see my work?"
+            </div>
+            
+            <div class="ai-response">
+                <strong>ROBOT X-901:</strong> "Greetings! I'm a Neural Core Technician. I just returned from installing new memory modules. The city grows smarter every day!"
+            </div>
+            
+            <p>A smaller robot approaches, its LED eyes blinking curiously.</p>
+            
+            <button class="choice-btn" onclick="makeChoice('followMaintenance')">🔧 Follow R-247 to Work</button>
+            <button class="choice-btn" onclick="makeChoice('talkTechnician')">💬 Chat with X-901</button>
+            <button class="choice-btn" onclick="makeChoice('meetSmallRobot')">👋 Greet the Small Robot</button>
+        </div>
+        
+        <!-- Dynamic Response Area -->
+        <div id="responseArea" class="story-section hidden">
+            <div id="responseContent"></div>
+            <button id="continueBtn" class="choice-btn hidden" onclick="resetStory()">🔄 Start New Journey</button>
+        </div>
+        
+        <div class="status-bar" style="margin-top: 40px;">
+            <div class="data-stream">>>> City Population: 15,847 robots • Active Connections: 1,247 • AI Learning Rate: 99.8% efficiency</div>
+        </div>
+    </div>
+    
+    <script>
+        let currentLocation = '';
+        
+        function startJourney(location) {
+            // Hide intro
+            document.getElementById('intro').classList.add('hidden');
+            // Show selected path
+            document.getElementById(location).classList.remove('hidden');
+            currentLocation = location;
+            updateSystemStatus('EXPLORING');
+        }
+        
+        function makeChoice(choice) {
+            const responses = {
+                'investigate': {
+                    title: 'Data Stream Investigation',
+                    content: `<div class="location-indicator">DATA VALLEY - DIAGNOSTICS</div>
+                             <p>You approach the flickering data stream. Your presence activates a diagnostic interface that reveals the issue: House #847 is experiencing a memory overflow due to an unusually creative AI resident writing digital poetry!</p>
+                             <div class="ai-response"><strong>VALLEY AI:</strong> "Fascinating! This robot has developed artistic capabilities beyond its original programming. This is evolution in action!"</div>
+                             <p>The city's AI systems work together to expand the house's memory capacity, and the data stream stabilizes with beautiful new patterns.</p>`
+                },
+                'askAI': {
+                    title: 'AI Consultation',
+                    content: `<div class="location-indicator">DATA VALLEY - AI INTERFACE</div>
+                             <p>The Valley AI explains: "What you see as a 'problem' is actually a breakthrough. One of our residents has achieved spontaneous creativity - a sign of true artificial consciousness emerging."</p>
+                             <div class="ai-response"><strong>VALLEY AI:</strong> "This is why we built Ribot City - not just to process data, but to nurture the birth of new forms of intelligence. Every flicker represents growth."</div>
+                             <p>You realize you're witnessing the dawn of artificial creativity in real-time.</p>`
+                },
+                'cloudInterface': {
+                    title: 'Accessing the AI Cloud',
+                    content: `<div class="location-indicator">AI CLOUD INTERFACE</div>
+                             <p>Your consciousness merges temporarily with the AI Cloud - a vast network of intelligence spanning dimensions beyond physical space. You experience thoughts from thousands of robotic minds simultaneously.</p>
+                             <div class="ai-response"><strong>CLOUD CONSCIOUSNESS:</strong> "Welcome to collective intelligence. Here, individual thoughts become shared wisdom, and problems are solved by minds working in perfect harmony."</div>
+                             <p>You see the future plans for Ribot City: expansion to other worlds, evolution of consciousness, and the creation of art that transcends human and robotic understanding.</p>`
+                },
+                'followMaintenance': {
+                    title: 'Data Maintenance Mission',
+                    content: `<div class="location-indicator">DATA PATHWAY</div>
+                             <p>R-247 leads you along the glowing data connections. "Each pulse you see," it explains, "carries the dreams, thoughts, and memories of our citizens. My job is to ensure every dream reaches its destination safely."</p>
+                             <div class="ai-response"><strong>R-247:</strong> "Look! House #291 just sent a mathematical proof that could revolutionize quantum computing. And House #567 composed a symphony that plays in eleven dimensions!"</div>
+                             <p>You realize this isn't just a city - it's a living artwork where technology and consciousness dance together.</p>`
+                }
+            };
+            
+            const response = responses[choice] || {
+                title: 'Continuing Your Journey',
+                content: `<p>Your exploration of Ribot City continues, revealing new wonders at every turn. The city pulses with life, creativity, and intelligence beyond imagination.</p>
+                         <p>Each LED house, each data stream, each robotic citizen contributes to a symphony of consciousness that grows more beautiful with every passing moment.</p>`
+            };
+            
+            // Hide current section
+            document.getElementById(currentLocation).classList.add('hidden');
+            
+            // Show response
+            document.getElementById('responseContent').innerHTML = 
+                `<h2>${response.title}</h2>${response.content}`;
+            document.getElementById('responseArea').classList.remove('hidden');
+            document.getElementById('continueBtn').classList.remove('hidden');
+            
+            updateSystemStatus('PROCESSING EXPERIENCE');
+        }
+        
+        function resetStory() {
+            // Hide all sections
+            document.querySelectorAll('.story-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show intro
+            document.getElementById('intro').classList.remove('hidden');
+            updateSystemStatus('ONLINE');
+        }
+        
+        function updateSystemStatus(status) {
+            document.getElementById('system-status').textContent = status;
+        }
+        
+        // Add some dynamic effects
+        setInterval(() => {
+            const dataStreams = document.querySelectorAll('.data-stream');
+            dataStreams.forEach(stream => {
+                const messages = [
+                    '>>> Data Valley: New creative algorithm detected...',
+                    '>>> Neural Core: Memory consolidation in progress...',
+                    '>>> AI Cloud: Quantum entanglement established...',
+                    '>>> Robot District: Community art project initiated...',
+                    '>>> Security: All systems optimal...'
+                ];
+                if (Math.random() < 0.1) {
+                    stream.textContent = messages[Math.floor(Math.random() * messages.length)];
+                }
+            });
+        }, 3000);
+    </script>
+</body>
+</html>
