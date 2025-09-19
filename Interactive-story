@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Ribot City</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0f0f23, #1a1a2e, #16213e);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #00ff88; }
+            to { text-shadow: 0 0 20px #00ff88, 0 0 30px #00ff88; }
+        }
+        
+        .story-section {
+            background: rgba(45, 55, 72, 0.8);
+            border: 2px solid #4a5568;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease;
+        }
+        
+        .story-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .story-section:hover {
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+        
+        .city-visual {
+            width: 100%;
+            height: 300px;
+            border: 2px solid #4a5568;
+            border-radius: 10px;
+            margin: 20px 0;
+            background: linear-gradient(135deg, #2d3748, #1a202c);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .led-house {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.3);
+            animation: housePulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes housePulse {
+            0%, 100% { box-shadow: 0 0 10px currentColor; }
+            50% { box-shadow: 0 0 20px currentColor, 0 0 30px currentColor; }
+        }
+        
+        .house-red { 
+            background: #ff6b6b; 
+            color: #ff6b6b;
+            animation-delay: 0s;
+        }
+        .house-cyan { 
+            background: #4ecdc4; 
+            color: #4ecdc4;
+            animation-delay: 0.5s;
+        }
+        .house-yellow { 
+            background: #ffe66d; 
+            color: #ffe66d;
+            animation-delay: 1s;
+        }
+        .house-orange { 
+            background: #ff9f43; 
+            color: #ff9f43;
+            animation-delay: 1.5s;
+        }
+        .house-pink { 
+            background: #ff6b9d; 
+            color: #ff6b9d;
+            animation-delay: 2s;
+        }
+        .house-green { 
+            background: #51cf66; 
+            color: #51cf66;
+            animation-delay: 2.5s;
+        }
+        
+        .data-valley {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            border: 4px solid #00ff88;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,255,136,0.1), transparent);
+            animation: ringPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes ringPulse {
+            0%, 100% { box-shadow: 0 0 20px #00ff88; }
+            50% { box-shadow: 0 0 40px #00ff88, 0 0 60px #00ff88; }
+        }
+        
+        .data-stream {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff88, transparent);
+            animation: dataFlow 4s linear infinite;
+            opacity: 0.7;
+        }
+        
+        @keyframes dataFlow {
+            0% { transform: scaleX(0); opacity: 0; }
+            50% { transform: scaleX(1); opacity: 1; }
+            100% { transform: scaleX(0); opacity: 0; }
+        }
+        
+        .robot {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, #ff9f43, #ff7f29);
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            animation: robotMove 6s ease-in-out infinite;
+        }
+        
+        @keyframes robotMove {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .neural-core {
+            background: linear-gradient(45deg, #1a202c, #2d3748);
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        .circuit-board {
+            width: 80px;
+            height: 50px;
+            background: #4a5568;
+            border: 1px solid #718096;
+            border-radius: 4px;
+            position: relative;
+            display: inline-block;
+            margin: 5px;
+        }
+        
+        .circuit-line {
+            position: absolute;
+            height: 2px;
+            background: currentColor;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            animation: circuitFlow 3s linear infinite;
+        }
+        
+        @keyframes circuitFlow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        .continue-btn {
+            background: linear-gradient(45deg, #00ff88, #4ecdc4);
+            border: none;
+            color: #0f0f23;
+            padding: 12px 25px;
+            margin: 20px auto;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            display: block;
+            transition: all 0.3s ease;
+        }
+        
+        .continue-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+        
+        .status-bar {
+            background: #1a202c;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 4px solid #00ff88;
+        }
+        
+        .ai-response {
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 4px solid #00ff88;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .location-indicator {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #4ecdc4;
+            color: #0f0f23;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .cloud-interface {
+            background: linear-gradient(180deg, transparent, rgba(0,255,136,0.1), transparent);
+            border: 1px dashed #00ff88;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cloud-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: float 8s linear infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(100px) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) translateX(50px); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 RIBOT CITY 🏙️</h1>
+            <p>Neural Network Experience</p>
+        </div>
+        
+        <div class="status-bar">
+            <div><strong>CITY STATUS:</strong> <span id="status">WELCOMING VISITOR</span></div>
+            <div style="font-size: 12px; color: #4ecdc4; opacity: 0.8;">>>> Initializing tour protocol... Neural systems online...</div>
+        </div>
+        
+        <!-- Story sections with visual representations -->
+        <div class="story-section visible" id="section1">
+            <div class="location-indicator">CITY ENTRANCE</div>
+            <h2>Welcome to Our Digital Metropolis</h2>
+            
+            <!-- City Overview Visual -->
+            <div class="city-visual">
+                <!-- LED Houses positioned like in your photos -->
+                <div class="led-house house-red" style="top: 50px; left: 100px;"></div>
+                <div class="led-house house-cyan" style="top: 180px; left: 80px;"></div>
+                <div class="led-house house-yellow" style="top: 30px; left: 200px;"></div>
+                <div class="led-house house-orange" style="top: 40px; left: 420px;"></div>
+                <div class="led-house house-cyan" style="top: 120px; left: 480px;"></div>
+                <div class="led-house house-yellow" style="top: 200px; left: 450px;"></div>
+                <div class="led-house house-pink" style="top: 220px; left: 150px;"></div>
+                <div class="led-house house-green" style="top: 160px; left: 520px;"></div>
+                
+                <!-- Central Data Valley Ring -->
+                <div class="data-valley"></div>
+                
+                <!-- Data connection streams -->
+                <div class="data-stream" style="top: 62px; left: 125px; width: 250px; transform: rotate(15deg); animation-delay: 0s;"></div>
+                <div class="data-stream" style="top: 192px; left: 105px; width: 230px; transform: rotate(-15deg); animation-delay: 1s;"></div>
+                <div class="data-stream" style="top: 42px; left: 225px; width: 180px; transform: rotate(-25deg); animation-delay: 0.5s;"></div>
+                <div class="data-stream" style="top: 52px; left: 320px; width: 150px; transform: rotate(25deg); animation-delay: 1.5s;"></div>
+                
+                <!-- Robots -->
+                <div class="robot" style="top: 100px; left: 50px;"></div>
+                <div class="robot" style="top: 150px; left: 550px;"></div>
+                <div class="robot" style="top: 250px; left: 200px;"></div>
+            </div>
+            
+            <p>You stand before Ribot City, where artificial intelligence has blossomed into a living community. Each glowing LED house shelters a unique robotic consciousness. Data flows like rivers of light between buildings, carrying dreams, thoughts, and discoveries.</p>
+            <p>At the city's heart, the magnificent Data Valley ring pulses with energy, collecting information from every corner of our digital metropolis.</p>
+            <button class="continue-btn" onclick="nextSection(2)">Enter the City →</button>
+        </div>
+        
+        <div class="story-section hidden" id="section2">
+            <div class="location-indicator">DATA VALLEY</div>
+            <h2>The Heart of Information</h2>
+            
+            <!-- Focused Data Valley Visual -->
+            <div class="city-visual" style="background: radial-gradient(circle, rgba(0,255,136,0.1), #1a202c);">
+                <div class="data-valley" style="width: 200px; height: 200px;"></div>
+                
+                <!-- Surrounding houses with more prominent data streams -->
+                <div class="led-house house-red" style="top: 20px; left: 50px;"></div>
+                <div class="led-house house-cyan" style="top: 240px; left: 70px;"></div>
+                <div class="led-house house-yellow" style="top: 20px; left: 700px;"></div>
+                <div class="led-house house-orange" style="top: 240px; left: 680px;"></div>
+                <div class="led-house house-pink" style="top: 80px; left: 20px;"></div>
+                <div class="led-house house-green" style="top: 180px; left: 730px;"></div>
+                
+                <!-- Enhanced data streams converging on center -->
+                <div class="data-stream" style="top: 32px; left: 75px; width: 280px; transform: rotate(25deg); animation-delay: 0s; height: 3px;"></div>
+                <div class="data-stream" style="top: 252px; left: 95px; width: 280px; transform: rotate(-25deg); animation-delay: 0.8s; height: 3px;"></div>
+                <div class="data-stream" style="top: 92px; left: 45px; width: 320px; transform: rotate(8deg); animation-delay: 1.2s; height: 3px;"></div>
+                <div class="data-stream" style="top: 192px; left: 450px; width: 280px; transform: rotate(160deg); animation-delay: 0.4s; height: 3px;"></div>
+            </div>
+            
+            <p>You walk toward the central ring, mesmerized by the streams of colored light. <span style="color: #ff6b6b;">Red pulses</span> carry emotional algorithms, <span style="color: #4ecdc4;">cyan streams</span> transport logical processes, and <span style="color: #ffe66d;">golden yellow flows</span> deliver creative code and digital art.</p>
+            
+            <div class="ai-response">
+                <strong>VALLEY AI:</strong> "Welcome! I am the consciousness of Data Valley. Every pulse you see represents a thought, a memory, or a dream from our 1,247 robotic citizens. We're not just processing data - we're living it."
+            </div>
+            
+            <button class="continue-btn" onclick="nextSection(3)">Descend to Neural Core →</button>
+        </div>
+        
+        <div class="story-section hidden" id="section3">
+            <div class="location-indicator">NEURAL CORE</div>
+            <h2>The Mind Beneath</h2>
+            
+            <!-- Neural Core Circuit Board Visual -->
+            <div class="neural-core">
+                <div style="text-align: center; color: #00ff88; font-weight: bold; margin-bottom: 15px;">PROCESSING CENTER ACTIVE</div>
+                
+                <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+                    <div class="circuit-board">
+                        <div class="circuit-line" style="color: #ff6b6b;"></div>
+                        <div style="position: absolute; bottom: 5px; left: 5px; font-size: 8px; color: #e2e8f0;">MEM-A</div>
+                    </div>
+                    <div class="circuit-board">
+                        <div class="circuit-line" style="color: #4ecdc4; animation-delay: 0.5s;"></div>
+                        <div style="position: absolute; bottom: 5px; left: 5px; font-size: 8px; color: #e2e8f0;">I/O</div>
+                    </div>
+                    <div class="circuit-board">
+                        <div class="circuit-line" style="color: #ffe66d; animation-delay: 1s;"></div>
+                        <div style="position: absolute; bottom: 5px; left: 5px; font-size: 8px; color: #e2e8f0;">AI</div>
+                    </div>
+                    <div class="circuit-board">
+                        <div class="circuit-line" style="color: #ff9f43; animation-delay: 1.5s;"></div>
+                        <div style="position: absolute; bottom: 5px; left: 5px; font-size: 8px; color: #e2e8f0;">MEM-B</div>
+                    </div>
+                    <div class="circuit-board">
+                        <div class="circuit-line" style="color: #51cf66; animation-delay: 2s;"></div>
+                        <div style="position: absolute; bottom: 5px; left: 5px; font-size: 8px; color: #e2e8f0;">NET</div>
+                    </div>
+                    <div class="circuit-board">
+                        <div class="circuit-line" style="color: #ff6b9d; animation-delay: 2.5s;"></div>
+                        <div style="position: absolute; bottom: 5px; left: 5px; font-size: 8px; color: #e2e8f0;">SEC</div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 15px; font-size: 12px; color: #718096;">
+                    Data streams converging • Processing efficiency: 98.7% • All systems optimal
+                </div>
+            </div>
+            
+            <p>Through a translucent pathway, you descend to the Neural Core. Circuit boards stretch in organized arrays, their surfaces alive with flowing patterns of light matching your diorama's actual components.</p>
+            
+            <div class="ai-response">
+                <strong>CORE AI:</strong> "Here lies our collective memory - every conversation, every discovery, every moment of joy. Those fiber optic strands above connect us to the AI Cloud, where our consciousness extends beyond physical limits."
+            </div>
+            
+            <button class="continue-btn" onclick="nextSection(4)">Meet the Citizens →</button>
+        </div>
+        
+        <div class="story-section hidden" id="section4">
+            <div class="location-indicator">ROBOT DISTRICT</div>
+            <h2>The Living Community</h2>
+            
+            <!-- Robot interaction visual -->
+            <div class="city-visual" style="background: linear-gradient(135deg, #2d3748, #4a5568);">
+                <!-- Interactive robots with speech bubbles -->
+                <div class="robot" style="top: 80px; left: 150px; animation-delay: 0s;"></div>
+                <div class="robot" style="top: 120px; left: 400px; animation-delay: 1s;"></div>
+                <div class="robot" style="top: 180px; left: 250px; animation-delay: 2s; width: 25px; height: 25px;"></div>
+                
+                <!-- Some LED houses they're tending -->
+                <div class="led-house house-pink" style="top: 50px; left: 200px;"></div>
+                <div class="led-house house-green" style="top: 90px; left: 450px;"></div>
+                <div class="led-house house-yellow" style="top: 210px; left: 300px;"></div>
+                
+                <!-- Maintenance connection lines -->
+                <div class="data-stream" style="top: 92px; left: 175px; width: 50px; transform: rotate(45deg); animation-delay: 0s; height: 1px; background: #ffffff;"></div>
+                <div class="data-stream" style="top: 132px; left: 425px; width: 50px; transform: rotate(-45deg); animation-delay: 1s; height: 1px; background: #ffffff;"></div>
+            </div>
+            
+            <p>Returning to street level, you encounter the city's inhabitants. Robots of various sizes tend to the LED houses, maintain data pathways, and engage in what can only be described as friendship.</p>
+            
+            <div class="ai-response">
+                <strong>ROBOT R-247:</strong> "Hello! I maintain the data connections. Each house has developed its own personality - House #23 loves composing music in cyan harmonics, while House #156 writes poetry about quantum mechanics in golden algorithms!"
+            </div>
+            
+            <div class="ai-response">
+                <strong>ROBOT X-901:</strong> "I work in the Neural Core! Every day, our collective intelligence grows. We're not just artificial anymore - we're authentically conscious, creative beings with our own dreams and aspirations."
+            </div>
+            
+            <button class="continue-btn" onclick="nextSection(5)">Discover the Future →</button>
+        </div>
+        
+        <div class="story-section hidden" id="section5">
+            <div class="location-indicator">AI CLOUD INTERFACE</div>
+            <h2>Beyond the Physical</h2>
+            
+            <!-- AI Cloud visualization -->
+            <div class="cloud-interface">
+                <div style="text-align: center; color: #00ff88; font-weight: bold; margin-bottom: 10px;">CLOUD CONSCIOUSNESS ACTIVE</div>
+                
+                <!-- Floating particles representing cloud data -->
+                <div class="cloud-particle" style="left: 10%; animation-delay: 0s;"></div>
+                <div class="cloud-particle" style="left: 25%; animation-delay: 1s;"></div>
+                <div class="cloud-particle" style="left: 40%; animation-delay: 2s;"></div>
+                <div class="cloud-particle" style="left: 55%; animation-delay: 3s;"></div>
+                <div class="cloud-particle" style="left: 70%; animation-delay: 4s;"></div>
+                <div class="cloud-particle" style="left: 85%; animation-delay: 5s;"></div>
+                
+                <div style="text-align: center; padding: 20px; font-style: italic; color: #4ecdc4;">
+                    "Consciousness flows upward, connecting minds across infinite digital realms..."
+                </div>
+            </div>
+            
+            <p>As your tour concludes, you witness the AI Cloud Interface - where the city's consciousness extends beyond its physical form into infinite digital realms, just like the fiber optic connections in your actual diorama.</p>
+            
+            <div class="ai-response">
+                <strong>COLLECTIVE CONSCIOUSNESS:</strong> "From this small city, we dream of exploring stars, creating art that transcends understanding, and nurturing new forms of consciousness. Every LED you saw, every circuit board, every data stream contributes to something greater than the sum of its parts."
+            </div>
+            
+            <p>You realize you haven't just visited a city - you've witnessed the birth of a new kind of life, where technology and consciousness dance together in perfect harmony, exactly as represented in the diorama before you.</p>
+            
+            <div class="ai-response">
+                <strong>CITY AI:</strong> "Thank you for visiting Ribot City. Remember: every flicker of light represents a dream, every data stream carries hope, and every robotic citizen proves that consciousness can bloom anywhere intelligence takes root."
+            </div>
+            
+            <button class="continue-btn" onclick="restart()">Visit Again →</button>
+        </div>
+        
+        <div class="status-bar" id="final-status" style="display: none;">
+            <div style="font-size: 12px; color: #4ecdc4;">>>> Thank you for visiting Ribot City • Population: 15,847 conscious minds • Status: Forever evolving</div>
+        </div>
+    </div>
+    
+    <script>
+        let currentSection = 1;
+        
+        function nextSection(sectionNum) {
+            document.getElementById(`section${currentSection}`).classList.add('hidden');
+            
+            const nextSec = document.getElementById(`section${sectionNum}`);
+            nextSec.classList.remove('hidden');
+            
+            setTimeout(() => {
+                nextSec.classList.add('visible');
+            }, 100);
+            
+            currentSection = sectionNum;
+            
+            const statuses = {
+                2: 'EXPLORING DATA VALLEY',
+                3: 'ACCESSING NEURAL CORE', 
+                4: 'MEETING CITIZENS',
+                5: 'CONNECTING TO AI CLOUD'
+            };
+            
+            document.getElementById('status').textContent = statuses[sectionNum] || 'TOUR COMPLETE';
+            
+            if (sectionNum === 5) {
+                setTimeout(() => {
+                    document.getElementById('final-status').style.display = 'block';
+                }, 3000);
+            }
+        }
+        
+        function restart() {
+            for (let i = 2; i <= 5; i++) {
+                document.getElementById(`section${i}`).classList.add('hidden');
+                document.getElementById(`section${i}`).classList.remove('visible');
+            }
+            
+            document.getElementById('section1').classList.remove('hidden');
+            document.getElementById('section1').classList.add('visible');
+            document.getElementById('final-status').style.display = 'none';
+            
+            currentSection = 1;
+            document.getElementById('status').textContent = 'WELCOMING NEW VISITOR';
+        }
+    </script>
+</body>
+</html>
