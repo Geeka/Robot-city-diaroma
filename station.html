@@ -95,7 +95,7 @@
         <div class="card">
             <p class="greeting-label">LAST GREETED</p>
             <div id="currentName">—</div>
-            <p id="status">Connecting to visitor board...</p>
+            <p id="status">Connecting to visitor sheet...</p>
             <p class="count" id="visitorTotal"></p>
             <p class="count" id="lastChecked" style="color: #718096;"></p>
             <button class="btn small" onclick="greet('Test Visitor')">🔊 Test Greeting</button>
@@ -108,26 +108,19 @@
     </div>
 
     <div class="card" style="font-size: 11px; color: #718096; text-align: left;">
-        <p><strong>Diagnostics</strong> (station v3)</p>
+        <p><strong>Diagnostics</strong> (station v6 • reads sheet directly)</p>
         <p id="diagLink"></p>
         <p id="diag" style="word-break: break-all;">Waiting to start...</p>
     </div>
 
     <script>
-        function showDiag(msg) {
-            document.getElementById('diag').textContent = msg;
-        }
-
-        window.addEventListener('load', () => {
-            document.getElementById('diagLink').textContent =
-                'Link ends with: ...' + VISITOR_API.slice(-15);
-        });
-
         // ================= CONFIG =================
-        // Same Google Apps Script Web App URL used in index.html
-        const VISITOR_API = 'https://script.google.com/macros/s/AKfycbzgkkvV0PCx8ZhHujm3iybcb4wVFHxI-BcsK8PbRM2WWIlK4T8du_PS1iu-bRcDyEB9cw/exec';
+        // Your Google Sheet ID (share it as "Anyone with the link → Viewer")
+        const SHEET_ID = '1Ft_qacgU9QPFXL_AwEx8xrliJkgZ60D-WmcB76xHIQE';
+        const SHEET_TAB = 'Visitors';
 
-        const POLL_MS = 3000;          // check for new visitors every 3 seconds
+        const POLL_MS = 4000;          // check for new visitors every 4 seconds
+        const REPLY_TIMEOUT = 20000;   // wait up to 20 seconds for Google to reply
         const TOM_REPEAT_GAP = 6000;   // pause after each greeting so Tom can repeat it
 
         let lastCount = null;
@@ -135,6 +128,69 @@
         let wakeLock = null;
         const queue = [];
         let busy = false;
+        let polling = false;
+        let pollTimer = null;
+        let lastPollAt = 0;
+
+        // ================= DIAGNOSTICS =================
+        function showDiag(msg) {
+            document.getElementById('diag').textContent = msg;
+        }
+
+        document.getElementById('diagLink').textContent =
+            `Sheet ID ends with: ...${SHEET_ID.slice(-10)} • Tab: ${SHEET_TAB}`;
+
+        // ================= READ THE SHEET =================
+        // Loads the Name column straight from the Google Sheet (like loading a script file)
+        function readVisitors() {
+            return new Promise((resolve, reject) => {
+                const cb = 'cb_' + Date.now() + '_' + Math.floor(Math.random() * 1000000);
+                const s = document.createElement('script');
+                let settled = false;
+
+                const cleanup = () => {
+                    settled = true;
+                    clearTimeout(timer);
+                    window[cb] = function () {};   // ignore any late reply
+                    s.remove();
+                };
+
+                const timer = setTimeout(() => {
+                    if (settled) return;
+                    cleanup();
+                    reject(new Error('No reply in 20s. Is the sheet shared as "Anyone with the link → Viewer"?'));
+                }, REPLY_TIMEOUT);
+
+                window[cb] = response => {
+                    if (settled) return;
+                    cleanup();
+                    if (!response || response.status === 'error') {
+                        const msg = response && response.errors && response.errors[0]
+                            ? response.errors[0].detailed_message || response.errors[0].message
+                            : 'Unknown sheet error';
+                        reject(new Error(msg));
+                        return;
+                    }
+                    const rows = (response.table && response.table.rows) || [];
+                    const names = rows
+                        .map(r => (r.c && r.c[0] && r.c[0].v != null) ? String(r.c[0].v) : '')
+                        .filter(n => n !== '');
+                    resolve(names);
+                };
+
+                s.onerror = () => {
+                    if (settled) return;
+                    cleanup();
+                    reject(new Error('Could not load the sheet (network problem).'));
+                };
+
+                const query = encodeURIComponent('select B where B is not null');
+                s.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq` +
+                        `?tqx=responseHandler:${cb}&headers=1` +
+                        `&sheet=${encodeURIComponent(SHEET_TAB)}&tq=${query}&t=${Date.now()}`;
+                document.body.appendChild(s);
+            });
+        }
 
         // ================= VOICE =================
         function pickVoice() {
@@ -153,12 +209,7 @@
         }
 
         // ================= START =================
-        async function startStation() {
-            if (!VISITOR_API) {
-                document.getElementById('startError').textContent =
-                    'Paste your Visitor API link into station.html first (the VISITOR_API line).';
-                return;
-            }
+        function startStation() {
             if (!('speechSynthesis' in window)) {
                 document.getElementById('startError').textContent =
                     'This browser cannot speak. Try Chrome or Safari.';
@@ -194,10 +245,6 @@
         });
 
         // ================= WATCH FOR NEW VISITORS =================
-        let polling = false;
-        let pollTimer = null;
-        let lastPollAt = 0;
-
         function schedulePoll(delay) {
             clearTimeout(pollTimer);
             pollTimer = setTimeout(poll, delay);
@@ -208,20 +255,13 @@
             polling = true;
             lastPollAt = Date.now();
             const status = document.getElementById('status');
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 8000); // give up on stuck checks
 
             try {
-                const res = await fetch(`${VISITOR_API}?t=${Date.now()}`, {
-                    cache: 'no-store',
-                    signal: controller.signal
-                });
-                const text = await res.text();
-                showDiag(`HTTP ${res.status} • ${text.substring(0, 120)}`);
-                const data = JSON.parse(text);
-                const count = data.count || 0;
-                const recent = data.recent || [];
+                const names = await readVisitors();
+                const count = names.length;
+                const recent = names.slice(-5).reverse();   // newest first
 
+                showDiag(`OK • ${count} visitors • newest: ${recent.join(', ') || 'none yet'}`);
                 document.getElementById('visitorTotal').textContent = `Total visitors: ${count}`;
 
                 if (lastCount === null || count < lastCount) {
@@ -231,6 +271,7 @@
                     recent.slice(0, newOnes).reverse().forEach(name => greet(name));
                     lastCount = count;
                 }
+
                 status.textContent = '🟢 Watching for new visitors...';
                 document.getElementById('lastChecked').textContent =
                     `Last checked: ${new Date().toLocaleTimeString()}`;
@@ -238,7 +279,6 @@
                 status.textContent = '🟠 Connection problem, retrying...';
                 showDiag('Error: ' + e.message);
             } finally {
-                clearTimeout(timeout);
                 polling = false;
                 schedulePoll(POLL_MS);
             }
