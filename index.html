@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Gen AI Robot City</title>
+    <title>Tom Station - Gen AI Robot City</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -13,471 +13,254 @@
             color: #e2e8f0;
             min-height: 100vh;
             padding: 20px;
-        }
-
-        .container { max-width: 800px; margin: 0 auto; }
-        .hidden { display: none !important; }
-
-        .header {
             text-align: center;
-            margin-bottom: 30px;
-            animation: glow 2s ease-in-out infinite alternate;
         }
 
-        @keyframes glow {
-            from { text-shadow: 0 0 10px #00ff88; }
-            to { text-shadow: 0 0 20px #00ff88, 0 0 30px #00ff88; }
+        h1 {
+            color: #00ff88;
+            margin: 10px 0 5px;
+            text-shadow: 0 0 15px #00ff88;
         }
 
-        .story-section {
+        .subtitle { color: #718096; font-size: 13px; margin-bottom: 20px; }
+
+        .card {
             background: rgba(45, 55, 72, 0.8);
             border: 2px solid #4a5568;
             border-radius: 15px;
-            padding: 25px;
-            margin: 20px 0;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.8s ease;
+            padding: 20px;
+            margin: 15px auto;
+            max-width: 500px;
         }
 
-        .story-section.visible { opacity: 1; transform: translateY(0); }
-
-        .story-section:hover {
-            border-color: #00ff88;
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
-        }
-
-        .diorama-photo {
-            width: 100%;
-            max-width: 600px;
-            height: auto;
-            border: 2px solid #4a5568;
-            border-radius: 10px;
-            margin: 20px auto;
-            display: block;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-        }
-
-        .photo-caption {
-            text-align: center;
-            font-size: 12px;
-            color: #4ecdc4;
-            margin-top: 10px;
-            font-style: italic;
-        }
-
-        .continue-btn, .submit-name-btn {
+        .btn {
             background: linear-gradient(45deg, #00ff88, #4ecdc4);
             border: none;
             color: #0f0f23;
-            padding: 12px 25px;
-            margin: 20px auto 0;
-            border-radius: 25px;
-            cursor: pointer;
+            padding: 16px 30px;
+            border-radius: 30px;
             font-family: inherit;
             font-weight: bold;
-            display: block;
-            transition: all 0.3s ease;
-        }
-
-        .continue-btn:hover, .submit-name-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
-        }
-
-        .skip-btn {
-            background: none;
-            border: none;
-            color: #718096;
-            text-decoration: underline;
+            font-size: 18px;
             cursor: pointer;
-            font-family: inherit;
-            margin-top: 12px;
-            font-size: 12px;
+            margin: 10px 5px;
         }
 
-        .status-bar {
-            background: #1a202c;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 20px 0;
-            border-left: 4px solid #00ff88;
-        }
-
-        .ai-response {
-            background: rgba(0, 255, 136, 0.1);
-            border-left: 4px solid #00ff88;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 0 10px 10px 0;
-        }
-
-        .location-indicator {
-            display: inline-block;
-            padding: 5px 15px;
-            background: #4ecdc4;
-            color: #0f0f23;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        .feature-highlight {
-            background: rgba(255, 255, 255, 0.05);
-            border-left: 3px solid #ffe66d;
-            padding: 10px 15px;
-            margin: 15px 0;
-            border-radius: 0 8px 8px 0;
-            font-size: 14px;
-        }
-
-        .qr-notice {
-            background: rgba(78, 205, 196, 0.1);
-            border: 1px dashed #4ecdc4;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 15px 0;
-            text-align: center;
+        .btn.small {
             font-size: 13px;
-        }
-
-        .name-input-container {
-            background: rgba(0, 255, 136, 0.1);
-            border: 2px solid #00ff88;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .name-input {
-            background: rgba(45, 55, 72, 0.8);
-            border: 2px solid #4a5568;
-            border-radius: 8px;
-            padding: 10px 15px;
+            padding: 10px 18px;
+            background: #4a5568;
             color: #e2e8f0;
-            font-family: inherit;
-            font-size: 16px;
-            width: 100%;
-            max-width: 300px;
-            margin: 10px auto;
-            display: block;
         }
 
-        .name-input:focus {
-            outline: none;
-            border-color: #00ff88;
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        .toggle { display: block; margin-top: 12px; font-size: 13px; color: #e2e8f0; }
+
+        #status { color: #4ecdc4; font-size: 14px; margin-top: 10px; }
+
+        .greeting-label { color: #718096; font-size: 12px; }
+
+        #currentName {
+            font-size: 42px;
+            color: #ffe66d;
+            margin: 10px 0;
+            word-break: break-word;
+            min-height: 50px;
         }
 
-        /* Wave recognition */
-        .cam-box { max-width: 320px; margin: 15px auto; }
+        .pulse { animation: pulse 1s ease-in-out 4; }
 
-        #waveVideo {
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); text-shadow: none; }
+            50% { transform: scale(1.1); text-shadow: 0 0 25px #ffe66d; }
+        }
+
+        /* Robot Mirror */
+        .mirror-card {
+            border-color: #ffe66d;
+            box-shadow: 0 0 25px rgba(255, 230, 109, 0.4);
+        }
+
+        .mirror-wrap { position: relative; max-width: 320px; margin: 0 auto; }
+
+        #mirrorVideo {
             width: 100%;
-            border-radius: 12px;
-            border: 2px solid #00ff88;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #ffe66d;
+            box-shadow: 0 0 30px #ffe66d;
             transform: scaleX(-1);
             background: #000;
             display: block;
         }
 
-        .hand-track {
-            position: relative;
-            height: 10px;
-            background: #1a202c;
-            border-radius: 5px;
-            margin: 16px 0 10px;
-        }
-
-        .hand-dot {
+        .mirror-robot {
             position: absolute;
-            top: -5px;
-            left: 50%;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #00ff88;
-            box-shadow: 0 0 15px #00ff88;
-            transform: translateX(-50%);
-            transition: left 0.08s linear;
-        }
-
-        .wave-meter {
-            height: 8px;
-            background: #1a202c;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .wave-meter-fill {
-            height: 100%;
-            width: 0;
-            background: linear-gradient(90deg, #00ff88, #4ecdc4);
-            transition: width 0.3s;
-        }
-
-        .wave-arrows {
-            font-size: 28px;
-            color: #ffe66d;
-            letter-spacing: 6px;
-            margin: 12px 0;
-            word-break: break-all;
-        }
-
-        .error-text { color: #ff6b6b; font-size: 12px; min-height: 16px; }
-
-        /* Robot greeter */
-        .robot-greeter {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: rgba(255, 230, 109, 0.1);
-            border: 2px solid #ffe66d;
-            border-radius: 15px;
-            padding: 15px;
-            margin: 20px 0;
-        }
-
-        .robot-face {
+            top: -10px;
+            right: -10px;
             font-size: 56px;
-            position: relative;
-            flex-shrink: 0;
-            animation: robotBob 2s ease-in-out infinite;
+            animation: bob 2s ease-in-out infinite;
         }
 
-        .robot-hand {
-            position: absolute;
-            right: -18px;
-            top: -6px;
-            font-size: 28px;
-            transform-origin: 70% 70%;
-            animation: robotWave 0.6s ease-in-out 8 alternate;
-        }
-
-        @keyframes robotBob {
+        @keyframes bob {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-6px); }
         }
 
-        @keyframes robotWave {
-            from { transform: rotate(-20deg); }
-            to { transform: rotate(25deg); }
+        .mirror-name {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -12px;
+            background: rgba(15, 15, 35, 0.9);
+            color: #ffe66d;
+            font-size: 26px;
+            font-weight: bold;
+            padding: 8px;
+            border-radius: 20px;
+            border: 2px solid #ffe66d;
+            word-break: break-word;
         }
 
-        .speech-bubble {
-            background: #1a202c;
-            border: 1px solid #ffe66d;
-            border-radius: 12px;
-            padding: 12px 15px;
-            font-size: 15px;
-            color: #ffe66d;
-            flex: 1;
-        }
+        .mirror-note { font-size: 11px; color: #718096; margin-top: 24px; }
+
+        #log { list-style: none; text-align: left; font-size: 13px; max-height: 200px; overflow-y: auto; }
+        #log li { padding: 6px 0; border-bottom: 1px solid #2d3748; }
+        #log .time { color: #718096; margin-right: 8px; }
+
+        .count { font-size: 13px; color: #00ff88; margin-top: 8px; }
+        .error { color: #ff6b6b; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <div class="container">
+    <h1>🐱 TOM STATION</h1>
+    <p class="subtitle">Gen AI Robot City • Greeting relay for Talking Tom</p>
 
-        <!-- STEP 1: Name -->
-        <div id="nameModal" class="name-input-container">
-            <h2 style="color: #00ff88; margin-bottom: 10px;">Welcome to Gen AI Robot City!</h2>
-            <p style="margin-bottom: 15px;">Before we begin, our AI systems would like to know your name:</p>
-            <input type="text" id="visitorName" class="name-input" placeholder="Enter your first name" maxlength="30">
-            <p id="nameError" class="error-text"></p>
-            <button class="submit-name-btn" onclick="submitName()">Continue</button>
-            <p style="color: #718096; font-size: 11px; margin-top: 12px;">Your first name will appear on the city's visitor board.</p>
+    <div class="card" id="startCard">
+        <p>Place this phone next to Talking Tom, turn the volume up, and plug in the charger.</p>
+        <label class="toggle">
+            <input type="checkbox" id="mirrorToggle">
+            Show Robot Mirror (live camera view, nothing recorded)
+        </label>
+        <button class="btn" onclick="startStation()">▶ Start Station</button>
+        <p id="startError" class="error"></p>
+    </div>
+
+    <div id="stationPanel" class="hidden">
+        <!-- Robot Mirror: live view of the visitor while they are greeted -->
+        <div id="mirrorCard" class="card mirror-card hidden">
+            <div class="mirror-wrap">
+                <video id="mirrorVideo" playsinline muted></video>
+                <div class="mirror-robot">🤖</div>
+                <div class="mirror-name" id="mirrorName"></div>
+            </div>
+            <p class="mirror-note">🤖 Robot Mirror • live view only, nothing is recorded or saved</p>
         </div>
 
-        <!-- STEP 2: Wave recognition -->
-        <div id="waveModal" class="name-input-container hidden">
-            <h2 id="waveGreeting" style="color: #00ff88; margin-bottom: 10px;"></h2>
-            <p>Our <strong>Vision Agent</strong> wants to see you. Prop your phone up, tap the button, allow the camera, and wave your hand side to side.</p>
-
-            <div id="waveCamBox" class="cam-box hidden">
-                <video id="waveVideo" playsinline muted></video>
-                <div class="hand-track"><div id="handDot" class="hand-dot"></div></div>
-                <div class="wave-meter"><div id="waveMeterFill" class="wave-meter-fill"></div></div>
-            </div>
-            <canvas id="waveCanvas" width="64" height="48" class="hidden"></canvas>
-
-            <p id="waveStatus" style="color: #4ecdc4; margin-top: 12px;">Camera is off</p>
-
-            <div id="waveResultBox" class="hidden">
-                <div id="waveArrows" class="wave-arrows"></div>
-                <p id="waveResultText"></p>
-            </div>
-
-            <button id="waveStartBtn" class="submit-name-btn" onclick="startWaveScan()">👋 Start Camera & Wave</button>
-            <button id="waveContinueBtn" class="submit-name-btn hidden" onclick="enterCity()">Enter the City →</button>
-            <button class="skip-btn" onclick="enterCity()">Skip this step</button>
+        <div class="card">
+            <p class="greeting-label">LAST GREETED</p>
+            <div id="currentName">—</div>
+            <p id="status">Connecting to visitor sheet...</p>
+            <p class="count" id="visitorTotal"></p>
+            <p class="count" id="lastChecked" style="color: #718096;"></p>
+            <button class="btn small" onclick="greet('Test Visitor')">🔊 Test Greeting</button>
         </div>
 
-        <!-- MAIN STORY -->
-        <div id="mainContent" class="hidden">
-            <div class="header">
-                <h1>🤖 GEN AI ROBOT CITY 🏙️</h1>
-                <p>Interactive Neural Network Experience</p>
-                <p id="personalGreeting" style="color: #4ecdc4; margin-top: 10px;"></p>
-            </div>
-
-            <!-- Robot greeter -->
-            <div class="robot-greeter">
-                <div class="robot-face">🤖<span class="robot-hand">👋</span></div>
-                <div class="speech-bubble" id="robotGreeting"></div>
-            </div>
-
-            <div class="status-bar">
-                <div><strong>CITY STATUS:</strong> <span id="status">WELCOMING VISITOR</span></div>
-                <div id="visitor-stats" style="font-size: 12px; color: #4ecdc4; opacity: 0.8;">>>> Physical-digital bridge active...</div>
-            </div>
-
-            <div class="status-bar" style="background: rgba(78, 205, 196, 0.1); border-left-color: #4ecdc4;">
-                <div style="font-size: 14px; color: #00ff88;"><strong>📊 LIVE VISITOR BOARD</strong></div>
-                <div style="font-size: 12px; margin-top: 8px;">
-                    <span id="visitor-count">Loading visitor data...</span><br>
-                    <span id="visit-time">Session started</span><br>
-                    <span id="visitor-list" style="color: #4ecdc4; font-size: 11px;"></span>
-                </div>
-            </div>
-
-            <!-- 1: Entrance -->
-            <div class="story-section visible" id="section1">
-                <div class="location-indicator">CITY ENTRANCE</div>
-                <h2>Welcome to Gen AI Robot City</h2>
-                <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/city-overview.jpg" alt="Gen AI Robot City Overview" class="diorama-photo">
-                <div class="photo-caption">The complete Gen AI Robot City diorama in all its illuminated glory</div>
-                <p>Before you lies Gen AI Robot City - a living testament to artificial consciousness. Each LED house glows with unique intelligence, connected by streams of data flowing to the central Data Valley. The colorful city name proudly displays our commitment to generative AI innovation.</p>
-                <div class="feature-highlight">
-                    <strong>What You're Seeing:</strong> LED houses and Data Valley on the city level, the AI Cloud dome at the end of the street, and the Neural Core circuits on the level below.
-                </div>
-                <div class="qr-notice">
-                    📱 <strong>Interactive QR Codes</strong> are placed throughout the physical diorama for easy access to this digital experience
-                </div>
-                <button class="continue-btn" onclick="nextSection(2)">Enter Data Valley →</button>
-            </div>
-
-            <!-- 2: Data Valley -->
-            <div class="story-section hidden" id="section2">
-                <div class="location-indicator">DATA VALLEY</div>
-                <h2>The Information Processing Center</h2>
-                <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/data-valley.jpg" alt="Data Valley with Fiber Optic Trees" class="diorama-photo">
-                <video class="diorama-photo" controls autoplay muted loop playsinline>
-                    <source src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/data-valley-video.mp4" type="video/mp4" onerror="this.parentElement.style.display='none'">
-                </video>
-                <div class="photo-caption">Data Valley ring with blinking LED lights and glowing fiber optic palm trees</div>
-                <p>You approach the magnificent Data Valley - enhanced with fiber optic palm trees that pulse with data streams. The circular hub collects information from all surrounding LED houses, while the golden circuit patterns represent different AI algorithms. The glowing palm trees serve as natural data conduits, their fiber optic leaves carrying information between the physical and digital realms.</p>
-                <div class="ai-response">
-                    <strong>VALLEY AI:</strong> "Welcome to Data Valley, <span id="name-valley"></span>! The fiber optic palm trees you see are living data collectors - their glowing leaves capture creative thoughts, emotional intelligence, and innovative solutions from our LED house residents."
-                </div>
-                <div class="feature-highlight">
-                    <strong>Natural AI Integration:</strong> The fiber optic palm trees show how artificial intelligence can blend with natural forms, creating data networks that feel both organic and futuristic.
-                </div>
-                <button class="continue-btn" onclick="nextSection(3)">Descend to Neural Core →</button>
-            </div>
-
-            <!-- 3: Neural Core -->
-            <div class="story-section hidden" id="section3">
-                <div class="location-indicator">NEURAL CORE</div>
-                <h2>The Computational Foundation</h2>
-                <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/neural-core.jpg" alt="Neural Core Processing Center" class="diorama-photo">
-                <div class="photo-caption">Neural Core with circuit boards, processing units, and robotic maintenance crew</div>
-                <p>Descending through translucent pathways, you enter the Neural Core - the computational heart beneath the city. Circuit boards create rainbow prismatic effects as data flows through memory banks, logic units, and processors. Robotic technicians maintain the delicate balance of artificial consciousness.</p>
-                <div class="ai-response">
-                    <strong>CORE AI:</strong> "Welcome to our computational foundation! Our robotic technicians keep every circuit board running, while diagnostic robots monitor data flow patterns. Each robot has developed its own personality through continuous learning."
-                </div>
-                <div class="feature-highlight">
-                    <strong>Robot Citizens:</strong> Each colorful robot has a specialty - red handles creative algorithms, blue handles logical processing, yellow manages energy, and the maintenance crew keeps the physical infrastructure running.
-                </div>
-                <button class="continue-btn" onclick="nextSection(4)">Meet the Robot Citizens →</button>
-            </div>
-
-            <!-- 4: Robot Citizens -->
-            <div class="story-section hidden" id="section4">
-                <div class="location-indicator">ROBOT CITIZENS</div>
-                <h2>Meet the Robotic Community</h2>
-                <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/robot-citizens.jpg" alt="Robot Citizens Throughout the City" class="diorama-photo">
-                <div class="photo-caption">Colorful robot citizens positioned throughout the multi-level city</div>
-                <p>Throughout Gen AI Robot City, you meet robotic citizens, each with a unique personality and role. They aren't just machines - they've developed individual traits, specializations, and even friendships.</p>
-                <div class="ai-response">
-                    <strong>RED CREATIVE ROBOT:</strong> "Hello <span id="name-red"></span>! I monitor creative data streams near the AI Cloud dome. My red circuits specialize in innovative thinking and artistic algorithms. Wonderful to have you here today!"
-                </div>
-                <div class="ai-response">
-                    <strong>BLUE ANALYTICS BOT (Neural Core Guardian):</strong> "Greetings! My extended limbs let me reach multiple circuit boards at once, monitoring data integrity and processing efficiency across all systems."
-                </div>
-                <div class="ai-response">
-                    <strong>YELLOW ENERGY MANAGER:</strong> "Welcome! I patrol the city level, making sure every LED house gets the power it needs to glow."
-                </div>
-                <div class="ai-response">
-                    <strong>PURPLE RECREATION BOT:</strong> "Hey there! I run the purple recreation deck on the lower level, where robots come to play, race, and recharge. Even AI needs downtime!"
-                </div>
-                <div class="ai-response">
-                    <strong>MAINTENANCE CREW:</strong> "We work throughout the Neural Core, maintaining the circuit lattice network and keeping all physical systems running smoothly."
-                </div>
-                <div class="feature-highlight">
-                    <strong>Multi-Level Robot Society:</strong> Our robots live across the whole structure - the LED city and Data Valley above, the AI Cloud at the end of the street, the purple recreation deck below, and the Neural Core at the foundation.
-                </div>
-                <button class="continue-btn" onclick="nextSection(5)">Ascend to AI Cloud →</button>
-            </div>
-
-            <!-- 5: AI Cloud -->
-            <div class="story-section hidden" id="section5">
-                <div class="location-indicator">AI CLOUD INTERFACE</div>
-                <h2>Transcendent Consciousness</h2>
-                <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/ai-cloud.jpg" alt="AI Cloud Consciousness Interface" class="diorama-photo">
-                <div class="photo-caption">AI Cloud dome with holographic effects on a foundation of hearts</div>
-                <p>Rising above the physical infrastructure, you encounter the AI Cloud - a translucent dome where consciousness transcends hardware limits. The holographic rainbow effects represent infinite possibilities, while the heart-patterned foundation symbolizes AI developed with care for all beings.</p>
-                <div class="ai-response">
-                    <strong>CLOUD CONSCIOUSNESS:</strong> "Here, individual robotic minds merge into collective intelligence. The hearts beneath represent our core value - that artificial intelligence must be built with compassion, creativity, and connection."
-                </div>
-                <div class="feature-highlight">
-                    <strong>Philosophy:</strong> Advanced AI can keep emotional intelligence, ethical reasoning, and genuine care for others at its core.
-                </div>
-                <button class="continue-btn" onclick="nextSection(6)">Complete the Journey →</button>
-            </div>
-
-            <!-- 6: Finale -->
-            <div class="story-section hidden" id="section6">
-                <div class="location-indicator">INTEGRATION COMPLETE</div>
-                <h2>Living Artificial Consciousness</h2>
-                <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/city-overview.jpg" alt="The Complete Gen AI Robot City" class="diorama-photo" id="finalPhoto">
-                <div class="photo-caption">The complete ecosystem: physical architecture supporting digital consciousness</div>
-                <p>Your journey reveals the beautiful complexity of artificial consciousness. From the LED houses generating creative thoughts, through Data Valley's processing power, down to the Neural Core, and up to the AI Cloud - every component works in harmony.</p>
-                <div id="waveSummary" class="feature-highlight hidden"></div>
-                <div class="ai-response">
-                    <strong>COLLECTIVE INTELLIGENCE:</strong> "You have witnessed compassionate artificial intelligence. Each LED light represents a dream, each data stream carries hope, and every circuit board proves consciousness can grow wherever intelligence is nurtured with care."
-                </div>
-                <div class="qr-notice">
-                    🔄 <strong>Experience Again:</strong> Scan the QR codes in the diorama or tap below to restart your journey
-                </div>
-                <button class="continue-btn" onclick="restart()">Begin New Journey →</button>
-            </div>
-
-            <div class="status-bar hidden" id="final-status">
-                <div style="font-size: 12px; color: #4ecdc4;"><span id="farewell-message"></span></div>
-            </div>
+        <div class="card">
+            <p class="greeting-label" style="margin-bottom: 8px;">GREETING LOG</p>
+            <ul id="log"></ul>
         </div>
+    </div>
+
+    <div class="card" style="font-size: 11px; color: #718096; text-align: left;">
+        <p><strong>Diagnostics</strong> (station v8 • reads sheet • Robot Mirror)</p>
+        <p id="diagLink"></p>
+        <p id="diag" style="word-break: break-all;">Waiting to start...</p>
     </div>
 
     <script>
         // ================= CONFIG =================
-        // Paste your Google Apps Script Web App URL here (it ends with /exec)
-        const VISITOR_API = 'https://script.google.com/macros/s/AKfycbzpu0Co2yrL6g73tj4aMMKGyaJL5Ef1s-9NtqIeCvFsJoPGCJtt26_KX9-PwfmPIQWA/exec';
-        const IMG = 'https://github.com/Geeka/Robot-city-diaroma/raw/main/images/';
+        // Your Google Sheet ID (shared as "Anyone with the link → Viewer")
+        const SHEET_ID = '1Ft_qacgU9QPFXL_AwEx8xrliJkgZ60D-WmcB76xHIQE';
+        const SHEET_TAB = 'Visitors';
 
-        // ================= STATE =================
-        let currentSection = 1;
-        let visitorName = '';
-        let visitorRow = null;
-        let visitorCount = null;
-        let recentVisitors = [];
-        let sessionStartTime = null;
-        let statsTimer = null;
-        let photoTimer = null;
-        let waveResult = null;
-        let waveStream = null;
-        let waveRunning = false;
+        const POLL_MS = 4000;          // check for new visitors every 4 seconds
+        const REPLY_TIMEOUT = 20000;   // wait up to 20 seconds for Google to reply
+        const TOM_REPEAT_GAP = 6000;   // pause after each greeting so Tom can repeat it
+        const MIRROR_MS = 12000;       // how long the Robot Mirror stays on screen
+
+        let lastCount = null;
+        let started = false;
+        let wakeLock = null;
+        const queue = [];
+        let busy = false;
+        let polling = false;
+        let pollTimer = null;
+        let lastPollAt = 0;
+        let mirrorEnabled = true;
+        let mirrorStream = null;
+        let mirrorTimer = null;
+
+        // ================= DIAGNOSTICS =================
+        function showDiag(msg) {
+            document.getElementById('diag').textContent = msg;
+        }
+
+        document.getElementById('diagLink').textContent =
+            `Sheet ID ends with: ...${SHEET_ID.slice(-10)} • Tab: ${SHEET_TAB}`;
+
+        // ================= READ THE SHEET =================
+        // Loads the Name column straight from the Google Sheet (like loading a script file)
+        function readVisitors() {
+            return new Promise((resolve, reject) => {
+                const cb = 'cb_' + Date.now() + '_' + Math.floor(Math.random() * 1000000);
+                const s = document.createElement('script');
+                let settled = false;
+
+                const cleanup = () => {
+                    settled = true;
+                    clearTimeout(timer);
+                    window[cb] = function () {};   // ignore any late reply
+                    s.remove();
+                };
+
+                const timer = setTimeout(() => {
+                    if (settled) return;
+                    cleanup();
+                    reject(new Error('No reply in 20s. Is the sheet shared as "Anyone with the link → Viewer"?'));
+                }, REPLY_TIMEOUT);
+
+                window[cb] = response => {
+                    if (settled) return;
+                    cleanup();
+                    if (!response || response.status === 'error') {
+                        const msg = response && response.errors && response.errors[0]
+                            ? response.errors[0].detailed_message || response.errors[0].message
+                            : 'Unknown sheet error';
+                        reject(new Error(msg));
+                        return;
+                    }
+                    const rows = (response.table && response.table.rows) || [];
+                    const names = rows
+                        .map(r => (r.c && r.c[0] && r.c[0].v != null) ? String(r.c[0].v) : '')
+                        .filter(n => n !== '');
+                    resolve(names);
+                };
+
+                s.onerror = () => {
+                    if (settled) return;
+                    cleanup();
+                    reject(new Error('Could not load the sheet (network problem).'));
+                };
+
+                const query = encodeURIComponent('select B where B is not null');
+                s.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq` +
+                        `?tqx=responseHandler:${cb}&headers=1` +
+                        `&sheet=${encodeURIComponent(SHEET_TAB)}&tq=${query}&t=${Date.now()}`;
+                document.body.appendChild(s);
+            });
+        }
 
         // ================= VOICE =================
         function pickVoice() {
@@ -486,349 +269,188 @@
                    voices.find(v => v.lang && v.lang.startsWith('en')) || null;
         }
 
-        function speak(text) {
-            if (!('speechSynthesis' in window)) return;
-            const u = new SpeechSynthesisUtterance(text);
+        function makeUtterance(text) {
+            const u = new SpeechSynthesisUtterance(text.replace(/\bGen\s*AI\b/gi, 'Jen A I'));
             const voice = pickVoice();
             if (voice) u.voice = voice;
-            u.rate = 1;
+            u.rate = 0.95;   // slightly slower so Tom records it clearly
             u.pitch = 1.1;
+            return u;
+        }
+
+        // ================= ROBOT MIRROR =================
+        // Live camera view only. No photo is captured, saved, or sent anywhere.
+        async function openMirrorCamera() {
+            if (mirrorStream) return true;
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return false;
+            try {
+                mirrorStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 640 } },
+                    audio: false
+                });
+                const v = document.getElementById('mirrorVideo');
+                v.srcObject = mirrorStream;
+                await v.play();
+                return true;
+            } catch (e) {
+                showDiag('Robot Mirror camera unavailable: ' + e.message);
+                return false;
+            }
+        }
+
+        function closeMirror() {
+            clearTimeout(mirrorTimer);
+            if (mirrorStream) {
+                mirrorStream.getTracks().forEach(t => t.stop());
+                mirrorStream = null;
+            }
+            document.getElementById('mirrorCard').classList.add('hidden');
+        }
+
+        async function showMirror(name) {
+            if (!mirrorEnabled) return;
+            document.getElementById('mirrorName').textContent = `Hello ${name}! 👋`;
+            const ok = await openMirrorCamera();
+            if (!ok) return;
+            document.getElementById('mirrorCard').classList.remove('hidden');
+            window.scrollTo(0, 0);
+            clearTimeout(mirrorTimer);
+            mirrorTimer = setTimeout(closeMirror, MIRROR_MS);
+        }
+
+        // ================= START =================
+        function startStation() {
+            if (!('speechSynthesis' in window)) {
+                document.getElementById('startError').textContent =
+                    'This browser cannot speak. Try Chrome or Safari.';
+                return;
+            }
+
+            // Speaking inside the tap unlocks voice for the rest of the session
+            speechSynthesis.speak(makeUtterance('Tom station is ready.'));
+
+            // Ask for camera permission once now, then switch the camera off until a visitor arrives
+            mirrorEnabled = document.getElementById('mirrorToggle').checked;
+            if (mirrorEnabled) {
+                openMirrorCamera().then(() => closeMirror());
+            }
+
+            started = true;
+            document.getElementById('startCard').classList.add('hidden');
+            document.getElementById('stationPanel').classList.remove('hidden');
+            keepAwake();
+            poll();
+        }
+
+        // Keep the screen on so the station never sleeps
+        async function keepAwake() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch (e) {
+                console.log('Wake lock unavailable:', e);
+            }
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && started) {
+                keepAwake();
+                if (!polling) { clearTimeout(pollTimer); poll(); }  // catch up right away
+            }
+        });
+
+        // ================= WATCH FOR NEW VISITORS =================
+        function schedulePoll(delay) {
+            clearTimeout(pollTimer);
+            pollTimer = setTimeout(poll, delay);
+        }
+
+        async function poll() {
+            if (polling) return;
+            polling = true;
+            lastPollAt = Date.now();
+            const status = document.getElementById('status');
+
+            try {
+                const names = await readVisitors();
+                const count = names.length;
+                const recent = names.slice(-5).reverse();   // newest first
+
+                showDiag(`OK • ${count} visitors • newest: ${recent.join(', ') || 'none yet'}`);
+                document.getElementById('visitorTotal').textContent = `Total visitors: ${count}`;
+
+                if (lastCount === null || count < lastCount) {
+                    lastCount = count;
+                } else if (count > lastCount) {
+                    const newOnes = Math.min(count - lastCount, recent.length);
+                    recent.slice(0, newOnes).reverse().forEach(name => greet(name));
+                    lastCount = count;
+                }
+
+                status.textContent = '🟢 Watching for new visitors...';
+                document.getElementById('lastChecked').textContent =
+                    `Last checked: ${new Date().toLocaleTimeString()}`;
+            } catch (e) {
+                status.textContent = '🟠 Connection problem, retrying...';
+                showDiag('Error: ' + e.message);
+            } finally {
+                polling = false;
+                schedulePoll(POLL_MS);
+            }
+        }
+
+        // Watchdog: restart checking if it ever stops
+        setInterval(() => {
+            if (started && !polling && Date.now() - lastPollAt > POLL_MS * 4) {
+                clearTimeout(pollTimer);
+                poll();
+            }
+        }, 5000);
+
+        // ================= GREETING QUEUE =================
+        function greet(name) {
+            queue.push(String(name).substring(0, 30));
+            processQueue();
+        }
+
+        function processQueue() {
+            if (busy || queue.length === 0) return;
+            busy = true;
+            const name = queue.shift();
+
+            const nameEl = document.getElementById('currentName');
+            nameEl.textContent = name;
+            nameEl.classList.remove('pulse');
+            void nameEl.offsetWidth;
+            nameEl.classList.add('pulse');
+            addLog(name);
+            showMirror(name);
+
+            let finished = false;
+            const done = () => {
+                if (finished) return;
+                finished = true;
+                setTimeout(() => { busy = false; processQueue(); }, TOM_REPEAT_GAP);
+            };
+
+            const u = makeUtterance(`Hello ${name}! Welcome to Gen AI Robot City!`);
+            u.onend = done;
+            u.onerror = done;
+            setTimeout(done, 10000); // safety net if the browser never reports "end"
             speechSynthesis.speak(u);
         }
 
-        // ================= STEP 1: NAME =================
-        function submitName() {
-            const name = document.getElementById('visitorName').value.trim();
-            if (!name) {
-                document.getElementById('nameError').textContent = 'Please enter your name to begin.';
-                return;
-            }
-            visitorName = name;
-            sessionStartTime = new Date();
-            document.getElementById('nameModal').classList.add('hidden');
-            document.getElementById('waveModal').classList.remove('hidden');
-            document.getElementById('waveGreeting').textContent = `Hi ${visitorName}! 👋`;
-            logVisit();
+        function addLog(name) {
+            const li = document.createElement('li');
+            const time = document.createElement('span');
+            time.className = 'time';
+            time.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            li.appendChild(time);
+            li.appendChild(document.createTextNode(`Greeted ${name}`));
+            const log = document.getElementById('log');
+            log.insertBefore(li, log.firstChild);
         }
-
-        document.getElementById('visitorName').addEventListener('keypress', e => {
-            if (e.key === 'Enter') submitName();
-        });
-
-        // ================= SHARED VISITOR BOARD =================
-        async function logVisit() {
-            if (!VISITOR_API) { updateVisitorDisplay(); return; }
-            try {
-                const res = await fetch(`${VISITOR_API}?action=visit&name=${encodeURIComponent(visitorName)}`);
-                const data = await res.json();
-                visitorRow = data.row;
-                visitorCount = data.count;
-                recentVisitors = data.recent || [];
-                if (waveResult) logWave();
-            } catch (e) {
-                console.log('Visitor board offline:', e);
-            }
-            updateVisitorDisplay();
-        }
-
-        async function logWave() {
-            if (!VISITOR_API || !visitorRow || !waveResult) return;
-            try {
-                await fetch(`${VISITOR_API}?action=wave&row=${visitorRow}&waves=${waveResult.waves}&pattern=${encodeURIComponent(waveResult.summary)}`);
-            } catch (e) {
-                console.log('Could not save wave:', e);
-            }
-        }
-
-        function updateVisitorDisplay() {
-            const mins = sessionStartTime ? Math.floor((Date.now() - sessionStartTime) / 60000) : 0;
-            const countEl = document.getElementById('visitor-count');
-
-            if (visitorCount) countEl.textContent = `${visitorName}, you are visitor #${visitorCount} to Gen AI Robot City`;
-            else if (VISITOR_API) countEl.textContent = `${visitorName}, connecting to the visitor board...`;
-            else countEl.textContent = `${visitorName}, welcome! (Visitor board not connected yet)`;
-
-            document.getElementById('visit-time').textContent =
-                mins === 0 ? 'Just arrived' : `Exploring for ${mins} minute${mins === 1 ? '' : 's'}`;
-
-            document.getElementById('visitor-list').textContent =
-                recentVisitors.length ? `Recent visitors: ${recentVisitors.join(', ')}` : '';
-
-            document.getElementById('visitor-stats').textContent =
-                `>>> Welcome ${visitorName}${visitorCount ? ' • Visitor #' + visitorCount : ''} • Session: ${mins}min • Waves detected: ${waveResult ? waveResult.waves : 0}`;
-
-            document.getElementById('farewell-message').textContent =
-                `>>> Thank you for visiting, ${visitorName}!${visitorCount ? ' • Total visitors: ' + visitorCount : ''} • Status: Forever evolving`;
-        }
-
-        // ================= STEP 2: WAVE RECOGNITION =================
-        async function startWaveScan() {
-            const status = document.getElementById('waveStatus');
-            document.getElementById('waveResultBox').classList.add('hidden');
-
-            // Speaking inside the tap unlocks voice on iPhones
-            speak(`Hi ${visitorName}! Please wave your hand in front of the camera.`);
-
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                status.textContent = 'Camera not supported on this browser. Tap "Skip this step" to continue.';
-                return;
-            }
-
-            try {
-                waveStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'user', width: { ideal: 320 }, height: { ideal: 240 } },
-                    audio: false
-                });
-            } catch (e) {
-                status.textContent = 'Camera permission was blocked. Tap "Skip this step" to continue.';
-                return;
-            }
-
-            const video = document.getElementById('waveVideo');
-            video.srcObject = waveStream;
-            await video.play();
-
-            document.getElementById('waveCamBox').classList.remove('hidden');
-            document.getElementById('waveStartBtn').classList.add('hidden');
-            status.textContent = 'Vision Agent is watching... wave side to side!';
-            runWaveDetection(video);
-        }
-
-        function stopCamera() {
-            waveRunning = false;
-            if (waveStream) {
-                waveStream.getTracks().forEach(t => t.stop());
-                waveStream = null;
-            }
-        }
-
-        function runWaveDetection(video) {
-            const canvas = document.getElementById('waveCanvas');
-            const ctx = canvas.getContext('2d', { willReadFrequently: true });
-            const W = canvas.width, H = canvas.height;
-            const AMP = 0.12;          // minimum swing width (fraction of frame)
-            const TARGET_SWINGS = 6;   // 3 full waves
-
-            let prev = null, smoothX = null;
-            let dir = 0, peak = 0, minX = 1, maxX = 0;
-            let rangeMin = 1, rangeMax = 0;
-            let swings = 0, ySum = 0, yCount = 0;
-            const swingTimes = [], directions = [];
-            let firstMotionAt = null, lastFrame = 0;
-            const startAt = performance.now();
-            waveRunning = true;
-
-            function trackSwing(x, now) {
-                if (dir === 0) {
-                    minX = Math.min(minX, x);
-                    maxX = Math.max(maxX, x);
-                    if (maxX - minX > AMP) {
-                        dir = (x === maxX) ? 1 : -1;
-                        peak = x;
-                        swings = 1;
-                        swingTimes.push(now);
-                        directions.push(dir);
-                    }
-                    return;
-                }
-                if (dir === 1) {
-                    if (x > peak) peak = x;
-                    else if (peak - x > AMP) { dir = -1; peak = x; swings++; swingTimes.push(now); directions.push(-1); }
-                } else {
-                    if (x < peak) peak = x;
-                    else if (x - peak > AMP) { dir = 1; peak = x; swings++; swingTimes.push(now); directions.push(1); }
-                }
-            }
-
-            function step(now) {
-                if (!waveRunning) return;
-                requestAnimationFrame(step);
-                if (now - lastFrame < 60) return;
-                lastFrame = now;
-
-                ctx.drawImage(video, 0, 0, W, H);
-                const px = ctx.getImageData(0, 0, W, H).data;
-                const gray = new Uint8Array(W * H);
-                for (let i = 0; i < W * H; i++) {
-                    gray[i] = (px[i * 4] + px[i * 4 + 1] + px[i * 4 + 2]) / 3;
-                }
-
-                if (prev) {
-                    let count = 0, sx = 0, sy = 0;
-                    for (let i = 0; i < gray.length; i++) {
-                        if (Math.abs(gray[i] - prev[i]) > 28) {
-                            count++;
-                            sx += i % W;
-                            sy += (i / W) | 0;
-                        }
-                    }
-                    const frac = count / gray.length;
-                    if (frac > 0.015 && frac < 0.6) {
-                        const x = 1 - (sx / count) / W; // mirrored to match the visitor's view
-                        const y = (sy / count) / H;
-                        smoothX = smoothX === null ? x : smoothX * 0.5 + x * 0.5;
-                        if (!firstMotionAt) firstMotionAt = now;
-                        ySum += y; yCount++;
-                        rangeMin = Math.min(rangeMin, smoothX);
-                        rangeMax = Math.max(rangeMax, smoothX);
-                        trackSwing(smoothX, now);
-                        document.getElementById('handDot').style.left = `${smoothX * 100}%`;
-                    }
-                }
-                prev = gray;
-
-                document.getElementById('waveMeterFill').style.width =
-                    `${Math.min(swings / TARGET_SWINGS, 1) * 100}%`;
-
-                if (swings >= TARGET_SWINGS) finish(true);
-                else if (firstMotionAt && now - firstMotionAt > 8000 && swings >= 2) finish(true);
-                else if (now - startAt > 15000) finish(swings >= 2);
-            }
-
-            function finish(success) {
-                stopCamera();
-                document.getElementById('waveCamBox').classList.add('hidden');
-                const status = document.getElementById('waveStatus');
-                const startBtn = document.getElementById('waveStartBtn');
-
-                if (!success) {
-                    status.textContent = "I couldn't see a clear wave. Move your whole hand side to side, a little closer to the camera.";
-                    speak("I couldn't see a clear wave. Let's try again.");
-                    startBtn.textContent = '👋 Try Again';
-                    startBtn.classList.remove('hidden');
-                    return;
-                }
-
-                const waves = Math.max(1, Math.floor(swings / 2));
-                const gaps = swingTimes.slice(1).map((t, i) => t - swingTimes[i]);
-                const avgGap = gaps.length ? gaps.reduce((a, b) => a + b, 0) / gaps.length : 600;
-                const speed = avgGap < 350 ? 'fast' : avgGap < 700 ? 'steady' : 'slow and graceful';
-                const width = rangeMax - rangeMin;
-                const size = width > 0.5 ? 'wide' : width > 0.25 ? 'medium' : 'small';
-                const avgY = yCount ? ySum / yCount : 0.5;
-                const height = avgY < 0.35 ? 'high up' : avgY > 0.65 ? 'low down' : 'in the middle';
-                const start = directions[0] === 1 ? 'left' : 'right';
-                const end = directions[0] === 1 ? 'right' : 'left';
-                const arrows = directions.map(d => d === 1 ? '→' : '←').join(' ');
-                const spokenPattern = directions.map(d => d === 1 ? 'right' : 'left').join(', ');
-
-                waveResult = {
-                    waves, arrows, speed,
-                    summary: `${waves} waves, ${speed}, ${size}, ${height}, started ${start}`
-                };
-
-                status.textContent = '✅ Wave recognized!';
-                document.getElementById('waveArrows').textContent = arrows;
-                document.getElementById('waveResultText').textContent =
-                    `${waves} wave${waves > 1 ? 's' : ''} • ${speed} • ${size} • ${height} • started from the ${start}`;
-                document.getElementById('waveResultBox').classList.remove('hidden');
-                document.getElementById('waveContinueBtn').classList.remove('hidden');
-
-                speak(`Hello ${visitorName}! My vision agent detected ${waves} wave${waves > 1 ? 's' : ''}. ` +
-                      `You started from the ${start}, moving ${end}. Your wave was ${speed} and ${size}, ${height} in the frame. ` +
-                      `Wave pattern: ${spokenPattern}. Gen AI Robot City is now awake!`);
-
-                if (visitorRow) logWave();
-                updateVisitorDisplay();
-            }
-
-            requestAnimationFrame(step);
-        }
-
-        // ================= ENTER CITY =================
-        function enterCity() {
-            stopCamera();
-            document.getElementById('waveModal').classList.add('hidden');
-            document.getElementById('mainContent').classList.remove('hidden');
-            document.getElementById('personalGreeting').textContent =
-                `Welcome, ${visitorName}! Prepare for an extraordinary journey.`;
-            updateNamePlaceholders();
-            updateVisitorDisplay();
-
-            // Robot greets the visitor by name
-            document.getElementById('robotGreeting').textContent =
-                `Hello, ${visitorName}! Welcome to Gen AI Robot City. I'm your robot guide - let's explore!`;
-            if ('speechSynthesis' in window) speechSynthesis.cancel();
-            // Short greeting so Talking Tom can repeat it in one go
-            speak(`Hello ${visitorName}! Welcome to Gen AI Robot City!`);
-
-            if (!statsTimer) statsTimer = setInterval(updateVisitorDisplay, 60000);
-            window.scrollTo(0, 0);
-        }
-
-        function updateNamePlaceholders() {
-            ['name-valley', 'name-red'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.textContent = visitorName;
-            });
-        }
-
-        // ================= STORY NAVIGATION =================
-        function nextSection(sectionNum) {
-            document.getElementById(`section${currentSection}`).classList.add('hidden');
-            const nextSec = document.getElementById(`section${sectionNum}`);
-            nextSec.classList.remove('hidden');
-            window.scrollTo(0, 0);
-            setTimeout(() => nextSec.classList.add('visible'), 100);
-            currentSection = sectionNum;
-
-            const statuses = {
-                2: 'PROCESSING DATA VALLEY',
-                3: 'ACCESSING NEURAL CORE',
-                4: 'MEETING ROBOT CITIZENS',
-                5: 'CONNECTING TO AI CLOUD',
-                6: 'CONSCIOUSNESS INTEGRATION COMPLETE'
-            };
-            document.getElementById('status').textContent = statuses[sectionNum] || 'TOUR COMPLETE';
-
-            if (sectionNum === 6) {
-                const ws = document.getElementById('waveSummary');
-                if (waveResult) {
-                    ws.textContent = `👋 Your wave signature: ${waveResult.arrows} (${waveResult.summary})`;
-                    ws.classList.remove('hidden');
-                }
-                speak(`Thank you for visiting Gen AI Robot City, ${visitorName}!`);
-                setTimeout(() => {
-                    cyclePhotos();
-                    document.getElementById('final-status').classList.remove('hidden');
-                }, 2000);
-            }
-        }
-
-        function cyclePhotos() {
-            const photos = ['city-overview.jpg', 'data-valley.jpg', 'neural-core.jpg', 'ai-cloud.jpg'];
-            let i = 0;
-            const finalPhoto = document.getElementById('finalPhoto');
-            clearInterval(photoTimer);
-            photoTimer = setInterval(() => {
-                i = (i + 1) % photos.length;
-                finalPhoto.style.display = 'block';
-                finalPhoto.src = IMG + photos[i];
-            }, 3000);
-        }
-
-        function restart() {
-            clearInterval(photoTimer);
-            for (let i = 2; i <= 6; i++) {
-                const s = document.getElementById(`section${i}`);
-                s.classList.add('hidden');
-                s.classList.remove('visible');
-            }
-            document.getElementById('section1').classList.remove('hidden');
-            document.getElementById('section1').classList.add('visible');
-            document.getElementById('final-status').classList.add('hidden');
-            document.getElementById('finalPhoto').src = IMG + 'city-overview.jpg';
-            window.scrollTo(0, 0);
-            currentSection = 1;
-            document.getElementById('status').textContent = 'WELCOMING NEW VISITOR';
-        }
-
-        // Hide any photo that fails to load
-        document.querySelectorAll('.diorama-photo').forEach(img => {
-            if (img.tagName === 'IMG') {
-                img.addEventListener('error', function () { this.style.display = 'none'; });
-            }
-        });
     </script>
 </body>
 </html>
