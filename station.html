@@ -97,6 +97,7 @@
             <div id="currentName">—</div>
             <p id="status">Connecting to visitor board...</p>
             <p class="count" id="visitorTotal"></p>
+            <p class="count" id="lastChecked" style="color: #718096;"></p>
             <button class="btn small" onclick="greet('Test Visitor')">🔊 Test Greeting</button>
         </div>
 
@@ -106,11 +107,25 @@
         </div>
     </div>
 
+    <div class="card" style="font-size: 11px; color: #718096; text-align: left;">
+        <p><strong>Diagnostics</strong> (station v3)</p>
+        <p id="diagLink"></p>
+        <p id="diag" style="word-break: break-all;">Waiting to start...</p>
+    </div>
+
     <script>
+        function showDiag(msg) {
+            document.getElementById('diag').textContent = msg;
+        }
+
+        window.addEventListener('load', () => {
+            document.getElementById('diagLink').textContent =
+                'Link ends with: ...' + VISITOR_API.slice(-15);
+        });
+
         // ================= CONFIG =================
         // Same Google Apps Script Web App URL used in index.html
         const VISITOR_API = 'https://script.google.com/macros/s/AKfycbzgkkvV0PCx8ZhHujm3iybcb4wVFHxI-BcsK8PbRM2WWIlK4T8du_PS1iu-bRcDyEB9cw/exec';
-        const VISITOR_API = 'https://script.google.com/macros/s/AKfycbzpu0Co2yrL6g73tj4aMMKGyaJL5Ef1s-9NtqIeCvFsJoPGCJtt26_KX9-PwfmPIQWA/exec';
 
         const POLL_MS = 3000;          // check for new visitors every 3 seconds
         const TOM_REPEAT_GAP = 6000;   // pause after each greeting so Tom can repeat it
@@ -172,15 +187,38 @@
         }
 
         document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible' && started) keepAwake();
+            if (document.visibilityState === 'visible' && started) {
+                keepAwake();
+                if (!polling) { clearTimeout(pollTimer); poll(); }  // catch up right away
+            }
         });
 
         // ================= WATCH FOR NEW VISITORS =================
+        let polling = false;
+        let pollTimer = null;
+        let lastPollAt = 0;
+
+        function schedulePoll(delay) {
+            clearTimeout(pollTimer);
+            pollTimer = setTimeout(poll, delay);
+        }
+
         async function poll() {
+            if (polling) return;
+            polling = true;
+            lastPollAt = Date.now();
             const status = document.getElementById('status');
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 8000); // give up on stuck checks
+
             try {
-                const res = await fetch(`${VISITOR_API}?t=${Date.now()}`);
-                const data = await res.json();
+                const res = await fetch(`${VISITOR_API}?t=${Date.now()}`, {
+                    cache: 'no-store',
+                    signal: controller.signal
+                });
+                const text = await res.text();
+                showDiag(`HTTP ${res.status} • ${text.substring(0, 120)}`);
+                const data = JSON.parse(text);
                 const count = data.count || 0;
                 const recent = data.recent || [];
 
@@ -194,12 +232,25 @@
                     lastCount = count;
                 }
                 status.textContent = '🟢 Watching for new visitors...';
+                document.getElementById('lastChecked').textContent =
+                    `Last checked: ${new Date().toLocaleTimeString()}`;
             } catch (e) {
                 status.textContent = '🟠 Connection problem, retrying...';
+                showDiag('Error: ' + e.message);
             } finally {
-                setTimeout(poll, POLL_MS);
+                clearTimeout(timeout);
+                polling = false;
+                schedulePoll(POLL_MS);
             }
         }
+
+        // Watchdog: restart checking if it ever stops
+        setInterval(() => {
+            if (started && !polling && Date.now() - lastPollAt > POLL_MS * 4) {
+                clearTimeout(pollTimer);
+                poll();
+            }
+        }, 5000);
 
         // ================= GREETING QUEUE =================
         function greet(name) {
