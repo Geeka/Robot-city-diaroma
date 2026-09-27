@@ -22,6 +22,8 @@
             text-shadow: 0 0 15px #00ff88;
         }
 
+        h2 { color: #00ff88; font-size: 18px; margin-bottom: 12px; }
+
         .subtitle { color: #718096; font-size: 13px; margin-bottom: 20px; }
 
         .card {
@@ -53,7 +55,21 @@
             color: #e2e8f0;
         }
 
-        .toggle { display: block; margin-top: 12px; font-size: 13px; color: #e2e8f0; }
+        .setting { text-align: left; margin: 12px 0; font-size: 13px; }
+        .setting label { display: block; color: #4ecdc4; margin-bottom: 6px; }
+
+        .select {
+            width: 100%;
+            background: rgba(15, 15, 35, 0.8);
+            border: 2px solid #4a5568;
+            border-radius: 8px;
+            padding: 10px;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 15px;
+        }
+
+        .toggle { display: block; margin-top: 12px; font-size: 13px; color: #e2e8f0; text-align: left; }
 
         #status { color: #4ecdc4; font-size: 14px; margin-top: 10px; }
 
@@ -137,16 +153,40 @@
     <h1>🐱 TOM STATION</h1>
     <p class="subtitle">Gen AI Robot City • Greeting relay for Talking Tom</p>
 
+    <!-- SETTINGS -->
     <div class="card" id="startCard">
-        <p>Place this phone next to Talking Tom, turn the volume up, and plug in the charger.</p>
+        <h2>⚙️ Station Settings</h2>
+        <p style="font-size: 13px;">Place this phone next to Talking Tom, turn the volume up, and plug in the charger.</p>
+
+        <div class="setting">
+            <label for="voiceStyle">🔊 Voice style</label>
+            <select id="voiceStyle" class="select">
+                <option value="robot">🤖 Robot</option>
+                <option value="friendly">🙂 Friendly</option>
+                <option value="deep">🦾 Deep robot</option>
+                <option value="squeaky">🐭 Squeaky</option>
+            </select>
+        </div>
+
+        <div class="setting">
+            <label for="voiceSelect">🗣️ Voice</label>
+            <select id="voiceSelect" class="select">
+                <option value="">Default voice</option>
+            </select>
+        </div>
+
+        <button class="btn small" onclick="previewVoice()">▶ Hear a sample</button>
+
         <label class="toggle">
             <input type="checkbox" id="mirrorToggle">
             Show Robot Mirror (live camera view, nothing recorded)
         </label>
-        <button class="btn" onclick="startStation()">▶ Start Station</button>
+
+        <button class="btn" id="startBtn" onclick="startStation()">▶ Start Station</button>
         <p id="startError" class="error"></p>
     </div>
 
+    <!-- RUNNING STATION -->
     <div id="stationPanel" class="hidden">
         <!-- Robot Mirror: live view of the visitor while they are greeted -->
         <div id="mirrorCard" class="card mirror-card hidden">
@@ -165,6 +205,7 @@
             <p class="count" id="visitorTotal"></p>
             <p class="count" id="lastChecked" style="color: #718096;"></p>
             <button class="btn small" onclick="greet('Test Visitor')">🔊 Test Greeting</button>
+            <button class="btn small" onclick="pauseStation()">⚙️ Settings</button>
         </div>
 
         <div class="card">
@@ -174,7 +215,7 @@
     </div>
 
     <div class="card" style="font-size: 11px; color: #718096; text-align: left;">
-        <p><strong>Diagnostics</strong> (station v8 • reads sheet • Robot Mirror)</p>
+        <p><strong>Diagnostics</strong> (station v9 • reads sheet • voice settings)</p>
         <p id="diagLink"></p>
         <p id="diag" style="word-break: break-all;">Waiting to start...</p>
     </div>
@@ -198,7 +239,7 @@
         let polling = false;
         let pollTimer = null;
         let lastPollAt = 0;
-        let mirrorEnabled = true;
+        let mirrorEnabled = false;
         let mirrorStream = null;
         let mirrorTimer = null;
 
@@ -262,20 +303,71 @@
             });
         }
 
-        // ================= VOICE =================
+        // ================= VOICE SETTINGS =================
+        const VOICE_STYLES = {
+            robot:    { pitch: 0.5, rate: 0.85 },
+            friendly: { pitch: 1.1, rate: 0.95 },
+            deep:     { pitch: 0.1, rate: 0.8 },
+            squeaky:  { pitch: 1.9, rate: 1.1 }
+        };
+
+        // Say "Gen AI" as "Jen A I" (some voices read "Gen" as "General")
+        function forSpeech(text) {
+            return text.replace(/\bGen\s*AI\b/gi, 'Jen A I');
+        }
+
+        function englishVoices() {
+            if (!('speechSynthesis' in window)) return [];
+            return speechSynthesis.getVoices()
+                .filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
+        }
+
+        function fillVoiceList() {
+            const select = document.getElementById('voiceSelect');
+            const current = select.value;
+            select.innerHTML = '';
+            const def = document.createElement('option');
+            def.value = '';
+            def.textContent = 'Default voice';
+            select.appendChild(def);
+            englishVoices().forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.name;
+                opt.textContent = `${v.name} (${v.lang})`;
+                select.appendChild(opt);
+            });
+            if ([...select.options].some(o => o.value === current)) select.value = current;
+        }
+
+        if ('speechSynthesis' in window) {
+            fillVoiceList();
+            speechSynthesis.onvoiceschanged = fillVoiceList;
+        }
+
         function pickVoice() {
-            const voices = speechSynthesis.getVoices();
-            return voices.find(v => v.lang === 'en-IN') ||
-                   voices.find(v => v.lang && v.lang.startsWith('en')) || null;
+            const chosen = document.getElementById('voiceSelect').value;
+            const voices = englishVoices();
+            if (chosen) {
+                const v = voices.find(x => x.name === chosen);
+                if (v) return v;
+            }
+            return voices.find(v => v.lang === 'en-IN') || voices[0] || null;
         }
 
         function makeUtterance(text) {
-            const u = new SpeechSynthesisUtterance(text.replace(/\bGen\s*AI\b/gi, 'Jen A I'));
+            const style = VOICE_STYLES[document.getElementById('voiceStyle').value] || VOICE_STYLES.robot;
+            const u = new SpeechSynthesisUtterance(forSpeech(text));
             const voice = pickVoice();
             if (voice) u.voice = voice;
-            u.rate = 0.95;   // slightly slower so Tom records it clearly
-            u.pitch = 1.1;
+            u.pitch = style.pitch;
+            u.rate = style.rate;
             return u;
+        }
+
+        function previewVoice() {
+            if (!('speechSynthesis' in window)) return;
+            speechSynthesis.cancel();
+            speechSynthesis.speak(makeUtterance('Hello Priya! Welcome to Gen AI Robot City!'));
         }
 
         // ================= ROBOT MIRROR =================
@@ -318,7 +410,7 @@
             mirrorTimer = setTimeout(closeMirror, MIRROR_MS);
         }
 
-        // ================= START =================
+        // ================= START / PAUSE =================
         function startStation() {
             if (!('speechSynthesis' in window)) {
                 document.getElementById('startError').textContent =
@@ -327,6 +419,7 @@
             }
 
             // Speaking inside the tap unlocks voice for the rest of the session
+            speechSynthesis.cancel();
             speechSynthesis.speak(makeUtterance('Tom station is ready.'));
 
             // Ask for camera permission once now, then switch the camera off until a visitor arrives
@@ -335,11 +428,25 @@
                 openMirrorCamera().then(() => closeMirror());
             }
 
+            lastCount = null;   // only greet visitors who arrive from now on
             started = true;
             document.getElementById('startCard').classList.add('hidden');
             document.getElementById('stationPanel').classList.remove('hidden');
             keepAwake();
             poll();
+        }
+
+        function pauseStation() {
+            started = false;
+            clearTimeout(pollTimer);
+            closeMirror();
+            speechSynthesis.cancel();
+            queue.length = 0;
+            document.getElementById('stationPanel').classList.add('hidden');
+            document.getElementById('startCard').classList.remove('hidden');
+            document.getElementById('startBtn').textContent = '▶ Resume Station';
+            showDiag('Paused for settings.');
+            window.scrollTo(0, 0);
         }
 
         // Keep the screen on so the station never sleeps
@@ -367,13 +474,14 @@
         }
 
         async function poll() {
-            if (polling) return;
+            if (!started || polling) return;
             polling = true;
             lastPollAt = Date.now();
             const status = document.getElementById('status');
 
             try {
                 const names = await readVisitors();
+                if (!started) return;   // paused while waiting for the reply
                 const count = names.length;
                 const recent = names.slice(-5).reverse();   // newest first
 
@@ -396,7 +504,7 @@
                 showDiag('Error: ' + e.message);
             } finally {
                 polling = false;
-                schedulePoll(POLL_MS);
+                if (started) schedulePoll(POLL_MS);
             }
         }
 
