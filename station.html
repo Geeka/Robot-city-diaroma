@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tom Station - Gen AI Robot City</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0f0f23, #1a1a2e, #16213e);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #00ff88;
+            margin: 10px 0 5px;
+            text-shadow: 0 0 15px #00ff88;
+        }
+
+        .subtitle { color: #718096; font-size: 13px; margin-bottom: 20px; }
+
+        .card {
+            background: rgba(45, 55, 72, 0.8);
+            border: 2px solid #4a5568;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px auto;
+            max-width: 500px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #00ff88, #4ecdc4);
+            border: none;
+            color: #0f0f23;
+            padding: 16px 30px;
+            border-radius: 30px;
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+
+        .btn.small {
+            font-size: 13px;
+            padding: 10px 18px;
+            background: #4a5568;
+            color: #e2e8f0;
+        }
+
+        #status { color: #4ecdc4; font-size: 14px; margin-top: 10px; }
+
+        .greeting-label { color: #718096; font-size: 12px; }
+
+        #currentName {
+            font-size: 42px;
+            color: #ffe66d;
+            margin: 10px 0;
+            word-break: break-word;
+            min-height: 50px;
+        }
+
+        .pulse { animation: pulse 1s ease-in-out 4; }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); text-shadow: none; }
+            50% { transform: scale(1.1); text-shadow: 0 0 25px #ffe66d; }
+        }
+
+        #log { list-style: none; text-align: left; font-size: 13px; max-height: 200px; overflow-y: auto; }
+        #log li { padding: 6px 0; border-bottom: 1px solid #2d3748; }
+        #log .time { color: #718096; margin-right: 8px; }
+
+        .count { font-size: 13px; color: #00ff88; margin-top: 8px; }
+        .error { color: #ff6b6b; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <h1>🐱 TOM STATION</h1>
+    <p class="subtitle">Gen AI Robot City • Greeting relay for Talking Tom</p>
+
+    <div class="card" id="startCard">
+        <p>Place this phone next to Talking Tom, turn the volume up, and plug in the charger.</p>
+        <button class="btn" onclick="startStation()">▶ Start Station</button>
+        <p id="startError" class="error"></p>
+    </div>
+
+    <div id="stationPanel" class="hidden">
+        <div class="card">
+            <p class="greeting-label">LAST GREETED</p>
+            <div id="currentName">—</div>
+            <p id="status">Connecting to visitor board...</p>
+            <p class="count" id="visitorTotal"></p>
+            <button class="btn small" onclick="greet('Test Visitor')">🔊 Test Greeting</button>
+        </div>
+
+        <div class="card">
+            <p class="greeting-label" style="margin-bottom: 8px;">GREETING LOG</p>
+            <ul id="log"></ul>
+        </div>
+    </div>
+
+    <script>
+        // ================= CONFIG =================
+        // Same Google Apps Script Web App URL used in index.html
+        const VISITOR_API = 'https://script.google.com/macros/s/AKfycbzgkkvV0PCx8ZhHujm3iybcb4wVFHxI-BcsK8PbRM2WWIlK4T8du_PS1iu-bRcDyEB9cw/exec';
+
+        const POLL_MS = 3000;          // check for new visitors every 3 seconds
+        const TOM_REPEAT_GAP = 6000;   // pause after each greeting so Tom can repeat it
+
+        let lastCount = null;
+        let started = false;
+        let wakeLock = null;
+        const queue = [];
+        let busy = false;
+
+        // ================= VOICE =================
+        function pickVoice() {
+            const voices = speechSynthesis.getVoices();
+            return voices.find(v => v.lang === 'en-IN') ||
+                   voices.find(v => v.lang && v.lang.startsWith('en')) || null;
+        }
+
+        function makeUtterance(text) {
+            const u = new SpeechSynthesisUtterance(text);
+            const voice = pickVoice();
+            if (voice) u.voice = voice;
+            u.rate = 0.95;   // slightly slower so Tom records it clearly
+            u.pitch = 1.1;
+            return u;
+        }
+
+        // ================= START =================
+        async function startStation() {
+            if (!VISITOR_API) {
+                document.getElementById('startError').textContent =
+                    'Paste your Visitor API link into station.html first (the VISITOR_API line).';
+                return;
+            }
+            if (!('speechSynthesis' in window)) {
+                document.getElementById('startError').textContent =
+                    'This browser cannot speak. Try Chrome or Safari.';
+                return;
+            }
+
+            // Speaking inside the tap unlocks voice for the rest of the session
+            speechSynthesis.speak(makeUtterance('Tom station is ready.'));
+
+            started = true;
+            document.getElementById('startCard').classList.add('hidden');
+            document.getElementById('stationPanel').classList.remove('hidden');
+            keepAwake();
+            poll();
+        }
+
+        // Keep the screen on so the station never sleeps
+        async function keepAwake() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch (e) {
+                console.log('Wake lock unavailable:', e);
+            }
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && started) keepAwake();
+        });
+
+        // ================= WATCH FOR NEW VISITORS =================
+        async function poll() {
+            const status = document.getElementById('status');
+            try {
+                const res = await fetch(`${VISITOR_API}?t=${Date.now()}`);
+                const data = await res.json();
+                const count = data.count || 0;
+                const recent = data.recent || [];
+
+                document.getElementById('visitorTotal').textContent = `Total visitors: ${count}`;
+
+                if (lastCount === null || count < lastCount) {
+                    lastCount = count;
+                } else if (count > lastCount) {
+                    const newOnes = Math.min(count - lastCount, recent.length);
+                    recent.slice(0, newOnes).reverse().forEach(name => greet(name));
+                    lastCount = count;
+                }
+                status.textContent = '🟢 Watching for new visitors...';
+            } catch (e) {
+                status.textContent = '🟠 Connection problem, retrying...';
+            } finally {
+                setTimeout(poll, POLL_MS);
+            }
+        }
+
+        // ================= GREETING QUEUE =================
+        function greet(name) {
+            queue.push(String(name).substring(0, 30));
+            processQueue();
+        }
+
+        function processQueue() {
+            if (busy || queue.length === 0) return;
+            busy = true;
+            const name = queue.shift();
+
+            const nameEl = document.getElementById('currentName');
+            nameEl.textContent = name;
+            nameEl.classList.remove('pulse');
+            void nameEl.offsetWidth;
+            nameEl.classList.add('pulse');
+            addLog(name);
+
+            let finished = false;
+            const done = () => {
+                if (finished) return;
+                finished = true;
+                setTimeout(() => { busy = false; processQueue(); }, TOM_REPEAT_GAP);
+            };
+
+            const u = makeUtterance(`Hello ${name}! Welcome to Gen AI Robot City!`);
+            u.onend = done;
+            u.onerror = done;
+            setTimeout(done, 10000); // safety net if the browser never reports "end"
+            speechSynthesis.speak(u);
+        }
+
+        function addLog(name) {
+            const li = document.createElement('li');
+            const time = document.createElement('span');
+            time.className = 'time';
+            time.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            li.appendChild(time);
+            li.appendChild(document.createTextNode(`Greeted ${name}`));
+            const log = document.getElementById('log');
+            log.insertBefore(li, log.firstChild);
+        }
+    </script>
+</body>
+</html>
