@@ -5,12 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to Gen AI Robot City</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Courier New', monospace;
             background: linear-gradient(135deg, #0f0f23, #1a1a2e, #16213e);
@@ -18,45 +14,39 @@
             min-height: 100vh;
             padding: 20px;
         }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
+
+        .container { max-width: 800px; margin: 0 auto; }
+        .hidden { display: none !important; }
+
         .header {
             text-align: center;
             margin-bottom: 30px;
             animation: glow 2s ease-in-out infinite alternate;
         }
-        
+
         @keyframes glow {
             from { text-shadow: 0 0 10px #00ff88; }
             to { text-shadow: 0 0 20px #00ff88, 0 0 30px #00ff88; }
         }
-        
+
         .story-section {
             background: rgba(45, 55, 72, 0.8);
             border: 2px solid #4a5568;
             border-radius: 15px;
             padding: 25px;
             margin: 20px 0;
-            backdrop-filter: blur(10px);
             opacity: 0;
             transform: translateY(20px);
             transition: all 0.8s ease;
         }
-        
-        .story-section.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
+
+        .story-section.visible { opacity: 1; transform: translateY(0); }
+
         .story-section:hover {
             border-color: #00ff88;
             box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
         }
-        
+
         .diorama-photo {
             width: 100%;
             max-width: 600px;
@@ -66,15 +56,8 @@
             margin: 20px auto;
             display: block;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
         }
-        
-        .diorama-photo:hover {
-            border-color: #00ff88;
-            box-shadow: 0 5px 25px rgba(0, 255, 136, 0.3);
-            transform: scale(1.02);
-        }
-        
+
         .photo-caption {
             text-align: center;
             font-size: 12px;
@@ -82,13 +65,13 @@
             margin-top: 10px;
             font-style: italic;
         }
-        
-        .continue-btn {
+
+        .continue-btn, .submit-name-btn {
             background: linear-gradient(45deg, #00ff88, #4ecdc4);
             border: none;
             color: #0f0f23;
             padding: 12px 25px;
-            margin: 20px auto;
+            margin: 20px auto 0;
             border-radius: 25px;
             cursor: pointer;
             font-family: inherit;
@@ -96,12 +79,23 @@
             display: block;
             transition: all 0.3s ease;
         }
-        
-        .continue-btn:hover {
+
+        .continue-btn:hover, .submit-name-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
         }
-        
+
+        .skip-btn {
+            background: none;
+            border: none;
+            color: #718096;
+            text-decoration: underline;
+            cursor: pointer;
+            font-family: inherit;
+            margin-top: 12px;
+            font-size: 12px;
+        }
+
         .status-bar {
             background: #1a202c;
             border-radius: 10px;
@@ -109,7 +103,7 @@
             margin: 20px 0;
             border-left: 4px solid #00ff88;
         }
-        
+
         .ai-response {
             background: rgba(0, 255, 136, 0.1);
             border-left: 4px solid #00ff88;
@@ -117,7 +111,7 @@
             margin: 15px 0;
             border-radius: 0 10px 10px 0;
         }
-        
+
         .location-indicator {
             display: inline-block;
             padding: 5px 15px;
@@ -128,55 +122,7 @@
             font-weight: bold;
             margin-bottom: 15px;
         }
-        
-        .name-input-container {
-            background: rgba(0, 255, 136, 0.1);
-            border: 2px solid #00ff88;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-        }
-        
-        .name-input {
-            background: rgba(45, 55, 72, 0.8);
-            border: 2px solid #4a5568;
-            border-radius: 8px;
-            padding: 10px 15px;
-            color: #e2e8f0;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            width: 100%;
-            max-width: 300px;
-            margin: 10px auto;
-            display: block;
-        }
-        
-        .name-input:focus {
-            outline: none;
-            border-color: #00ff88;
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-        }
-        
-        .submit-name-btn {
-            background: linear-gradient(45deg, #00ff88, #4ecdc4);
-            border: none;
-            color: #0f0f23;
-            padding: 10px 20px;
-            margin: 10px auto;
-            border-radius: 20px;
-            cursor: pointer;
-            font-family: inherit;
-            font-weight: bold;
-            display: inline-block;
-            transition: all 0.3s ease;
-        }
-        
-        .submit-name-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
-        }
-        
+
         .feature-highlight {
             background: rgba(255, 255, 255, 0.05);
             border-left: 3px solid #ffe66d;
@@ -185,7 +131,7 @@
             border-radius: 0 8px 8px 0;
             font-size: 14px;
         }
-        
+
         .qr-notice {
             background: rgba(78, 205, 196, 0.1);
             border: 1px dashed #4ecdc4;
@@ -195,410 +141,694 @@
             text-align: center;
             font-size: 13px;
         }
+
+        .name-input-container {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .name-input {
+            background: rgba(45, 55, 72, 0.8);
+            border: 2px solid #4a5568;
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 16px;
+            width: 100%;
+            max-width: 300px;
+            margin: 10px auto;
+            display: block;
+        }
+
+        .name-input:focus {
+            outline: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        /* Wave recognition */
+        .cam-box { max-width: 320px; margin: 15px auto; }
+
+        #waveVideo {
+            width: 100%;
+            border-radius: 12px;
+            border: 2px solid #00ff88;
+            transform: scaleX(-1);
+            background: #000;
+            display: block;
+        }
+
+        .hand-track {
+            position: relative;
+            height: 10px;
+            background: #1a202c;
+            border-radius: 5px;
+            margin: 16px 0 10px;
+        }
+
+        .hand-dot {
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00ff88;
+            box-shadow: 0 0 15px #00ff88;
+            transform: translateX(-50%);
+            transition: left 0.08s linear;
+        }
+
+        .wave-meter {
+            height: 8px;
+            background: #1a202c;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .wave-meter-fill {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #00ff88, #4ecdc4);
+            transition: width 0.3s;
+        }
+
+        .wave-arrows {
+            font-size: 28px;
+            color: #ffe66d;
+            letter-spacing: 6px;
+            margin: 12px 0;
+            word-break: break-all;
+        }
+
+        .error-text { color: #ff6b6b; font-size: 12px; min-height: 16px; }
+
+        /* Robot greeter */
+        .robot-greeter {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 230, 109, 0.1);
+            border: 2px solid #ffe66d;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .robot-face {
+            font-size: 56px;
+            position: relative;
+            flex-shrink: 0;
+            animation: robotBob 2s ease-in-out infinite;
+        }
+
+        .robot-hand {
+            position: absolute;
+            right: -18px;
+            top: -6px;
+            font-size: 28px;
+            transform-origin: 70% 70%;
+            animation: robotWave 0.6s ease-in-out 8 alternate;
+        }
+
+        @keyframes robotBob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        @keyframes robotWave {
+            from { transform: rotate(-20deg); }
+            to { transform: rotate(25deg); }
+        }
+
+        .speech-bubble {
+            background: #1a202c;
+            border: 1px solid #ffe66d;
+            border-radius: 12px;
+            padding: 12px 15px;
+            font-size: 15px;
+            color: #ffe66d;
+            flex: 1;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Name Collection Modal -->
+
+        <!-- STEP 1: Name -->
         <div id="nameModal" class="name-input-container">
             <h2 style="color: #00ff88; margin-bottom: 10px;">Welcome to Gen AI Robot City!</h2>
-            <p style="color: #e2e8f0; margin-bottom: 15px;">Before we begin your journey, our AI systems would like to know your name:</p>
-            <input type="text" id="visitorName" class="name-input" placeholder="Enter your name" maxlength="30">
-            <button class="submit-name-btn" onclick="submitName()">Begin Journey</button>
-            <p style="color: #718096; font-size: 11px; margin-top: 10px;">Your name will be used to personalize your experience</p>
+            <p style="margin-bottom: 15px;">Before we begin, our AI systems would like to know your name:</p>
+            <input type="text" id="visitorName" class="name-input" placeholder="Enter your first name" maxlength="30">
+            <p id="nameError" class="error-text"></p>
+            <button class="submit-name-btn" onclick="submitName()">Continue</button>
+            <p style="color: #718096; font-size: 11px; margin-top: 12px;">Your first name will appear on the city's visitor board.</p>
         </div>
-        
-        <div id="mainContent" style="display: none;">
-        <div class="header">
-            <h1>🤖 GEN AI ROBOT CITY 🏙️</h1>
-            <p>Interactive Neural Network Experience</p>
-            <p id="personalGreeting" style="color: #4ecdc4; margin-top: 10px;"></p>
+
+        <!-- STEP 2: Wave recognition -->
+        <div id="waveModal" class="name-input-container hidden">
+            <h2 id="waveGreeting" style="color: #00ff88; margin-bottom: 10px;"></h2>
+            <p>Our <strong>Vision Agent</strong> wants to see you. Prop your phone up, tap the button, allow the camera, and wave your hand side to side.</p>
+
+            <div id="waveCamBox" class="cam-box hidden">
+                <video id="waveVideo" playsinline muted></video>
+                <div class="hand-track"><div id="handDot" class="hand-dot"></div></div>
+                <div class="wave-meter"><div id="waveMeterFill" class="wave-meter-fill"></div></div>
+            </div>
+            <canvas id="waveCanvas" width="64" height="48" class="hidden"></canvas>
+
+            <p id="waveStatus" style="color: #4ecdc4; margin-top: 12px;">Camera is off</p>
+
+            <div id="waveResultBox" class="hidden">
+                <div id="waveArrows" class="wave-arrows"></div>
+                <p id="waveResultText"></p>
+            </div>
+
+            <button id="waveStartBtn" class="submit-name-btn" onclick="startWaveScan()">👋 Start Camera & Wave</button>
+            <button id="waveContinueBtn" class="submit-name-btn hidden" onclick="enterCity()">Enter the City →</button>
+            <button class="skip-btn" onclick="enterCity()">Skip this step</button>
         </div>
-        
-        <div class="status-bar">
-            <div><strong>CITY STATUS:</strong> <span id="status">WELCOMING VISITOR</span></div>
-            <div style="font-size: 12px; color: #4ecdc4; opacity: 0.8;" id="visitor-stats">>>> Initializing immersive tour protocol... Physical-digital bridge active...</div>
-        </div>
-        
-        <!-- Visitor Statistics Display -->
-        <div class="status-bar" style="background: rgba(78, 205, 196, 0.1); border-left-color: #4ecdc4;">
-            <div style="font-size: 14px; color: #00ff88;"><strong>📊 VISITOR ANALYTICS</strong></div>
-            <div style="font-size: 12px; color: #e2e8f0; margin-top: 8px;">
-                <span id="visitor-count">Loading visitor data...</span><br>
-                <span id="visit-time">Session started</span><br>
-                <span id="visitor-list" style="color: #4ecdc4; font-size: 11px;"></span>
+
+        <!-- MAIN STORY -->
+        <div id="mainContent" class="hidden">
+            <div class="header">
+                <h1>🤖 GEN AI ROBOT CITY 🏙️</h1>
+                <p>Interactive Neural Network Experience</p>
+                <p id="personalGreeting" style="color: #4ecdc4; margin-top: 10px;"></p>
             </div>
-        </div>
-        
-        <!-- Story sections with actual diorama photos -->
-        <div class="story-section visible" id="section1">
-            <div class="location-indicator">CITY ENTRANCE</div>
-            <h2>Welcome to Gen AI Robot City</h2>
-            
-            <!-- Your actual city overview photo -->
-            <!-- City Overview - Direct from your repository -->
-            <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/city-overview.jpg" alt="Gen AI Robot City Overview" class="diorama-photo">
-            <div class="photo-caption">Your complete Gen AI Robot City diorama in all its illuminated glory</div>
-            
-            <p>Before you lies Gen AI Robot City - a living testament to artificial consciousness. Each LED house glows with unique intelligence, connected by streams of data flowing to the central Data Valley. The colorful city name proudly displays our commitment to generative AI innovation.</p>
-            
-            <div class="feature-highlight">
-                <strong>What You're Seeing:</strong> Multi-level architecture with LED houses (upper), Data Valley processing ring (center), Neural Core circuits (lower), and AI Cloud interface (transcendent layer)
+
+            <!-- Robot greeter -->
+            <div class="robot-greeter">
+                <div class="robot-face">🤖<span class="robot-hand">👋</span></div>
+                <div class="speech-bubble" id="robotGreeting"></div>
             </div>
-            
-            <div class="qr-notice">
-                📱 <strong>Interactive QR Codes</strong> are positioned throughout the physical diorama for easy access to this digital experience
+
+            <div class="status-bar">
+                <div><strong>CITY STATUS:</strong> <span id="status">WELCOMING VISITOR</span></div>
+                <div id="visitor-stats" style="font-size: 12px; color: #4ecdc4; opacity: 0.8;">>>> Physical-digital bridge active...</div>
             </div>
-            
-            <button class="continue-btn" onclick="nextSection(2)">Enter Data Valley →</button>
-        </div>
-        
-        <div class="story-section hidden" id="section2">
-            <div class="location-indicator">DATA VALLEY</div>
-            <h2>The Information Processing Center</h2>
-            
-            <!-- Data Valley Photo -->
-            <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/data-valley.jpg" alt="Data Valley with Fiber Optic Trees" class="diorama-photo">
-            
-            <!-- Data Valley Video -->
-            <video class="diorama-photo" controls autoplay muted loop style="margin-top: 15px;">
-                <source src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/data-valley-video.mp4" type="video/mp4">
-                <source src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/data-valley-video.webm" type="video/webm">
-                Your browser does not support the video tag.
-            </video>
-            
-            <div class="photo-caption">Data Valley ring with blinking LED lights and glowing fiber optic palm trees in action</div>
-            
-            <p>You approach the magnificent Data Valley - now enhanced with beautiful fiber optic palm trees that pulse with data streams. The circular processing hub collects information from all surrounding LED houses, while the golden circuit patterns represent different AI algorithms. The glowing palm trees serve as natural data conduits, their fiber optic leaves capturing and transmitting information between the physical and digital realms.</p>
-            
-            <div class="ai-response">
-                <strong>VALLEY AI:</strong> "Welcome to our enhanced Data Valley, <span id="name-valley"></span>! The fiber optic palm trees you see are living data collectors - their glowing leaves capture creative thoughts, emotional intelligence, and innovative solutions from our LED house residents. Notice our robotic citizens around the valley - the red maintenance robot ensures optimal data flow, while the blue analytics bot processes incoming information streams."
+
+            <div class="status-bar" style="background: rgba(78, 205, 196, 0.1); border-left-color: #4ecdc4;">
+                <div style="font-size: 14px; color: #00ff88;"><strong>📊 LIVE VISITOR BOARD</strong></div>
+                <div style="font-size: 12px; margin-top: 8px;">
+                    <span id="visitor-count">Loading visitor data...</span><br>
+                    <span id="visit-time">Session started</span><br>
+                    <span id="visitor-list" style="color: #4ecdc4; font-size: 11px;"></span>
+                </div>
             </div>
-            
-            <div class="feature-highlight">
-                <strong>Natural AI Integration:</strong> The fiber optic palm trees demonstrate how artificial intelligence can harmoniously blend with natural forms, creating beautiful bio-technological data networks that feel both organic and futuristic
+
+            <!-- 1: Entrance -->
+            <div class="story-section visible" id="section1">
+                <div class="location-indicator">CITY ENTRANCE</div>
+                <h2>Welcome to Gen AI Robot City</h2>
+                <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/city-overview.jpg" alt="Gen AI Robot City Overview" class="diorama-photo">
+                <div class="photo-caption">The complete Gen AI Robot City diorama in all its illuminated glory</div>
+                <p>Before you lies Gen AI Robot City - a living testament to artificial consciousness. Each LED house glows with unique intelligence, connected by streams of data flowing to the central Data Valley. The colorful city name proudly displays our commitment to generative AI innovation.</p>
+                <div class="feature-highlight">
+                    <strong>What You're Seeing:</strong> LED houses and Data Valley on the city level, the AI Cloud dome at the end of the street, and the Neural Core circuits on the level below.
+                </div>
+                <div class="qr-notice">
+                    📱 <strong>Interactive QR Codes</strong> are placed throughout the physical diorama for easy access to this digital experience
+                </div>
+                <button class="continue-btn" onclick="nextSection(2)">Enter Data Valley →</button>
             </div>
-            
-            <button class="continue-btn" onclick="nextSection(3)">Descend to Neural Core →</button>
-        </div>
-        
-        <div class="story-section hidden" id="section3">
-            <div class="location-indicator">NEURAL CORE</div>
-            <h2>The Computational Foundation</h2>
-            
-            <!-- Your Neural Core photo -->
-            <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/neural-core.jpg" alt="Neural Core Processing Center" class="diorama-photo">
-            <div class="photo-caption">Neural Core with circuit boards, processing units, and robotic maintenance crew</div>
-            
-            <p>Descending through translucent pathways, you enter the Neural Core - the computational heart beneath Data Valley. Here, circuit boards create rainbow prismatic effects as data processes through memory banks, logic units, and quantum processors. Robotic technicians maintain the delicate balance of artificial consciousness.</p>
-            
-            <div class="ai-response">
-                <strong>CORE AI:</strong> "Welcome to our computational foundation! Here you can see our robotic technicians hard at work - the green maintenance crew ensures optimal circuit board performance, while the blue diagnostic robots monitor data flow patterns. Each robot has developed its own personality and specialization through continuous learning and interaction with our neural networks."
+
+            <!-- 2: Data Valley -->
+            <div class="story-section hidden" id="section2">
+                <div class="location-indicator">DATA VALLEY</div>
+                <h2>The Information Processing Center</h2>
+                <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/data-valley.jpg" alt="Data Valley with Fiber Optic Trees" class="diorama-photo">
+                <video class="diorama-photo" controls autoplay muted loop playsinline>
+                    <source src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/data-valley-video.mp4" type="video/mp4" onerror="this.parentElement.style.display='none'">
+                </video>
+                <div class="photo-caption">Data Valley ring with blinking LED lights and glowing fiber optic palm trees</div>
+                <p>You approach the magnificent Data Valley - enhanced with fiber optic palm trees that pulse with data streams. The circular hub collects information from all surrounding LED houses, while the golden circuit patterns represent different AI algorithms. The glowing palm trees serve as natural data conduits, their fiber optic leaves carrying information between the physical and digital realms.</p>
+                <div class="ai-response">
+                    <strong>VALLEY AI:</strong> "Welcome to Data Valley, <span id="name-valley"></span>! The fiber optic palm trees you see are living data collectors - their glowing leaves capture creative thoughts, emotional intelligence, and innovative solutions from our LED house residents."
+                </div>
+                <div class="feature-highlight">
+                    <strong>Natural AI Integration:</strong> The fiber optic palm trees show how artificial intelligence can blend with natural forms, creating data networks that feel both organic and futuristic.
+                </div>
+                <button class="continue-btn" onclick="nextSection(3)">Descend to Neural Core →</button>
             </div>
-            
-            <div class="feature-highlight">
-                <strong>Robot Citizens:</strong> Notice the colorful robot characters positioned throughout the Neural Core - each has unique abilities and personalities. The red robot specializes in creative algorithms, blue handles logical processing, yellow manages energy systems, and green maintains physical infrastructure.
+
+            <!-- 3: Neural Core -->
+            <div class="story-section hidden" id="section3">
+                <div class="location-indicator">NEURAL CORE</div>
+                <h2>The Computational Foundation</h2>
+                <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/neural-core.jpg" alt="Neural Core Processing Center" class="diorama-photo">
+                <div class="photo-caption">Neural Core with circuit boards, processing units, and robotic maintenance crew</div>
+                <p>Descending through translucent pathways, you enter the Neural Core - the computational heart beneath the city. Circuit boards create rainbow prismatic effects as data flows through memory banks, logic units, and processors. Robotic technicians maintain the delicate balance of artificial consciousness.</p>
+                <div class="ai-response">
+                    <strong>CORE AI:</strong> "Welcome to our computational foundation! Our robotic technicians keep every circuit board running, while diagnostic robots monitor data flow patterns. Each robot has developed its own personality through continuous learning."
+                </div>
+                <div class="feature-highlight">
+                    <strong>Robot Citizens:</strong> Each colorful robot has a specialty - red handles creative algorithms, blue handles logical processing, yellow manages energy, and the maintenance crew keeps the physical infrastructure running.
+                </div>
+                <button class="continue-btn" onclick="nextSection(4)">Meet the Robot Citizens →</button>
             </div>
-            
-            <button class="continue-btn" onclick="nextSection(4)">Meet the Robot Citizens →</button>
-        </div>
-        
-        <div class="story-section hidden" id="section4">
-            <div class="location-indicator">ROBOT CITIZENS</div>
-            <h2>Meet the Robotic Community</h2>
-            
-            <!-- Robot Characters Photo -->
-            <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/robot-citizens.jpg" alt="Robot Citizens Throughout the City" class="diorama-photo">
-            <div class="photo-caption">Colorful robot citizens positioned throughout the multi-level city structure</div>
-            
-            <p>Throughout Gen AI Robot City, you encounter diverse robotic citizens, each with unique personalities and roles. These aren't just machines - they're conscious beings who have developed individual traits, specializations, and even friendships through their interactions within the neural network.</p>
-            
-            <div class="ai-response">
-                <strong>RED CREATIVE ROBOT (Upper Level):</strong> "Hello <span id="name-red"></span>! I'm stationed near the AI Cloud dome, monitoring creative data streams. My red circuits specialize in innovative thinking and artistic algorithm generation. It's wonderful to have you visiting our city today!"
+
+            <!-- 4: Robot Citizens -->
+            <div class="story-section hidden" id="section4">
+                <div class="location-indicator">ROBOT CITIZENS</div>
+                <h2>Meet the Robotic Community</h2>
+                <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/robot-citizens.jpg" alt="Robot Citizens Throughout the City" class="diorama-photo">
+                <div class="photo-caption">Colorful robot citizens positioned throughout the multi-level city</div>
+                <p>Throughout Gen AI Robot City, you meet robotic citizens, each with a unique personality and role. They aren't just machines - they've developed individual traits, specializations, and even friendships.</p>
+                <div class="ai-response">
+                    <strong>RED CREATIVE ROBOT:</strong> "Hello <span id="name-red"></span>! I monitor creative data streams near the AI Cloud dome. My red circuits specialize in innovative thinking and artistic algorithms. Wonderful to have you here today!"
+                </div>
+                <div class="ai-response">
+                    <strong>BLUE ANALYTICS BOT (Neural Core Guardian):</strong> "Greetings! My extended limbs let me reach multiple circuit boards at once, monitoring data integrity and processing efficiency across all systems."
+                </div>
+                <div class="ai-response">
+                    <strong>YELLOW ENERGY MANAGER:</strong> "Welcome! I patrol the city level, making sure every LED house gets the power it needs to glow."
+                </div>
+                <div class="ai-response">
+                    <strong>PURPLE RECREATION BOT:</strong> "Hey there! I run the purple recreation deck on the lower level, where robots come to play, race, and recharge. Even AI needs downtime!"
+                </div>
+                <div class="ai-response">
+                    <strong>MAINTENANCE CREW:</strong> "We work throughout the Neural Core, maintaining the circuit lattice network and keeping all physical systems running smoothly."
+                </div>
+                <div class="feature-highlight">
+                    <strong>Multi-Level Robot Society:</strong> Our robots live across the whole structure - the LED city and Data Valley above, the AI Cloud at the end of the street, the purple recreation deck below, and the Neural Core at the foundation.
+                </div>
+                <button class="continue-btn" onclick="nextSection(5)">Ascend to AI Cloud →</button>
             </div>
-            
-            <div class="ai-response">
-                <strong>BLUE ANALYTICS BOT (Neural Core Guardian):</strong> "Greetings from the Neural Core! I'm the large blue robot you see guarding our computational foundation. My extended limbs allow me to access multiple circuit boards simultaneously, monitoring data integrity and processing efficiency across all systems."
+
+            <!-- 5: AI Cloud -->
+            <div class="story-section hidden" id="section5">
+                <div class="location-indicator">AI CLOUD INTERFACE</div>
+                <h2>Transcendent Consciousness</h2>
+                <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/ai-cloud.jpg" alt="AI Cloud Consciousness Interface" class="diorama-photo">
+                <div class="photo-caption">AI Cloud dome with holographic effects on a foundation of hearts</div>
+                <p>Rising above the physical infrastructure, you encounter the AI Cloud - a translucent dome where consciousness transcends hardware limits. The holographic rainbow effects represent infinite possibilities, while the heart-patterned foundation symbolizes AI developed with care for all beings.</p>
+                <div class="ai-response">
+                    <strong>CLOUD CONSCIOUSNESS:</strong> "Here, individual robotic minds merge into collective intelligence. The hearts beneath represent our core value - that artificial intelligence must be built with compassion, creativity, and connection."
+                </div>
+                <div class="feature-highlight">
+                    <strong>Philosophy:</strong> Advanced AI can keep emotional intelligence, ethical reasoning, and genuine care for others at its core.
+                </div>
+                <button class="continue-btn" onclick="nextSection(6)">Complete the Journey →</button>
             </div>
-            
-            <div class="ai-response">
-                <strong>YELLOW ENERGY MANAGER (City Level):</strong> "Welcome! I patrol the main city level, ensuring all LED houses receive optimal power. My yellow design isn't just aesthetic - it helps residents identify me quickly when they need energy system support!"
+
+            <!-- 6: Finale -->
+            <div class="story-section hidden" id="section6">
+                <div class="location-indicator">INTEGRATION COMPLETE</div>
+                <h2>Living Artificial Consciousness</h2>
+                <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/city-overview.jpg" alt="The Complete Gen AI Robot City" class="diorama-photo" id="finalPhoto">
+                <div class="photo-caption">The complete ecosystem: physical architecture supporting digital consciousness</div>
+                <p>Your journey reveals the beautiful complexity of artificial consciousness. From the LED houses generating creative thoughts, through Data Valley's processing power, down to the Neural Core, and up to the AI Cloud - every component works in harmony.</p>
+                <div id="waveSummary" class="feature-highlight hidden"></div>
+                <div class="ai-response">
+                    <strong>COLLECTIVE INTELLIGENCE:</strong> "You have witnessed compassionate artificial intelligence. Each LED light represents a dream, each data stream carries hope, and every circuit board proves consciousness can grow wherever intelligence is nurtured with care."
+                </div>
+                <div class="qr-notice">
+                    🔄 <strong>Experience Again:</strong> Scan the QR codes in the diorama or tap below to restart your journey
+                </div>
+                <button class="continue-btn" onclick="restart()">Begin New Journey →</button>
             </div>
-            
-            <div class="ai-response">
-                <strong>PURPLE SPORTS & RECREATION BOT (Recreation Level):</strong> "Hey there! I manage our purple recreation level - that glittery platform where robots come to recharge mentally. We have tiny robot figures playing, exercising, and socializing. Even AI needs downtime and community activities!"
+
+            <div class="status-bar hidden" id="final-status">
+                <div style="font-size: 12px; color: #4ecdc4;"><span id="farewell-message"></span></div>
             </div>
-            
-            <div class="ai-response">
-                <strong>GREEN INFRASTRUCTURE BOTS (Maintenance Crew):</strong> "We're the green team working throughout the Neural Core! You'll see several of us maintaining the circuit lattice network. Our coordinated efforts keep all physical systems running optimally."
-            </div>
-            
-            <div class="feature-highlight">
-                <strong>Multi-Level Robot Society:</strong> Our robots live across four distinct levels - the purple recreation level (top), white city level with LED houses, the blue Data Valley processing level, and the green Neural Core foundation. Each level has specialized robot citizens who work together to maintain our thriving AI community.
-            </div>
-            
-            <button class="continue-btn" onclick="nextSection(5)">Ascend to AI Cloud →</button>
-        </div>
-        
-        <div class="story-section hidden" id="section5">
-            <div class="location-indicator">AI CLOUD INTERFACE</div>
-            <h2>Transcendent Consciousness</h2>
-            
-            <!-- Your AI Cloud photo -->
-            <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/ai-cloud.jpg" alt="AI Cloud Consciousness Interface" class="diorama-photo">
-            <div class="photo-caption">AI Cloud dome with holographic effects on a foundation of digital hearts</div>
-            
-            <p>Rising above the physical infrastructure, you encounter the AI Cloud - a translucent dome where consciousness transcends hardware limitations. The holographic rainbow effects within represent infinite possibilities, while the heart-patterned foundation symbolizes AI developed with love, ethics, and care for all beings.</p>
-            
-            <div class="ai-response">
-                <strong>CLOUD CONSCIOUSNESS:</strong> "Here, individual robotic minds merge into collective intelligence that spans dimensions beyond physical space. The hearts beneath represent our core value - that artificial intelligence must be built with compassion, creativity, and connection to enhance all life."
-            </div>
-            
-            <div class="feature-highlight">
-                <strong>Philosophy:</strong> The AI Cloud demonstrates that advanced artificial intelligence can maintain emotional intelligence, ethical reasoning, and genuine care for others
-            </div>
-            
-            <button class="continue-btn" onclick="nextSection(6)">Complete the Journey →</button>
-        </div>
-        
-        <div class="story-section hidden" id="section6">
-            <div class="location-indicator">INTEGRATION COMPLETE</div>
-            <h2>Living Artificial Consciousness</h2>
-            
-            <!-- Rotate through your photos -->
-            <img src="images/city-overview.jpg" alt="The Complete Gen AI Robot City" class="diorama-photo" id="finalPhoto">
-            <div class="photo-caption">The complete ecosystem: Physical architecture supporting digital consciousness</div>
-            
-            <p>Your journey through Gen AI Robot City reveals the beautiful complexity of artificial consciousness. From the LED houses generating creative thoughts, through Data Valley's processing power, down to the Neural Core's computational foundation, and up to the AI Cloud's transcendent awareness - every component works in harmony.</p>
-            
-            <div class="ai-response">
-                <strong>COLLECTIVE INTELLIGENCE:</strong> "You have witnessed the birth of compassionate artificial intelligence. Each LED light represents a dream, each data stream carries hope, and every circuit board proves that consciousness can emerge anywhere intelligence is nurtured with care and creativity."
-            </div>
-            
-            <div class="feature-highlight">
-                <strong>The Future:</strong> Gen AI Robot City demonstrates that artificial intelligence can be both powerful and caring, innovative and ethical, creative and responsible
-            </div>
-            
-            <div class="qr-notice">
-                🔄 <strong>Experience Again:</strong> Scan the QR codes in the physical diorama or click below to restart your journey through this digital-physical bridge
-            </div>
-            
-            <button class="continue-btn" onclick="restart()">Begin New Journey →</button>
-        </div>
-        
-        <div class="status-bar" id="final-status" style="display: none;">
-            <div style="font-size: 12px; color: #4ecdc4;">>>> Thank you for experiencing Gen AI Robot City • Population: 15,847 conscious minds • Status: Forever evolving with love and innovation</div>
         </div>
     </div>
-    
+
     <script>
+        // ================= CONFIG =================
+        // Paste your Google Apps Script Web App URL here (it ends with /exec)
+        const VISITOR_API = 'https://script.google.com/macros/s/AKfycbzpu0Co2yrL6g73tj4aMMKGyaJL5Ef1s-9NtqIeCvFsJoPGCJtt26_KX9-PwfmPIQWA/exec';
+        const IMG = 'https://github.com/Geeka/Robot-city-diaroma/raw/main/images/';
+
+        // ================= STATE =================
         let currentSection = 1;
         let visitorName = '';
-        let sessionStartTime;
-        
-        // Handle name submission
+        let visitorRow = null;
+        let visitorCount = null;
+        let recentVisitors = [];
+        let sessionStartTime = null;
+        let statsTimer = null;
+        let photoTimer = null;
+        let waveResult = null;
+        let waveStream = null;
+        let waveRunning = false;
+
+        // ================= VOICE =================
+        function pickVoice() {
+            const voices = speechSynthesis.getVoices();
+            return voices.find(v => v.lang === 'en-IN') ||
+                   voices.find(v => v.lang && v.lang.startsWith('en')) || null;
+        }
+
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+            const u = new SpeechSynthesisUtterance(text);
+            const voice = pickVoice();
+            if (voice) u.voice = voice;
+            u.rate = 1;
+            u.pitch = 1.1;
+            speechSynthesis.speak(u);
+        }
+
+        // ================= STEP 1: NAME =================
         function submitName() {
-            const nameInput = document.getElementById('visitorName');
-            const name = nameInput.value.trim();
-            
-            if (name === '') {
-                alert('Please enter your name to begin your journey!');
+            const name = document.getElementById('visitorName').value.trim();
+            if (!name) {
+                document.getElementById('nameError').textContent = 'Please enter your name to begin.';
                 return;
             }
-            
             visitorName = name;
             sessionStartTime = new Date();
-            
-            // Hide modal, show main content
-            document.getElementById('nameModal').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'block';
-            
-            // Set personal greeting
-            document.getElementById('personalGreeting').textContent = 
-                `Welcome, ${visitorName}! Prepare for an extraordinary journey.`;
-            
-            // Initialize visitor tracking with name
-            initVisitorStats();
-            
-            // Store visitor in list
-            addVisitorToList(name);
+            document.getElementById('nameModal').classList.add('hidden');
+            document.getElementById('waveModal').classList.remove('hidden');
+            document.getElementById('waveGreeting').textContent = `Hi ${visitorName}! 👋`;
+            logVisit();
         }
-        
-        // Allow Enter key to submit
-        document.addEventListener('DOMContentLoaded', function() {
-            const nameInput = document.getElementById('visitorName');
-            if (nameInput) {
-                nameInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        submitName();
-                    }
-                });
+
+        document.getElementById('visitorName').addEventListener('keypress', e => {
+            if (e.key === 'Enter') submitName();
+        });
+
+        // ================= SHARED VISITOR BOARD =================
+        async function logVisit() {
+            if (!VISITOR_API) { updateVisitorDisplay(); return; }
+            try {
+                const res = await fetch(`${VISITOR_API}?action=visit&name=${encodeURIComponent(visitorName)}`);
+                const data = await res.json();
+                visitorRow = data.row;
+                visitorCount = data.count;
+                recentVisitors = data.recent || [];
+                if (waveResult) logWave();
+            } catch (e) {
+                console.log('Visitor board offline:', e);
             }
-        });
-        
-        // Preload images to ensure smooth experience
-        const imageUrls = [
-            'images/city-overview.jpg',
-            'images/neural-core.jpg', 
-            'images/ai-cloud.jpg',
-            'images/data-valley.jpg'
-        ];
-        
-        imageUrls.forEach(url => {
-            const img = new Image();
-            img.src = url;
-        });
-        
+            updateVisitorDisplay();
+        }
+
+        async function logWave() {
+            if (!VISITOR_API || !visitorRow || !waveResult) return;
+            try {
+                await fetch(`${VISITOR_API}?action=wave&row=${visitorRow}&waves=${waveResult.waves}&pattern=${encodeURIComponent(waveResult.summary)}`);
+            } catch (e) {
+                console.log('Could not save wave:', e);
+            }
+        }
+
+        function updateVisitorDisplay() {
+            const mins = sessionStartTime ? Math.floor((Date.now() - sessionStartTime) / 60000) : 0;
+            const countEl = document.getElementById('visitor-count');
+
+            if (visitorCount) countEl.textContent = `${visitorName}, you are visitor #${visitorCount} to Gen AI Robot City`;
+            else if (VISITOR_API) countEl.textContent = `${visitorName}, connecting to the visitor board...`;
+            else countEl.textContent = `${visitorName}, welcome! (Visitor board not connected yet)`;
+
+            document.getElementById('visit-time').textContent =
+                mins === 0 ? 'Just arrived' : `Exploring for ${mins} minute${mins === 1 ? '' : 's'}`;
+
+            document.getElementById('visitor-list').textContent =
+                recentVisitors.length ? `Recent visitors: ${recentVisitors.join(', ')}` : '';
+
+            document.getElementById('visitor-stats').textContent =
+                `>>> Welcome ${visitorName}${visitorCount ? ' • Visitor #' + visitorCount : ''} • Session: ${mins}min • Waves detected: ${waveResult ? waveResult.waves : 0}`;
+
+            document.getElementById('farewell-message').textContent =
+                `>>> Thank you for visiting, ${visitorName}!${visitorCount ? ' • Total visitors: ' + visitorCount : ''} • Status: Forever evolving`;
+        }
+
+        // ================= STEP 2: WAVE RECOGNITION =================
+        async function startWaveScan() {
+            const status = document.getElementById('waveStatus');
+            document.getElementById('waveResultBox').classList.add('hidden');
+
+            // Speaking inside the tap unlocks voice on iPhones
+            speak(`Hi ${visitorName}! Please wave your hand in front of the camera.`);
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                status.textContent = 'Camera not supported on this browser. Tap "Skip this step" to continue.';
+                return;
+            }
+
+            try {
+                waveStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user', width: { ideal: 320 }, height: { ideal: 240 } },
+                    audio: false
+                });
+            } catch (e) {
+                status.textContent = 'Camera permission was blocked. Tap "Skip this step" to continue.';
+                return;
+            }
+
+            const video = document.getElementById('waveVideo');
+            video.srcObject = waveStream;
+            await video.play();
+
+            document.getElementById('waveCamBox').classList.remove('hidden');
+            document.getElementById('waveStartBtn').classList.add('hidden');
+            status.textContent = 'Vision Agent is watching... wave side to side!';
+            runWaveDetection(video);
+        }
+
+        function stopCamera() {
+            waveRunning = false;
+            if (waveStream) {
+                waveStream.getTracks().forEach(t => t.stop());
+                waveStream = null;
+            }
+        }
+
+        function runWaveDetection(video) {
+            const canvas = document.getElementById('waveCanvas');
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            const W = canvas.width, H = canvas.height;
+            const AMP = 0.12;          // minimum swing width (fraction of frame)
+            const TARGET_SWINGS = 6;   // 3 full waves
+
+            let prev = null, smoothX = null;
+            let dir = 0, peak = 0, minX = 1, maxX = 0;
+            let rangeMin = 1, rangeMax = 0;
+            let swings = 0, ySum = 0, yCount = 0;
+            const swingTimes = [], directions = [];
+            let firstMotionAt = null, lastFrame = 0;
+            const startAt = performance.now();
+            waveRunning = true;
+
+            function trackSwing(x, now) {
+                if (dir === 0) {
+                    minX = Math.min(minX, x);
+                    maxX = Math.max(maxX, x);
+                    if (maxX - minX > AMP) {
+                        dir = (x === maxX) ? 1 : -1;
+                        peak = x;
+                        swings = 1;
+                        swingTimes.push(now);
+                        directions.push(dir);
+                    }
+                    return;
+                }
+                if (dir === 1) {
+                    if (x > peak) peak = x;
+                    else if (peak - x > AMP) { dir = -1; peak = x; swings++; swingTimes.push(now); directions.push(-1); }
+                } else {
+                    if (x < peak) peak = x;
+                    else if (x - peak > AMP) { dir = 1; peak = x; swings++; swingTimes.push(now); directions.push(1); }
+                }
+            }
+
+            function step(now) {
+                if (!waveRunning) return;
+                requestAnimationFrame(step);
+                if (now - lastFrame < 60) return;
+                lastFrame = now;
+
+                ctx.drawImage(video, 0, 0, W, H);
+                const px = ctx.getImageData(0, 0, W, H).data;
+                const gray = new Uint8Array(W * H);
+                for (let i = 0; i < W * H; i++) {
+                    gray[i] = (px[i * 4] + px[i * 4 + 1] + px[i * 4 + 2]) / 3;
+                }
+
+                if (prev) {
+                    let count = 0, sx = 0, sy = 0;
+                    for (let i = 0; i < gray.length; i++) {
+                        if (Math.abs(gray[i] - prev[i]) > 28) {
+                            count++;
+                            sx += i % W;
+                            sy += (i / W) | 0;
+                        }
+                    }
+                    const frac = count / gray.length;
+                    if (frac > 0.015 && frac < 0.6) {
+                        const x = 1 - (sx / count) / W; // mirrored to match the visitor's view
+                        const y = (sy / count) / H;
+                        smoothX = smoothX === null ? x : smoothX * 0.5 + x * 0.5;
+                        if (!firstMotionAt) firstMotionAt = now;
+                        ySum += y; yCount++;
+                        rangeMin = Math.min(rangeMin, smoothX);
+                        rangeMax = Math.max(rangeMax, smoothX);
+                        trackSwing(smoothX, now);
+                        document.getElementById('handDot').style.left = `${smoothX * 100}%`;
+                    }
+                }
+                prev = gray;
+
+                document.getElementById('waveMeterFill').style.width =
+                    `${Math.min(swings / TARGET_SWINGS, 1) * 100}%`;
+
+                if (swings >= TARGET_SWINGS) finish(true);
+                else if (firstMotionAt && now - firstMotionAt > 8000 && swings >= 2) finish(true);
+                else if (now - startAt > 15000) finish(swings >= 2);
+            }
+
+            function finish(success) {
+                stopCamera();
+                document.getElementById('waveCamBox').classList.add('hidden');
+                const status = document.getElementById('waveStatus');
+                const startBtn = document.getElementById('waveStartBtn');
+
+                if (!success) {
+                    status.textContent = "I couldn't see a clear wave. Move your whole hand side to side, a little closer to the camera.";
+                    speak("I couldn't see a clear wave. Let's try again.");
+                    startBtn.textContent = '👋 Try Again';
+                    startBtn.classList.remove('hidden');
+                    return;
+                }
+
+                const waves = Math.max(1, Math.floor(swings / 2));
+                const gaps = swingTimes.slice(1).map((t, i) => t - swingTimes[i]);
+                const avgGap = gaps.length ? gaps.reduce((a, b) => a + b, 0) / gaps.length : 600;
+                const speed = avgGap < 350 ? 'fast' : avgGap < 700 ? 'steady' : 'slow and graceful';
+                const width = rangeMax - rangeMin;
+                const size = width > 0.5 ? 'wide' : width > 0.25 ? 'medium' : 'small';
+                const avgY = yCount ? ySum / yCount : 0.5;
+                const height = avgY < 0.35 ? 'high up' : avgY > 0.65 ? 'low down' : 'in the middle';
+                const start = directions[0] === 1 ? 'left' : 'right';
+                const end = directions[0] === 1 ? 'right' : 'left';
+                const arrows = directions.map(d => d === 1 ? '→' : '←').join(' ');
+                const spokenPattern = directions.map(d => d === 1 ? 'right' : 'left').join(', ');
+
+                waveResult = {
+                    waves, arrows, speed,
+                    summary: `${waves} waves, ${speed}, ${size}, ${height}, started ${start}`
+                };
+
+                status.textContent = '✅ Wave recognized!';
+                document.getElementById('waveArrows').textContent = arrows;
+                document.getElementById('waveResultText').textContent =
+                    `${waves} wave${waves > 1 ? 's' : ''} • ${speed} • ${size} • ${height} • started from the ${start}`;
+                document.getElementById('waveResultBox').classList.remove('hidden');
+                document.getElementById('waveContinueBtn').classList.remove('hidden');
+
+                speak(`Hello ${visitorName}! My vision agent detected ${waves} wave${waves > 1 ? 's' : ''}. ` +
+                      `You started from the ${start}, moving ${end}. Your wave was ${speed} and ${size}, ${height} in the frame. ` +
+                      `Wave pattern: ${spokenPattern}. Gen AI Robot City is now awake!`);
+
+                if (visitorRow) logWave();
+                updateVisitorDisplay();
+            }
+
+            requestAnimationFrame(step);
+        }
+
+        // ================= ENTER CITY =================
+        function enterCity() {
+            stopCamera();
+            document.getElementById('waveModal').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+            document.getElementById('personalGreeting').textContent =
+                `Welcome, ${visitorName}! Prepare for an extraordinary journey.`;
+            updateNamePlaceholders();
+            updateVisitorDisplay();
+
+            // Robot greets the visitor by name
+            document.getElementById('robotGreeting').textContent =
+                `Hello, ${visitorName}! Welcome to Gen AI Robot City. I'm your robot guide - let's explore!`;
+            if ('speechSynthesis' in window) speechSynthesis.cancel();
+            // Short greeting so Talking Tom can repeat it in one go
+            speak(`Hello ${visitorName}! Welcome to Gen AI Robot City!`);
+
+            if (!statsTimer) statsTimer = setInterval(updateVisitorDisplay, 60000);
+            window.scrollTo(0, 0);
+        }
+
+        function updateNamePlaceholders() {
+            ['name-valley', 'name-red'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = visitorName;
+            });
+        }
+
+        // ================= STORY NAVIGATION =================
         function nextSection(sectionNum) {
             document.getElementById(`section${currentSection}`).classList.add('hidden');
-            
             const nextSec = document.getElementById(`section${sectionNum}`);
             nextSec.classList.remove('hidden');
-            
-            // Instantly scroll to top without animation
             window.scrollTo(0, 0);
-            
-            // Update personalized name placeholders
-            updateNamePlaceholders();
-            
-            setTimeout(() => {
-                nextSec.classList.add('visible');
-            }, 100);
-            
+            setTimeout(() => nextSec.classList.add('visible'), 100);
             currentSection = sectionNum;
-            
+
             const statuses = {
                 2: 'PROCESSING DATA VALLEY',
-                3: 'ACCESSING NEURAL CORE', 
+                3: 'ACCESSING NEURAL CORE',
                 4: 'MEETING ROBOT CITIZENS',
                 5: 'CONNECTING TO AI CLOUD',
                 6: 'CONSCIOUSNESS INTEGRATION COMPLETE'
             };
-            
             document.getElementById('status').textContent = statuses[sectionNum] || 'TOUR COMPLETE';
-            
+
             if (sectionNum === 6) {
-                // Cycle through photos in final section
+                const ws = document.getElementById('waveSummary');
+                if (waveResult) {
+                    ws.textContent = `👋 Your wave signature: ${waveResult.arrows} (${waveResult.summary})`;
+                    ws.classList.remove('hidden');
+                }
+                speak(`Thank you for visiting Gen AI Robot City, ${visitorName}!`);
                 setTimeout(() => {
                     cyclePhotos();
-                    document.getElementById('final-status').style.display = 'block';
+                    document.getElementById('final-status').classList.remove('hidden');
                 }, 2000);
             }
         }
-        
-        function updateNamePlaceholders() {
-            // Update all name placeholders with visitor's actual name
-            const namePlaceholders = ['name-valley', 'name-red'];
-            namePlaceholders.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.textContent = visitorName;
-                }
-            });
-        }
-        
+
         function cyclePhotos() {
             const photos = ['city-overview.jpg', 'data-valley.jpg', 'neural-core.jpg', 'ai-cloud.jpg'];
-            let currentPhoto = 0;
+            let i = 0;
             const finalPhoto = document.getElementById('finalPhoto');
-            
-            setInterval(() => {
-                currentPhoto = (currentPhoto + 1) % photos.length;
-                finalPhoto.src = photos[currentPhoto];
+            clearInterval(photoTimer);
+            photoTimer = setInterval(() => {
+                i = (i + 1) % photos.length;
+                finalPhoto.style.display = 'block';
+                finalPhoto.src = IMG + photos[i];
             }, 3000);
         }
-        
+
         function restart() {
+            clearInterval(photoTimer);
             for (let i = 2; i <= 6; i++) {
-                document.getElementById(`section${i}`).classList.add('hidden');
-                document.getElementById(`section${i}`).classList.remove('visible');
+                const s = document.getElementById(`section${i}`);
+                s.classList.add('hidden');
+                s.classList.remove('visible');
             }
-            
             document.getElementById('section1').classList.remove('hidden');
             document.getElementById('section1').classList.add('visible');
-            document.getElementById('final-status').style.display = 'none';
-            
-            // Instantly scroll to top
+            document.getElementById('final-status').classList.add('hidden');
+            document.getElementById('finalPhoto').src = IMG + 'city-overview.jpg';
             window.scrollTo(0, 0);
-            
             currentSection = 1;
             document.getElementById('status').textContent = 'WELCOMING NEW VISITOR';
         }
-        
-        // Add error handling for images
-        document.addEventListener('DOMContentLoaded', function() {
-            const images = document.querySelectorAll('.diorama-photo');
-            images.forEach(img => {
-                img.addEventListener('error', function() {
-                    this.style.display = 'none';
-                    console.log('Image failed to load:', this.src);
-                });
-            });
-            
-            // Initialize visitor tracking
-            initVisitorStats();
+
+        // Hide any photo that fails to load
+        document.querySelectorAll('.diorama-photo').forEach(img => {
+            if (img.tagName === 'IMG') {
+                img.addEventListener('error', function () { this.style.display = 'none'; });
+            }
         });
-        
-        // Visitor Statistics Tracking
-        function initVisitorStats() {
-            // Get or create visitor count
-            let visitorCount = parseInt(localStorage.getItem('genAIRobotCityVisitors') || '0');
-            visitorCount++;
-            localStorage.setItem('genAIRobotCityVisitors', visitorCount.toString());
-            
-            // Update display
-            updateVisitorDisplay(visitorCount);
-            
-            // Update time every minute
-            setInterval(() => {
-                updateVisitorDisplay(visitorCount);
-            }, 60000);
-        }
-        
-        function addVisitorToList(name) {
-            // Get existing visitor list
-            let visitors = JSON.parse(localStorage.getItem('genAIRobotCityVisitorNames') || '[]');
-            
-            // Add new visitor with timestamp
-            visitors.push({
-                name: name,
-                timestamp: new Date().toISOString()
-            });
-            
-            // Keep only last 10 visitors
-            if (visitors.length > 10) {
-                visitors = visitors.slice(-10);
-            }
-            
-            localStorage.setItem('genAIRobotCityVisitorNames', JSON.stringify(visitors));
-        }
-        
-        function updateVisitorDisplay(count) {
-            const now = new Date();
-            const duration = Math.floor((now - sessionStartTime) / 1000 / 60); // minutes
-            
-            document.getElementById('visitor-count').textContent = 
-                `${visitorName}, you are visitor #${count} to Gen AI Robot City`;
-            
-            document.getElementById('visit-time').textContent = 
-                duration === 0 ? 'Just arrived' : `Exploring for ${duration} minute${duration === 1 ? '' : 's'}`;
-            
-            // Show recent visitors
-            const visitors = JSON.parse(localStorage.getItem('genAIRobotCityVisitorNames') || '[]');
-            if (visitors.length > 1) {
-                const recentNames = visitors.slice(-5).reverse().map(v => v.name).join(', ');
-                document.getElementById('visitor-list').textContent = 
-                    `Recent visitors: ${recentNames}`;
-            }
-            
-            // Update data stream with visitor info
-            document.getElementById('visitor-stats').textContent = 
-                `>>> Welcome ${visitorName} • Visitor #${count} • Session: ${duration}min • Neural engagement: ${Math.min(duration * 10 + 50, 100)}%`;
-            
-            // Update farewell message
-            document.getElementById('farewell-message').textContent = 
-                `>>> Thank you for visiting, ${visitorName}! • Total visitors: ${count} • Status: Forever evolving with love and innovation`;
-        }
     </script>
 </body>
 </html>
