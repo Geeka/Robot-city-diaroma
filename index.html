@@ -354,16 +354,12 @@
 <body>
     <div class="container">
 
-        <!-- STEP 1: Name + voice choice -->
+        <!-- STEP 1: Name -->
         <div id="nameModal" class="name-input-container">
             <h2 style="color: #00ff88; margin-bottom: 10px;">Welcome to Gen AI Robot City!</h2>
             <p style="margin-bottom: 15px;">Before we begin, our AI systems would like to know your name:</p>
             <input type="text" id="visitorName" class="name-input" placeholder="Enter your first name" maxlength="30">
             <p id="nameError" class="error-text"></p>
-
-            <!-- Voice choice -->
-            <div style="margin: 10px auto; max-width: 320px; text-align: left; font-size: 13px;">
-
             <button class="submit-name-btn" onclick="submitName()">Continue</button>
             <p style="color: #718096; font-size: 11px; margin-top: 12px;">Your first name will appear on the city's visitor board.</p>
         </div>
@@ -586,73 +582,30 @@
         let selfieCanvas = null;   // stays on this phone unless the permission box is ticked
         let rewardReady = false;
 
-        // ================= VOICE =================
-        // Voice styles: pitch and speed presets
-        const VOICE_STYLES = {
-            robot:    { pitch: 0.5, rate: 0.85 },
-            friendly: { pitch: 1.1, rate: 1.0 },
-            deep:     { pitch: 0.1, rate: 0.8 },
-            squeaky:  { pitch: 1.9, rate: 1.15 }
-        };
+        // ================= ROBOT VOICE =================
+        const ROBOT_PITCH = 0.5;   // lower = more robotic
+        const ROBOT_RATE = 0.85;   // slightly slower, like a robot
 
         // Say "Gen AI" as "Jen A I" (some voices read "Gen" as "General")
         function forSpeech(text) {
             return text.replace(/\bGen\s*AI\b/gi, 'Jen A I');
         }
 
-        function englishVoices() {
-            if (!('speechSynthesis' in window)) return [];
-            return speechSynthesis.getVoices()
-                .filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
-        }
-
-        function fillVoiceList() {
-            const select = document.getElementById('voiceSelect');
-            if (!select) return;
-            const current = select.value;
-            select.innerHTML = '';
-            const def = document.createElement('option');
-            def.value = '';
-            def.textContent = 'Default voice';
-            select.appendChild(def);
-            englishVoices().forEach(v => {
-                const opt = document.createElement('option');
-                opt.value = v.name;
-                opt.textContent = `${v.name} (${v.lang})`;
-                select.appendChild(opt);
-            });
-            if ([...select.options].some(o => o.value === current)) select.value = current;
-        }
-
-        if ('speechSynthesis' in window) {
-            fillVoiceList();
-            speechSynthesis.onvoiceschanged = fillVoiceList;
-        }
-
         function pickVoice() {
-            const chosen = document.getElementById('voiceSelect').value;
-            const voices = englishVoices();
-            if (chosen) {
-                const v = voices.find(x => x.name === chosen);
-                if (v) return v;
-            }
+            if (!('speechSynthesis' in window)) return null;
+            const voices = speechSynthesis.getVoices()
+                .filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
             return voices.find(v => v.lang === 'en-IN') || voices[0] || null;
         }
 
         function speak(text) {
             if (!('speechSynthesis' in window)) return;
-            const style = VOICE_STYLES[document.getElementById('voiceStyle').value] || VOICE_STYLES.friendly;
             const u = new SpeechSynthesisUtterance(forSpeech(text));
             const voice = pickVoice();
             if (voice) u.voice = voice;
-            u.pitch = style.pitch;
-            u.rate = style.rate;
+            u.pitch = ROBOT_PITCH;
+            u.rate = ROBOT_RATE;
             speechSynthesis.speak(u);
-        }
-
-        function previewVoice() {
-            if ('speechSynthesis' in window) speechSynthesis.cancel();
-            speak('Hello! I am your guide to Gen AI Robot City.');
         }
 
         // ================= STEP 1: NAME =================
