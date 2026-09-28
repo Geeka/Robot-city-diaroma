@@ -85,6 +85,8 @@
             box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
         }
 
+        .continue-btn:disabled { opacity: 0.6; cursor: wait; }
+
         .big-btn {
             font-size: 18px;
             padding: 16px 32px;
@@ -106,6 +108,8 @@
             margin-top: 12px;
             font-size: 12px;
         }
+
+        .center { display: block; margin-left: auto; margin-right: auto; text-align: center; }
 
         .status-bar {
             background: #1a202c;
@@ -182,107 +186,40 @@
             box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
         }
 
-        /* Wave recognition */
-        .cam-box { max-width: 320px; margin: 15px auto; }
-
-        #waveVideo {
-            width: 100%;
-            border-radius: 12px;
-            border: 2px solid #00ff88;
-            transform: scaleX(-1);
-            background: #000;
-            display: block;
-        }
-
-        .hand-track {
-            position: relative;
-            height: 10px;
-            background: #1a202c;
-            border-radius: 5px;
-            margin: 16px 0 10px;
-        }
-
-        .hand-dot {
-            position: absolute;
-            top: -5px;
-            left: 50%;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #00ff88;
-            box-shadow: 0 0 15px #00ff88;
-            transform: translateX(-50%);
-            transition: left 0.08s linear;
-        }
-
-        .wave-meter {
-            height: 8px;
-            background: #1a202c;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .wave-meter-fill {
-            height: 100%;
-            width: 0;
-            background: linear-gradient(90deg, #00ff88, #4ecdc4);
-            transition: width 0.3s;
-        }
-
-        .wave-arrows {
-            font-size: 28px;
-            color: #ffe66d;
-            letter-spacing: 6px;
-            margin: 12px 0;
-            word-break: break-all;
-        }
-
         .error-text { color: #ff6b6b; font-size: 12px; min-height: 16px; }
 
-        /* Robot selfie */
-        .selfie-box {
-            border-top: 1px dashed #4a5568;
-            margin-top: 15px;
-            padding-top: 15px;
-        }
-
-        .selfie-cam { position: relative; max-width: 240px; margin: 15px auto; }
-
-        #selfieVideo {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 3px solid #ffe66d;
-            transform: scaleX(-1);
-            background: #000;
-            display: block;
-        }
-
-        .countdown {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 96px;
-            font-weight: bold;
-            color: #ffe66d;
-            text-shadow: 0 0 25px #ffe66d;
-        }
-
-        .selfie-preview {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            border: 3px solid #ffe66d;
-            box-shadow: 0 0 20px #ffe66d;
-            object-fit: cover;
-            margin: 12px auto;
-            display: block;
-        }
-
         .privacy-note { font-size: 11px; color: #718096; margin-top: 6px; }
+
+        /* Avatar picker */
+        .avatar-title { color: #ffe66d; font-size: 14px; margin-top: 6px; }
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-width: 300px;
+            margin: 10px auto;
+        }
+
+        .avatar-option {
+            background: rgba(15, 15, 35, 0.7);
+            border: 2px solid #4a5568;
+            border-radius: 12px;
+            padding: 8px 2px;
+            cursor: pointer;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 11px;
+            transition: all 0.15s ease;
+        }
+
+        .avatar-option .emoji { display: block; font-size: 34px; line-height: 1.3; }
+
+        .avatar-option.selected {
+            border-color: #00ff88;
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
+            transform: scale(1.06);
+        }
 
         /* Robot greeter */
         .robot-greeter {
@@ -332,14 +269,17 @@
             flex: 1;
         }
 
-        .greeter-photo {
+        .greeter-avatar {
             width: 64px;
             height: 64px;
             border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            flex-shrink: 0;
             border: 2px solid #ffe66d;
             box-shadow: 0 0 12px #ffe66d;
-            object-fit: cover;
-            flex-shrink: 0;
         }
 
         /* AI Agents page */
@@ -409,60 +349,49 @@
             margin: 10px auto;
             box-shadow: 0 0 25px rgba(0, 255, 136, 0.4);
         }
+
+        /* Guest book */
+        .guestbook-card {
+            background: rgba(78, 205, 196, 0.08);
+            border-color: #4ecdc4;
+        }
+
+        .gb-textarea {
+            min-height: 110px;
+            resize: vertical;
+            max-width: 420px;
+        }
+
+        .star-row { display: flex; justify-content: center; gap: 6px; margin: 8px 0; }
+
+        .star {
+            background: none;
+            border: none;
+            font-size: 32px;
+            color: #4a5568;
+            cursor: pointer;
+            transition: transform 0.15s ease, color 0.15s ease;
+        }
+
+        .star.active { color: #ffe66d; text-shadow: 0 0 10px #ffe66d; }
+        .star:active { transform: scale(1.2); }
     </style>
 </head>
 <body>
     <div class="container">
 
-        <!-- STEP 1: Name -->
+        <!-- STEP 1: Name + avatar -->
         <div id="nameModal" class="name-input-container">
             <h2 style="color: #00ff88; margin-bottom: 10px;">Welcome to Gen AI Robot City!</h2>
             <p style="margin-bottom: 15px;">Before we begin, our AI systems would like to know your name:</p>
             <input type="text" id="visitorName" class="name-input" placeholder="Enter your first name" maxlength="30">
             <p id="nameError" class="error-text"></p>
-            <button class="submit-name-btn" onclick="submitName()">Continue</button>
+
+            <p class="avatar-title">🎭 Pick your avatar</p>
+            <div id="avatarGrid" class="avatar-grid"></div>
+
+            <button class="submit-name-btn" onclick="submitName()">Continue →</button>
             <p style="color: #718096; font-size: 11px; margin-top: 12px;">Your first name will appear on the city's visitor board.</p>
-        </div>
-
-        <!-- STEP 2: Wave recognition + optional robot selfie -->
-        <div id="waveModal" class="name-input-container hidden">
-            <h2 id="waveGreeting" style="color: #00ff88; margin-bottom: 10px;"></h2>
-            <p>Our <strong>Vision Agent</strong> wants to see you. Prop your phone up, tap the button, allow the camera, and wave your hand side to side.</p>
-
-            <div id="waveCamBox" class="cam-box hidden">
-                <video id="waveVideo" playsinline muted></video>
-                <div class="hand-track"><div id="handDot" class="hand-dot"></div></div>
-                <div class="wave-meter"><div id="waveMeterFill" class="wave-meter-fill"></div></div>
-            </div>
-            <canvas id="waveCanvas" width="64" height="48" class="hidden"></canvas>
-
-            <p id="waveStatus" style="color: #4ecdc4; margin-top: 12px;">Camera is off</p>
-
-            <div id="waveResultBox" class="hidden">
-                <div id="waveArrows" class="wave-arrows"></div>
-                <p id="waveResultText"></p>
-            </div>
-
-            <!-- Optional robot selfie (shown after a successful wave) -->
-            <div id="selfieBox" class="selfie-box hidden">
-                <p style="color: #ffe66d;">📸 Want a Robot Selfie on your awards?</p>
-                <p class="privacy-note">Kids: ask your grown-up first! Your photo stays on this phone unless you tick the box below.</p>
-                <label style="display: block; font-size: 12px; margin: 10px auto 0; text-align: left; max-width: 320px;">
-                    <input type="checkbox" id="saveConsent">
-                    My grown-up says it's OK to save my photo privately for the Gen AI Robot City team (deleted after 30 days, never shown publicly).
-                </label>
-                <div id="selfieCamBox" class="selfie-cam hidden">
-                    <video id="selfieVideo" playsinline muted></video>
-                    <div id="countdown" class="countdown hidden">3</div>
-                </div>
-                <img id="selfiePreview" class="selfie-preview hidden" alt="Your robot selfie">
-                <button id="selfieBtn" class="submit-name-btn" onclick="startSelfie()">📸 Take Robot Selfie</button>
-                <button id="retakeBtn" class="skip-btn hidden" onclick="startSelfie()">Retake photo</button>
-            </div>
-
-            <button id="waveStartBtn" class="submit-name-btn" onclick="startWaveScan()">👋 Start Camera & Wave</button>
-            <button id="waveContinueBtn" class="submit-name-btn hidden" onclick="enterCity()">Continue →</button>
-            <button class="skip-btn" onclick="enterCity()">Skip this step</button>
         </div>
 
         <!-- MAIN -->
@@ -478,7 +407,7 @@
                 <div class="robot-greeter">
                     <div class="robot-face">🤖<span class="robot-hand">👋</span></div>
                     <div class="speech-bubble" id="robotGreeting"></div>
-                    <img id="greeterPhoto" class="greeter-photo hidden" alt="Your photo">
+                    <div id="greeterAvatar" class="greeter-avatar"></div>
                 </div>
 
                 <div id="rewardCard" class="reward-card">
@@ -486,11 +415,12 @@
                     <canvas id="rewardCanvas" width="600" height="800" class="hidden"></canvas>
                     <img id="rewardImage" class="reward-image" alt="Your Gen AI Robot City Participation Award">
                     <button class="continue-btn" onclick="downloadAward('participation')">⬇️ Save My Participation Award</button>
-                    <p class="privacy-note" style="margin-top: 10px;">On iPhone, you can also press and hold the image and choose "Save to Photos". Your award stays on this phone only.</p>
+                    <p class="privacy-note" style="margin-top: 10px;">On iPhone, you can also press and hold the image and choose "Save to Photos".</p>
                 </div>
 
                 <p style="text-align: center; color: #ffe66d; margin-top: 10px;">🏆 Explore all 7 zones to unlock your <strong>Award of Completion</strong>!</p>
                 <button class="continue-btn big-btn" onclick="startTour()">🏙️ Enter the City →</button>
+                <button class="skip-btn center" onclick="openGuestbook('welcome')">✍️ Short on time? Just sign our guest book</button>
             </div>
 
             <!-- CITY TOUR (shown after tapping Enter the City) -->
@@ -636,16 +566,16 @@
                             Checks every result is kind, safe, and honest, and asks a human before big decisions.
                             <span class="agent-tag">Played by the purple robot</span>
                         </button>
+                        <button class="agent-card" style="border-left-color: #63b3ed;" onclick="agentSpeak('vision')">
+                            <span class="agent-name">👁️ Vision Agent</span>
+                            Uses cameras to see and understand the world - like spotting a friendly wave.
+                            <span class="agent-tag">Tool: camera</span>
+                        </button>
                     </div>
 
                     <h3 class="section-subtitle">✨ Agents You Already Met Today</h3>
                     <p style="font-size: 14px;">These are real programs that worked for you during this visit:</p>
                     <div class="agent-grid">
-                        <button class="agent-card" style="border-left-color: #00ff88;" onclick="agentSpeak('vision')">
-                            <span class="agent-name">👁️ Vision Agent</span>
-                            Used your phone's camera to watch your wave and describe its pattern.
-                            <span class="agent-tag">Tool: camera</span>
-                        </button>
                         <button class="agent-card" style="border-left-color: #00ff88;" onclick="agentSpeak('memory')">
                             <span class="agent-name">🗂️ Memory Agent</span>
                             Saved your name on the city's visitor board so the city remembers you.
@@ -665,7 +595,7 @@
                     </div>
 
                     <div class="feature-highlight">
-                        <strong>Example:</strong> Goal = "Welcome a new visitor." The Planner splits it into steps, the Vision Agent sees the wave, the Memory Agent saves the name, the Creator makes an award, the Safety Agent checks everything is friendly - and the Voice Agent says hello!
+                        <strong>Example:</strong> Goal = "Welcome a new visitor." The Planner splits it into steps, the Memory Agent saves the name, the Creator makes an award with your avatar, the Safety Agent checks everything is friendly - and the Voice Agent says hello!
                     </div>
 
                     <button class="continue-btn" onclick="nextSection(7)">Complete the Journey →</button>
@@ -683,13 +613,14 @@
                         <canvas id="completionCanvas" width="600" height="800" class="hidden"></canvas>
                         <img id="completionImage" class="reward-image" alt="Your Gen AI Robot City Award of Completion">
                         <button class="continue-btn" onclick="downloadAward('completion')">⬇️ Save My Completion Award</button>
-                        <p class="privacy-note" style="margin-top: 10px;">On iPhone, you can also press and hold the image and choose "Save to Photos". Your award stays on this phone only.</p>
+                        <p class="privacy-note" style="margin-top: 10px;">On iPhone, you can also press and hold the image and choose "Save to Photos".</p>
                     </div>
+
+                    <button class="continue-btn big-btn" onclick="openGuestbook('tour')">✍️ Sign the Guest Book</button>
 
                     <img src="images/city-overview.jpg" alt="The Complete Gen AI Robot City" class="diorama-photo" id="finalPhoto">
                     <div class="photo-caption">The complete ecosystem: physical architecture supporting digital consciousness</div>
                     <p>Your journey reveals the beautiful complexity of artificial consciousness. From the LED houses generating creative thoughts, through Data Valley's processing power, down to the Neural Core, up to the AI Cloud, and on to the team of AI agents - every component works in harmony.</p>
-                    <div id="waveSummary" class="feature-highlight hidden"></div>
                     <div class="ai-response">
                         <strong>COLLECTIVE INTELLIGENCE:</strong> "You have witnessed compassionate artificial intelligence. Each LED light represents a dream, each data stream carries hope, and every circuit board proves consciousness can grow wherever intelligence is nurtured with care."
                     </div>
@@ -699,6 +630,35 @@
                 <div class="status-bar hidden" id="final-status">
                     <div style="font-size: 12px; color: #4ecdc4;"><span id="farewell-message"></span></div>
                 </div>
+            </div>
+
+            <!-- GUEST BOOK -->
+            <div id="guestbookBlock" class="reward-card guestbook-card hidden">
+                <h3 style="color: #4ecdc4;">✍️ Gen AI Robot City Guest Book</h3>
+                <p style="font-size: 13px; margin: 6px 0 10px;">Tell us what you thought of the city!</p>
+
+                <div id="gbForm">
+                    <p style="font-size: 13px; color: #ffe66d;">Your rating</p>
+                    <div class="star-row" id="starRow">
+                        <button class="star" onclick="setRating(1)" aria-label="1 star">★</button>
+                        <button class="star" onclick="setRating(2)" aria-label="2 stars">★</button>
+                        <button class="star" onclick="setRating(3)" aria-label="3 stars">★</button>
+                        <button class="star" onclick="setRating(4)" aria-label="4 stars">★</button>
+                        <button class="star" onclick="setRating(5)" aria-label="5 stars">★</button>
+                    </div>
+                    <input type="text" id="gbFrom" class="name-input" maxlength="60" placeholder="Where are you from? (optional)">
+                    <textarea id="gbMessage" class="name-input gb-textarea" maxlength="300" placeholder="Your message for the Gen AI Robot City team..."></textarea>
+                    <p class="privacy-note">Saved privately for the Gen AI Robot City team, not shown on this website. Please don't include phone numbers, emails, or addresses.</p>
+                    <p id="gbError" class="error-text"></p>
+                    <button class="continue-btn" id="gbSubmit" onclick="submitGuestbook()">📨 Sign the Guest Book</button>
+                </div>
+
+                <div id="gbThanks" class="hidden">
+                    <p style="font-size: 40px; margin: 10px 0;">💚</p>
+                    <p>Thank you, <span id="gbThanksName"></span>! Your guest book entry has been saved.</p>
+                </div>
+
+                <button class="skip-btn" onclick="closeGuestbook()">← Back</button>
             </div>
         </div>
     </div>
@@ -710,6 +670,20 @@
         const IMG = 'images/';
         const TOTAL_ZONES = 7;
 
+        // ================= AVATARS =================
+        const AVATARS = [
+            { emoji: '🤖', name: 'Robo',      color: '#00ff88' },
+            { emoji: '🧑', name: 'Human',     color: '#f6ad55' },
+            { emoji: '👾', name: 'Pixel',     color: '#b794f4' },
+            { emoji: '🦾', name: 'Iron Arm',  color: '#4ecdc4' },
+            { emoji: '🚀', name: 'Rocket',    color: '#fc8181' },
+            { emoji: '🧑‍🚀', name: 'Astronaut', color: '#63b3ed' },
+            { emoji: '🐱', name: 'Kitty',     color: '#ff6b9d' },
+            { emoji: '🦉', name: 'Wise Owl',  color: '#ffe66d' },
+            { emoji: '🐙', name: 'Octo',      color: '#d6bcfa' }
+        ];
+        let selectedAvatar = AVATARS[0];
+
         // ================= STATE =================
         let currentSection = 1;
         let visitorName = '';
@@ -719,13 +693,11 @@
         let sessionStartTime = null;
         let statsTimer = null;
         let photoTimer = null;
-        let waveResult = null;
-        let waveStream = null;
-        let waveRunning = false;
-        let selfieStream = null;
-        let selfieCanvas = null;   // stays on this phone unless the permission box is ticked
         let participationReady = false;
         let completionReady = false;
+        let gbRating = 0;
+        let gbReturnTo = 'welcome';
+        let gbSigned = false;
 
         // ================= ROBOT VOICE =================
         const ROBOT_PITCH = 0.5;   // lower = more robotic
@@ -753,6 +725,33 @@
             speechSynthesis.speak(u);
         }
 
+        // ================= AVATAR PICKER =================
+        function renderAvatars() {
+            const grid = document.getElementById('avatarGrid');
+            AVATARS.forEach(a => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'avatar-option' + (a === selectedAvatar ? ' selected' : '');
+                const emoji = document.createElement('span');
+                emoji.className = 'emoji';
+                emoji.textContent = a.emoji;
+                btn.appendChild(emoji);
+                btn.appendChild(document.createTextNode(a.name));
+                btn.onclick = () => selectAvatar(a, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function selectAvatar(avatar, btn) {
+            selectedAvatar = avatar;
+            document.querySelectorAll('.avatar-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            if ('speechSynthesis' in window) speechSynthesis.cancel();
+            speak(`${avatar.name} selected!`);
+        }
+
+        renderAvatars();
+
         // ================= AI AGENTS: tap a card to hear it =================
         function agentSpeak(agent) {
             const lines = {
@@ -760,7 +759,7 @@
                 researcher: 'I am the Research Agent. I find information in Data Valley, and check that the facts are correct.',
                 creator: 'I am the Creator Agent. I write stories, design pictures, and build awards like yours.',
                 safety: 'I am the Safety Agent. I check that everything is kind, safe, and honest, and I ask a human before big decisions.',
-                vision: `I am the Vision Agent. I used your camera to watch your wave, ${visitorName}, and describe its pattern.`,
+                vision: 'I am the Vision Agent. I use cameras to see and understand the world around me.',
                 memory: `I am the Memory Agent. I saved your name, ${visitorName}, on the visitor board, so the city remembers you.`,
                 voice: 'I am the Voice Agent. I speak to you in this robot voice, and I tell the Tom Station to greet you.'
             };
@@ -768,7 +767,7 @@
             speak(lines[agent] || '');
         }
 
-        // ================= STEP 1: NAME =================
+        // ================= STEP 1: NAME + AVATAR =================
         function submitName() {
             const name = document.getElementById('visitorName').value.trim();
             if (!name) {
@@ -778,9 +777,8 @@
             visitorName = name;
             sessionStartTime = new Date();
             document.getElementById('nameModal').classList.add('hidden');
-            document.getElementById('waveModal').classList.remove('hidden');
-            document.getElementById('waveGreeting').textContent = `Hi ${visitorName}! 👋`;
             logVisit();
+            enterCity();   // straight to the welcome screen (inside the tap, so the voice can play)
         }
 
         document.getElementById('visitorName').addEventListener('keypress', e => {
@@ -788,30 +786,7 @@
         });
 
         // ================= SHARED VISITOR BOARD =================
-        // Only the first name and wave info go to the visitor board.
-        // A selfie is saved ONLY if the permission box is ticked, to the organiser's private Drive folder.
-
-        async function uploadSelfieIfAllowed() {
-            const consent = document.getElementById('saveConsent');
-            if (!VISITOR_API || !selfieCanvas || !consent || !consent.checked) return;
-            try {
-                await fetch(VISITOR_API, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({
-                        action: 'photo',
-                        consent: true,
-                        name: visitorName,
-                        row: visitorRow,
-                        photo: selfieCanvas.toDataURL('image/jpeg', 0.85)
-                    })
-                });
-            } catch (e) {
-                console.log('Could not save photo:', e);
-            }
-        }
-
+        // Only the first name goes to the visitor board. No camera or photos are used.
         async function logVisit() {
             if (!VISITOR_API) { updateVisitorDisplay(); return; }
             try {
@@ -820,7 +795,6 @@
                 visitorRow = data.row;
                 visitorCount = data.count;
                 recentVisitors = data.recent || [];
-                if (waveResult) logWave();
             } catch (e) {
                 console.log('Visitor board offline:', e);
             }
@@ -828,15 +802,6 @@
             // add the visitor number to any award already shown
             if (participationReady) drawAward('participation');
             if (completionReady) drawAward('completion');
-        }
-
-        async function logWave() {
-            if (!VISITOR_API || !visitorRow || !waveResult) return;
-            try {
-                await fetch(`${VISITOR_API}?action=wave&row=${visitorRow}&waves=${waveResult.waves}&pattern=${encodeURIComponent(waveResult.summary)}`);
-            } catch (e) {
-                console.log('Could not save wave:', e);
-            }
         }
 
         function updateVisitorDisplay() {
@@ -853,252 +818,73 @@
                 recentVisitors.length ? `Recent visitors: ${recentVisitors.join(', ')}` : '';
 
             document.getElementById('visitor-stats').textContent =
-                `>>> Welcome ${visitorName}${visitorCount ? ' • Visitor #' + visitorCount : ''} • Session: ${mins}min • Waves detected: ${waveResult ? waveResult.waves : 0}`;
+                `>>> Welcome ${visitorName}${visitorCount ? ' • Visitor #' + visitorCount : ''} • Session: ${mins}min • Avatar: ${selectedAvatar.name}`;
 
             document.getElementById('farewell-message').textContent =
                 `>>> Thank you for visiting, ${visitorName}!${visitorCount ? ' • Total visitors: ' + visitorCount : ''} • Status: Forever evolving`;
         }
 
-        // ================= STEP 2: WAVE RECOGNITION =================
-        async function startWaveScan() {
-            const status = document.getElementById('waveStatus');
-            document.getElementById('waveResultBox').classList.add('hidden');
+        // ================= GUEST BOOK =================
+        function setRating(n) {
+            gbRating = n;
+            document.querySelectorAll('#starRow .star').forEach((b, i) => {
+                b.classList.toggle('active', i < n);
+            });
+        }
 
-            // Speaking inside the tap unlocks voice on iPhones
-            speak(`Hi ${visitorName}! Please wave your hand in front of the camera.`);
+        function openGuestbook(from) {
+            gbReturnTo = from;
+            document.getElementById('welcomeBlock').classList.add('hidden');
+            document.getElementById('cityTour').classList.add('hidden');
+            document.getElementById('guestbookBlock').classList.remove('hidden');
+            window.scrollTo(0, 0);
+            if (!gbSigned) {
+                if ('speechSynthesis' in window) speechSynthesis.cancel();
+                speak(`${visitorName}, we would love to hear what you think of Gen AI Robot City!`);
+            }
+        }
 
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                status.textContent = 'Camera not supported on this browser. Tap "Skip this step" to continue.';
+        function closeGuestbook() {
+            document.getElementById('guestbookBlock').classList.add('hidden');
+            if (gbReturnTo === 'tour') document.getElementById('cityTour').classList.remove('hidden');
+            else document.getElementById('welcomeBlock').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        async function submitGuestbook() {
+            const message = document.getElementById('gbMessage').value.trim();
+            const from = document.getElementById('gbFrom').value.trim();
+            const errorEl = document.getElementById('gbError');
+            const btn = document.getElementById('gbSubmit');
+
+            if (!message) {
+                errorEl.textContent = 'Please write a short message.';
                 return;
             }
+            errorEl.textContent = '';
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            const params = new URLSearchParams({
+                action: 'guestbook',
+                name: visitorName,
+                from: from,
+                rating: String(gbRating),
+                message: message
+            });
 
             try {
-                waveStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'user', width: { ideal: 320 }, height: { ideal: 240 } },
-                    audio: false
-                });
+                await fetch(`${VISITOR_API}?${params.toString()}`, { mode: 'no-cors' });
+                gbSigned = true;
+                document.getElementById('gbForm').classList.add('hidden');
+                document.getElementById('gbThanksName').textContent = visitorName;
+                document.getElementById('gbThanks').classList.remove('hidden');
+                if ('speechSynthesis' in window) speechSynthesis.cancel();
+                speak(`Thank you ${visitorName}! Your message has been saved in our guest book.`);
             } catch (e) {
-                status.textContent = 'Camera permission was blocked. Tap "Skip this step" to continue.';
-                return;
-            }
-
-            const video = document.getElementById('waveVideo');
-            video.srcObject = waveStream;
-            await video.play();
-
-            document.getElementById('waveCamBox').classList.remove('hidden');
-            document.getElementById('waveStartBtn').classList.add('hidden');
-            status.textContent = 'Vision Agent is watching... wave side to side!';
-            runWaveDetection(video);
-        }
-
-        function stopCamera() {
-            waveRunning = false;
-            if (waveStream) {
-                waveStream.getTracks().forEach(t => t.stop());
-                waveStream = null;
-            }
-        }
-
-        function runWaveDetection(video) {
-            const canvas = document.getElementById('waveCanvas');
-            const ctx = canvas.getContext('2d', { willReadFrequently: true });
-            const W = canvas.width, H = canvas.height;
-            const AMP = 0.12;          // minimum swing width (fraction of frame)
-            const TARGET_SWINGS = 6;   // 3 full waves
-
-            let prev = null, smoothX = null;
-            let dir = 0, peak = 0, minX = 1, maxX = 0;
-            let rangeMin = 1, rangeMax = 0;
-            let swings = 0, ySum = 0, yCount = 0;
-            const swingTimes = [], directions = [];
-            let firstMotionAt = null, lastFrame = 0;
-            const startAt = performance.now();
-            waveRunning = true;
-
-            function trackSwing(x, now) {
-                if (dir === 0) {
-                    minX = Math.min(minX, x);
-                    maxX = Math.max(maxX, x);
-                    if (maxX - minX > AMP) {
-                        dir = (x === maxX) ? 1 : -1;
-                        peak = x;
-                        swings = 1;
-                        swingTimes.push(now);
-                        directions.push(dir);
-                    }
-                    return;
-                }
-                if (dir === 1) {
-                    if (x > peak) peak = x;
-                    else if (peak - x > AMP) { dir = -1; peak = x; swings++; swingTimes.push(now); directions.push(-1); }
-                } else {
-                    if (x < peak) peak = x;
-                    else if (x - peak > AMP) { dir = 1; peak = x; swings++; swingTimes.push(now); directions.push(1); }
-                }
-            }
-
-            function step(now) {
-                if (!waveRunning) return;
-                requestAnimationFrame(step);
-                if (now - lastFrame < 60) return;
-                lastFrame = now;
-
-                ctx.drawImage(video, 0, 0, W, H);
-                const px = ctx.getImageData(0, 0, W, H).data;
-                const gray = new Uint8Array(W * H);
-                for (let i = 0; i < W * H; i++) {
-                    gray[i] = (px[i * 4] + px[i * 4 + 1] + px[i * 4 + 2]) / 3;
-                }
-
-                if (prev) {
-                    let count = 0, sx = 0, sy = 0;
-                    for (let i = 0; i < gray.length; i++) {
-                        if (Math.abs(gray[i] - prev[i]) > 28) {
-                            count++;
-                            sx += i % W;
-                            sy += (i / W) | 0;
-                        }
-                    }
-                    const frac = count / gray.length;
-                    if (frac > 0.015 && frac < 0.6) {
-                        const x = 1 - (sx / count) / W; // mirrored to match the visitor's view
-                        const y = (sy / count) / H;
-                        smoothX = smoothX === null ? x : smoothX * 0.5 + x * 0.5;
-                        if (!firstMotionAt) firstMotionAt = now;
-                        ySum += y; yCount++;
-                        rangeMin = Math.min(rangeMin, smoothX);
-                        rangeMax = Math.max(rangeMax, smoothX);
-                        trackSwing(smoothX, now);
-                        document.getElementById('handDot').style.left = `${smoothX * 100}%`;
-                    }
-                }
-                prev = gray;
-
-                document.getElementById('waveMeterFill').style.width =
-                    `${Math.min(swings / TARGET_SWINGS, 1) * 100}%`;
-
-                if (swings >= TARGET_SWINGS) finish(true);
-                else if (firstMotionAt && now - firstMotionAt > 8000 && swings >= 2) finish(true);
-                else if (now - startAt > 15000) finish(swings >= 2);
-            }
-
-            function finish(success) {
-                stopCamera();
-                document.getElementById('waveCamBox').classList.add('hidden');
-                const status = document.getElementById('waveStatus');
-                const startBtn = document.getElementById('waveStartBtn');
-
-                if (!success) {
-                    status.textContent = "I couldn't see a clear wave. Move your whole hand side to side, a little closer to the camera.";
-                    speak("I couldn't see a clear wave. Let's try again.");
-                    startBtn.textContent = '👋 Try Again';
-                    startBtn.classList.remove('hidden');
-                    return;
-                }
-
-                const waves = Math.max(1, Math.floor(swings / 2));
-                const gaps = swingTimes.slice(1).map((t, i) => t - swingTimes[i]);
-                const avgGap = gaps.length ? gaps.reduce((a, b) => a + b, 0) / gaps.length : 600;
-                const speed = avgGap < 350 ? 'fast' : avgGap < 700 ? 'steady' : 'slow and graceful';
-                const width = rangeMax - rangeMin;
-                const size = width > 0.5 ? 'wide' : width > 0.25 ? 'medium' : 'small';
-                const avgY = yCount ? ySum / yCount : 0.5;
-                const height = avgY < 0.35 ? 'high up' : avgY > 0.65 ? 'low down' : 'in the middle';
-                const start = directions[0] === 1 ? 'left' : 'right';
-                const end = directions[0] === 1 ? 'right' : 'left';
-                const arrows = directions.map(d => d === 1 ? '→' : '←').join(' ');
-                const spokenPattern = directions.map(d => d === 1 ? 'right' : 'left').join(', ');
-
-                waveResult = {
-                    waves, arrows,
-                    summary: `${waves} waves, ${speed}, ${size}, ${height}, started ${start}`
-                };
-
-                status.textContent = '✅ Wave recognized!';
-                document.getElementById('waveArrows').textContent = arrows;
-                document.getElementById('waveResultText').textContent =
-                    `${waves} wave${waves > 1 ? 's' : ''} • ${speed} • ${size} • ${height} • started from the ${start}`;
-                document.getElementById('waveResultBox').classList.remove('hidden');
-                document.getElementById('selfieBox').classList.remove('hidden');
-                document.getElementById('waveContinueBtn').classList.remove('hidden');
-
-                speak(`Hello ${visitorName}! My vision agent detected ${waves} wave${waves > 1 ? 's' : ''}. ` +
-                      `You started from the ${start}, moving ${end}. Your wave was ${speed} and ${size}, ${height} in the frame. ` +
-                      `Wave pattern: ${spokenPattern}. Gen AI Robot City is now awake!`);
-
-                if (visitorRow) logWave();
-                updateVisitorDisplay();
-            }
-
-            requestAnimationFrame(step);
-        }
-
-        // ================= OPTIONAL ROBOT SELFIE =================
-        async function startSelfie() {
-            const status = document.getElementById('waveStatus');
-            try {
-                selfieStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 640 } },
-                    audio: false
-                });
-            } catch (e) {
-                status.textContent = 'Camera not available for the selfie. You can still continue!';
-                return;
-            }
-
-            const video = document.getElementById('selfieVideo');
-            video.srcObject = selfieStream;
-            await video.play();
-
-            document.getElementById('selfieCamBox').classList.remove('hidden');
-            document.getElementById('selfiePreview').classList.add('hidden');
-            document.getElementById('selfieBtn').classList.add('hidden');
-            document.getElementById('retakeBtn').classList.add('hidden');
-
-            speak('Smile! Three, two, one!');
-            runCountdown(3, () => captureSelfie(video));
-        }
-
-        function runCountdown(n, done) {
-            const el = document.getElementById('countdown');
-            if (n === 0) {
-                el.classList.add('hidden');
-                done();
-                return;
-            }
-            el.textContent = n;
-            el.classList.remove('hidden');
-            setTimeout(() => runCountdown(n - 1, done), 1000);
-        }
-
-        function captureSelfie(video) {
-            const vw = video.videoWidth || 640;
-            const vh = video.videoHeight || 640;
-            const side = Math.min(vw, vh);
-
-            const c = document.createElement('canvas');
-            c.width = 400;
-            c.height = 400;
-            const ctx = c.getContext('2d');
-            ctx.translate(400, 0);
-            ctx.scale(-1, 1);   // mirror so it matches what the visitor saw
-            ctx.drawImage(video, (vw - side) / 2, (vh - side) / 2, side, side, 0, 0, 400, 400);
-            selfieCanvas = c;
-
-            stopSelfieCamera();
-            const preview = document.getElementById('selfiePreview');
-            preview.src = c.toDataURL('image/jpeg', 0.9);
-            preview.classList.remove('hidden');
-            document.getElementById('selfieCamBox').classList.add('hidden');
-            document.getElementById('retakeBtn').classList.remove('hidden');
-            speak(`Great photo, ${visitorName}!`);
-        }
-
-        function stopSelfieCamera() {
-            if (selfieStream) {
-                selfieStream.getTracks().forEach(t => t.stop());
-                selfieStream = null;
+                errorEl.textContent = 'Could not save right now. Please check your internet and try again.';
+                btn.disabled = false;
+                btn.textContent = '📨 Sign the Guest Book';
             }
         }
 
@@ -1139,7 +925,7 @@
         function fitText(ctx, text, maxWidth, startSize) {
             let size = startSize;
             ctx.font = `bold ${size}px 'Courier New', monospace`;
-            while (ctx.measureText(text).width > maxWidth && size > 18) {
+            while (ctx.measureText(text).width > maxWidth && size > 14) {
                 size -= 2;
                 ctx.font = `bold ${size}px 'Courier New', monospace`;
             }
@@ -1147,6 +933,7 @@
 
         function drawAward(kind) {
             const cfg = AWARDS[kind];
+            const avatar = selectedAvatar;
             const c = document.getElementById(cfg.canvas);
             const ctx = c.getContext('2d');
             const W = c.width, H = c.height;
@@ -1182,10 +969,10 @@
             fitText(ctx, cfg.title, 540, 30);
             ctx.fillText(cfg.title, W / 2, 145);
 
-            // Photo circle (selfie or robot avatar)
+            // Avatar circle
             const cx = W / 2, cy = 355, r = 150;
             ctx.save();
-            ctx.shadowColor = cfg.border;
+            ctx.shadowColor = avatar.color;
             ctx.shadowBlur = 30;
             ctx.beginPath();
             ctx.arc(cx, cy, r + 6, 0, Math.PI * 2);
@@ -1197,22 +984,17 @@
             ctx.beginPath();
             ctx.arc(cx, cy, r, 0, Math.PI * 2);
             ctx.clip();
-            if (selfieCanvas) {
-                ctx.drawImage(selfieCanvas, cx - r, cy - r, r * 2, r * 2);
-            } else {
-                ctx.fillStyle = '#2d3748';
-                ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
-                ctx.font = '170px serif';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('🤖', cx, cy + 10);
-                ctx.textBaseline = 'alphabetic';
-            }
+            ctx.fillStyle = '#1a202c';
+            ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+            ctx.globalAlpha = 0.35;
+            ctx.fillStyle = avatar.color;
+            ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+            ctx.globalAlpha = 1;
+            ctx.font = '170px serif';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(avatar.emoji, cx, cy + 10);
+            ctx.textBaseline = 'alphabetic';
             ctx.restore();
-
-            if (selfieCanvas) {
-                ctx.font = '70px serif';
-                ctx.fillText('🤖', cx + r - 10, cy + r + 5);   // robot buddy badge
-            }
 
             // Name
             ctx.fillStyle = '#ffffff';
@@ -1228,19 +1010,15 @@
             const details = [];
             if (visitorCount) details.push(`Visitor #${visitorCount}`);
             details.push(new Date().toLocaleDateString());
+            details.push(`${avatar.name} avatar`);
+            const detailsText = details.join('  •  ');
             ctx.fillStyle = '#ffe66d';
-            ctx.font = "bold 22px 'Courier New', monospace";
-            ctx.fillText(details.join('  •  '), W / 2, 700);
-
-            if (waveResult) {
-                ctx.fillStyle = '#e2e8f0';
-                ctx.font = "20px 'Courier New', monospace";
-                ctx.fillText(`Wave signature: ${waveResult.arrows}`, W / 2, 735);
-            }
+            fitText(ctx, detailsText, 540, 22);
+            ctx.fillText(detailsText, W / 2, 705);
 
             ctx.fillStyle = '#718096';
             ctx.font = "16px 'Courier New', monospace";
-            ctx.fillText(cfg.footer, W / 2, 765);
+            ctx.fillText(cfg.footer, W / 2, 755);
 
             document.getElementById(cfg.image).src = c.toDataURL('image/png');
         }
@@ -1258,32 +1036,28 @@
 
         // ================= WELCOME SCREEN (greeting + participation award) =================
         function enterCity() {
-            stopCamera();
-            stopSelfieCamera();
-            document.getElementById('waveModal').classList.add('hidden');
             document.getElementById('mainContent').classList.remove('hidden');
             document.getElementById('welcomeBlock').classList.remove('hidden');
             document.getElementById('cityTour').classList.add('hidden');
+            document.getElementById('guestbookBlock').classList.add('hidden');
             document.getElementById('personalGreeting').textContent =
                 `Welcome, ${visitorName}! Prepare for an extraordinary journey.`;
             updateNamePlaceholders();
             updateVisitorDisplay();
 
-            // Robot greets the visitor by name (and face, if they took a selfie)
-            const greeterPhoto = document.getElementById('greeterPhoto');
-            if (selfieCanvas) {
-                greeterPhoto.src = selfieCanvas.toDataURL('image/jpeg', 0.9);
-                greeterPhoto.classList.remove('hidden');
-            }
+            // Robot greets the visitor by name, with their avatar
+            const greeterAvatar = document.getElementById('greeterAvatar');
+            greeterAvatar.textContent = selectedAvatar.emoji;
+            greeterAvatar.style.background = selectedAvatar.color + '55';
+            greeterAvatar.style.borderColor = selectedAvatar.color;
+            greeterAvatar.style.boxShadow = `0 0 12px ${selectedAvatar.color}`;
+
             document.getElementById('robotGreeting').textContent =
-                `Hello, ${visitorName}! ${selfieCanvas ? 'Great to see your smile! ' : ''}Here is your Participation Award. Tap "Enter the City" when you're ready! 🎖️`;
+                `Hello, ${visitorName}! Love your ${selectedAvatar.name} avatar! Here is your Participation Award. Tap "Enter the City" when you're ready! 🎖️`;
 
             // Participation award
             participationReady = true;
             drawAward('participation');
-
-            // Save the selfie privately, only if the permission box was ticked
-            uploadSelfieIfAllowed();
 
             if ('speechSynthesis' in window) speechSynthesis.cancel();
             speak(`Hello ${visitorName}! Welcome to Gen AI Robot City! You have earned your Participation Award. Tap Enter the City to begin your tour!`);
@@ -1337,11 +1111,6 @@
                 completionReady = true;
                 drawAward('completion');
 
-                const ws = document.getElementById('waveSummary');
-                if (waveResult) {
-                    ws.textContent = `👋 Your wave signature: ${waveResult.arrows} (${waveResult.summary})`;
-                    ws.classList.remove('hidden');
-                }
                 if ('speechSynthesis' in window) speechSynthesis.cancel();
                 speak(`Congratulations ${visitorName}! You explored all ${TOTAL_ZONES} zones of Gen AI Robot City and earned your Award of Completion!`);
                 setTimeout(() => {
