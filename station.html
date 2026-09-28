@@ -69,6 +69,10 @@
             font-size: 15px;
         }
 
+        .note { font-size: 11px; color: #718096; text-align: left; margin-top: 4px; }
+
+        #sampleStatus { font-size: 12px; color: #ffe66d; min-height: 16px; margin-bottom: 6px; }
+
         .toggle { display: block; margin-top: 12px; font-size: 13px; color: #e2e8f0; text-align: left; }
 
         #status { color: #4ecdc4; font-size: 14px; margin-top: 10px; }
@@ -89,6 +93,33 @@
             0%, 100% { transform: scale(1); text-shadow: none; }
             50% { transform: scale(1.1); text-shadow: 0 0 25px #ffe66d; }
         }
+
+        /* Music indicator */
+        .music-bar {
+            display: inline-flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 18px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .music-bar span {
+            width: 4px;
+            background: #00ff88;
+            animation: eq 0.8s ease-in-out infinite;
+        }
+
+        .music-bar span:nth-child(2) { animation-delay: 0.2s; }
+        .music-bar span:nth-child(3) { animation-delay: 0.4s; }
+        .music-bar span:nth-child(4) { animation-delay: 0.1s; }
+
+        @keyframes eq {
+            0%, 100% { height: 4px; }
+            50% { height: 18px; }
+        }
+
+        .music-bar.paused span { animation: none; height: 4px; background: #718096; }
 
         /* Robot Mirror */
         .mirror-card {
@@ -161,9 +192,9 @@
         <div class="setting">
             <label for="voiceStyle">🔊 Voice style</label>
             <select id="voiceStyle" class="select">
-                <option value="robot">🤖 Robot</option>
-                <option value="friendly">🙂 Friendly</option>
+                <option value="machine">🤖 Machine (word by word)</option>
                 <option value="deep">🦾 Deep robot</option>
+                <option value="friendly">🙂 Friendly</option>
                 <option value="squeaky">🐭 Squeaky</option>
             </select>
         </div>
@@ -171,11 +202,25 @@
         <div class="setting">
             <label for="voiceSelect">🗣️ Voice</label>
             <select id="voiceSelect" class="select">
-                <option value="">Default voice</option>
+                <option value="">Auto (most robotic available)</option>
             </select>
+            <p class="note">Tip: robotic voices like "Zarvox" or "Trinoids" (iPhone) or "eSpeak" (Android) sound the most machine-like.</p>
         </div>
 
         <button class="btn small" onclick="previewVoice()">▶ Hear a sample</button>
+        <p id="sampleStatus"></p>
+
+        <div class="setting">
+            <label for="musicLevel">🎵 Background music</label>
+            <select id="musicLevel" class="select" onchange="onMusicLevelChange()">
+                <option value="low">Low (recommended)</option>
+                <option value="medium">Medium</option>
+                <option value="off">Off</option>
+            </select>
+            <p class="note">Music goes silent during each greeting so Tom repeats only the voice. On iPhone, turn off silent mode to hear music and chirps.</p>
+        </div>
+
+        <button class="btn small" id="musicPreviewBtn" onclick="toggleMusicPreview()">🎵 Preview music</button>
 
         <label class="toggle">
             <input type="checkbox" id="mirrorToggle">
@@ -204,6 +249,7 @@
             <p id="status">Connecting to visitor board...</p>
             <p class="count" id="visitorTotal"></p>
             <p class="count" id="lastChecked" style="color: #718096;"></p>
+            <p class="count" id="musicStatus" style="color: #718096;">🎵 Music: off</p>
             <button class="btn small" onclick="greet('Test Visitor')">🔊 Test Greeting</button>
             <button class="btn small" onclick="pauseStation()">⚙️ Settings</button>
         </div>
@@ -215,7 +261,7 @@
     </div>
 
     <div class="card" style="font-size: 11px; color: #718096; text-align: left;">
-        <p><strong>Diagnostics</strong> (station v11 • reads Apps Script, sheet as backup)</p>
+        <p><strong>Diagnostics</strong> (station v13 • robot music • machine voice)</p>
         <p id="diagLink"></p>
         <p id="diag" style="word-break: break-all;">Waiting to start...</p>
     </div>
@@ -230,7 +276,7 @@
 
         const POLL_MS = 4000;          // check for new visitors every 4 seconds
         const REPLY_TIMEOUT = 15000;   // wait up to 15 seconds for Google to reply
-        const TOM_REPEAT_GAP = 6000;   // pause after each greeting so Tom can repeat it
+        const TOM_REPEAT_GAP = 6000;   // silence after each greeting so Tom can repeat it
         const MIRROR_MS = 12000;       // how long the Robot Mirror stays on screen
 
         let lastCount = null;
@@ -248,6 +294,10 @@
         // ================= DIAGNOSTICS =================
         function showDiag(msg) {
             document.getElementById('diag').textContent = msg;
+        }
+
+        function setSampleStatus(msg) {
+            document.getElementById('sampleStatus').textContent = msg;
         }
 
         document.getElementById('diagLink').textContent =
@@ -344,17 +394,176 @@
             }
         }
 
-        // ================= VOICE SETTINGS =================
+        // ================= ROBOT BACKGROUND MUSIC (generated live, no files) =================
+        let audioCtx = null;
+        let musicGain = null;
+        let musicTimer = null;
+        let musicOn = false;
+        let musicDucked = false;
+        let musicStep = 0;
+        let nextNoteTime = 0;
+
+        const MUSIC_LEVELS = { off: 0, low: 0.12, medium: 0.25 };
+        const BPM = 108;
+        const STEP_TIME = 60 / BPM / 2;          // eighth notes
+        const ARPEGGIO = [0, 7, 12, 15, 19, 15, 12, 7];   // sci-fi minor arpeggio
+        const ROOTS = [45, 45, 41, 43];          // A, A, F, G (one bar each)
+
+        function ensureAudio() {
+            if (!audioCtx) {
+                const Ctx = window.AudioContext || window.webkitAudioContext;
+                if (!Ctx) return false;
+                audioCtx = new Ctx();
+                musicGain = audioCtx.createGain();
+                musicGain.gain.value = 0;
+                const softFilter = audioCtx.createBiquadFilter();
+                softFilter.type = 'lowpass';
+                softFilter.frequency.value = 2200;
+                musicGain.connect(softFilter);
+                softFilter.connect(audioCtx.destination);
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return true;
+        }
+
+        function mtof(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+
+        function tone(freq, time, dur, type, vol, dest) {
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = type;
+            o.frequency.value = freq;
+            g.gain.setValueAtTime(0.0001, time);
+            g.gain.exponentialRampToValueAtTime(vol, time + 0.01);
+            g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+            o.connect(g);
+            g.connect(dest || musicGain);
+            o.start(time);
+            o.stop(time + dur + 0.05);
+        }
+
+        function scheduleStep(step, time) {
+            const root = ROOTS[Math.floor(step / 8)];
+            if (step % 4 === 0) tone(mtof(root - 12), time, STEP_TIME * 3.5, 'triangle', 0.5);        // pulsing bass
+            tone(mtof(root + 12 + ARPEGGIO[step % 8]), time, STEP_TIME * 0.8, 'square', 0.1);         // arpeggio
+            if (step % 8 === 6) tone(mtof(root + 43), time, 0.06, 'sine', 0.12);                      // data blip
+            if (step % 16 === 15) tone(mtof(root + 48), time, 0.05, 'sine', 0.1);                     // high blip
+        }
+
+        function musicScheduler() {
+            if (!musicOn) return;
+            while (nextNoteTime < audioCtx.currentTime + 0.25) {
+                scheduleStep(musicStep, nextNoteTime);
+                nextNoteTime += STEP_TIME;
+                musicStep = (musicStep + 1) % 32;
+            }
+            musicTimer = setTimeout(musicScheduler, 50);
+        }
+
+        function currentMusicLevel() {
+            return MUSIC_LEVELS[document.getElementById('musicLevel').value] || 0;
+        }
+
+        function applyMusicVolume() {
+            if (!musicGain) return;
+            const target = (musicOn && !musicDucked) ? currentMusicLevel() : 0;
+            musicGain.gain.setTargetAtTime(target, audioCtx.currentTime, musicDucked ? 0.05 : 0.6);
+            updateMusicStatus();
+        }
+
+        function startMusic() {
+            if (currentMusicLevel() === 0 || !ensureAudio()) return;
+            if (!musicOn) {
+                musicOn = true;
+                nextNoteTime = audioCtx.currentTime + 0.1;
+                musicScheduler();
+            }
+            applyMusicVolume();
+        }
+
+        function stopMusic() {
+            musicOn = false;
+            clearTimeout(musicTimer);
+            if (musicGain) musicGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
+            updateMusicStatus();
+        }
+
+        // Silence the music while greeting, then fade it back in
+        function duckMusic(on) {
+            musicDucked = on;
+            applyMusicVolume();
+        }
+
+        function updateMusicStatus() {
+            const el = document.getElementById('musicStatus');
+            const btn = document.getElementById('musicPreviewBtn');
+            if (!musicOn) {
+                el.textContent = '🎵 Music: off';
+                btn.textContent = '🎵 Preview music';
+            } else if (musicDucked) {
+                el.innerHTML = '🎵 Music: paused for greeting <span class="music-bar paused"><span></span><span></span><span></span><span></span></span>';
+                btn.textContent = '⏹ Stop music';
+            } else {
+                el.innerHTML = '🎵 Music: playing <span class="music-bar"><span></span><span></span><span></span><span></span></span>';
+                btn.textContent = '⏹ Stop music';
+            }
+        }
+
+        function toggleMusicPreview() {
+            if (musicOn) stopMusic();
+            else startMusic();
+        }
+
+        function onMusicLevelChange() {
+            if (currentMusicLevel() === 0) stopMusic();
+            else if (musicOn) applyMusicVolume();
+        }
+
+        // Short robot "boot chirp" before each greeting
+        function playChirp() {
+            if (!audioCtx) return;
+            const t = audioCtx.currentTime + 0.02;
+            [880, 1320, 1760].forEach((f, i) => {
+                tone(f, t + i * 0.09, 0.08, 'square', 0.08, audioCtx.destination);
+            });
+        }
+
+        // ================= MACHINE VOICE =================
         const VOICE_STYLES = {
-            robot:    { pitch: 0.5, rate: 0.85 },
-            friendly: { pitch: 1.1, rate: 0.95 },
-            deep:     { pitch: 0.1, rate: 0.8 },
-            squeaky:  { pitch: 1.9, rate: 1.1 }
+            machine:  { pitch: 0.3, rate: 0.8, wordByWord: true },
+            deep:     { pitch: 0.1, rate: 0.75, wordByWord: false },
+            friendly: { pitch: 1.1, rate: 0.95, wordByWord: false },
+            squeaky:  { pitch: 1.9, rate: 1.1, wordByWord: false }
         };
 
-        // Say "Gen AI" as "Jen A I" (some voices read "Gen" as "General")
-        function forSpeech(text) {
-            return text.replace(/\bGen\s*AI\b/gi, 'Jen A I');
+        // Voices that sound robotic, used automatically when available
+        const ROBOTIC_VOICE_NAMES = /zarvox|trinoids|robot|espeak|fred|ralph|junior|albert/i;
+
+        // Phones only allow speech that starts from a tap. The first tap anywhere
+        // "unlocks" speech so later automatic greetings are allowed too.
+        let speechUnlocked = false;
+        function unlockSpeech() {
+            if (speechUnlocked || !('speechSynthesis' in window)) return;
+            speechUnlocked = true;
+            const u = new SpeechSynthesisUtterance(' ');
+            u.volume = 0;
+            speechSynthesis.speak(u);
+        }
+        document.addEventListener('touchend', unlockSpeech, { once: true });
+        document.addEventListener('click', unlockSpeech, { once: true });
+
+        function safeCancel() {
+            if (!('speechSynthesis' in window)) return;
+            if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
+        }
+
+        function currentStyle() {
+            return VOICE_STYLES[document.getElementById('voiceStyle').value] || VOICE_STYLES.machine;
+        }
+
+        // Say "Gen AI" clearly (some voices read "Gen" as "General")
+        function forSpeech(text, wordByWord) {
+            return text.replace(/\bGen\s*AI\b/gi, wordByWord ? 'Jen Ay Eye' : 'Jen A I');
         }
 
         function englishVoices() {
@@ -369,12 +578,15 @@
             select.innerHTML = '';
             const def = document.createElement('option');
             def.value = '';
-            def.textContent = 'Default voice';
+            def.textContent = 'Auto (most robotic available)';
             select.appendChild(def);
-            englishVoices().forEach(v => {
+            const voices = englishVoices();
+            // Show robotic-sounding voices first
+            voices.sort((a, b) => (ROBOTIC_VOICE_NAMES.test(b.name) ? 1 : 0) - (ROBOTIC_VOICE_NAMES.test(a.name) ? 1 : 0));
+            voices.forEach(v => {
                 const opt = document.createElement('option');
                 opt.value = v.name;
-                opt.textContent = `${v.name} (${v.lang})`;
+                opt.textContent = `${ROBOTIC_VOICE_NAMES.test(v.name) ? '🤖 ' : ''}${v.name} (${v.lang})`;
                 select.appendChild(opt);
             });
             if ([...select.options].some(o => o.value === current)) select.value = current;
@@ -392,12 +604,13 @@
                 const v = voices.find(x => x.name === chosen);
                 if (v) return v;
             }
-            return voices.find(v => v.lang === 'en-IN') || voices[0] || null;
+            return voices.find(v => ROBOTIC_VOICE_NAMES.test(v.name)) ||
+                   voices.find(v => v.lang === 'en-IN') ||
+                   voices[0] || null;
         }
 
-        function makeUtterance(text) {
-            const style = VOICE_STYLES[document.getElementById('voiceStyle').value] || VOICE_STYLES.robot;
-            const u = new SpeechSynthesisUtterance(forSpeech(text));
+        function makeUtterance(text, style) {
+            const u = new SpeechSynthesisUtterance(text);
             const voice = pickVoice();
             if (voice) u.voice = voice;
             u.pitch = style.pitch;
@@ -405,10 +618,74 @@
             return u;
         }
 
+        // Speaks text in the chosen style; "Machine" says it word. by. word.
+        // If the chosen voice fails, it automatically retries with the phone's default voice.
+        function speakText(text, onDone, useDefaultVoice) {
+            let finished = false;
+            const finish = () => {
+                if (finished) return;
+                finished = true;
+                if (onDone) onDone();
+            };
+            if (!('speechSynthesis' in window)) {
+                setSampleStatus('This browser cannot speak. Try Chrome or Safari.');
+                finish();
+                return;
+            }
+
+            const style = currentStyle();
+            const spoken = forSpeech(text, style.wordByWord);
+            const parts = style.wordByWord
+                ? spoken.split(/\s+/).map(w => w.replace(/[^\w']/g, '')).filter(Boolean)
+                : [spoken];
+            let retried = false;
+
+            parts.forEach((part, i) => {
+                const u = makeUtterance(part, style);
+                if (useDefaultVoice) u.voice = null;
+                if (i === 0) u.onstart = () => setSampleStatus('🔊 Speaking...');
+
+                u.onerror = e => {
+                    const err = (e && e.error) ? e.error : 'unknown';
+                    if (err === 'interrupted' || err === 'canceled') {
+                        if (i === parts.length - 1) finish();
+                        return;
+                    }
+                    if (!useDefaultVoice && !retried) {
+                        retried = true;
+                        finished = true;   // the retry takes over from here
+                        safeCancel();
+                        setSampleStatus(`Voice problem (${err}), trying the default voice...`);
+                        speakText(text, onDone, true);
+                        return;
+                    }
+                    setSampleStatus(`Voice error: ${err}`);
+                    showDiag(`Voice error: ${err}`);
+                    if (i === parts.length - 1) finish();
+                };
+
+                if (i === parts.length - 1) {
+                    u.onend = () => {
+                        setSampleStatus('✅ Voice working');
+                        finish();
+                    };
+                }
+                speechSynthesis.speak(u);
+            });
+            setTimeout(finish, 2000 + parts.length * 1000);   // safety net
+        }
+
+        // Starts the voice immediately inside the tap (phones block delayed speech)
         function previewVoice() {
-            if (!('speechSynthesis' in window)) return;
-            speechSynthesis.cancel();
-            speechSynthesis.speak(makeUtterance('Hello Priya! Welcome to Gen AI Robot City!'));
+            if (!('speechSynthesis' in window)) {
+                setSampleStatus('This browser cannot speak. Try Chrome or Safari.');
+                return;
+            }
+            ensureAudio();
+            safeCancel();
+            playChirp();
+            setSampleStatus('Starting voice...');
+            speakText('Hello Priya! Welcome to Gen AI Robot City!');
         }
 
         // ================= ROBOT MIRROR =================
@@ -459,9 +736,10 @@
                 return;
             }
 
-            // Speaking inside the tap unlocks voice for the rest of the session
-            speechSynthesis.cancel();
-            speechSynthesis.speak(makeUtterance('Tom station is ready.'));
+            // Tapping Start unlocks sound and voice for the rest of the session
+            ensureAudio();
+            safeCancel();
+            speakText('Tom station is ready.');
 
             // Ask for camera permission once now, then switch the camera off until a visitor arrives
             mirrorEnabled = document.getElementById('mirrorToggle').checked;
@@ -475,13 +753,17 @@
             document.getElementById('stationPanel').classList.remove('hidden');
             keepAwake();
             poll();
+
+            // Background music starts after the ready message
+            setTimeout(() => { if (started) startMusic(); }, 2500);
         }
 
         function pauseStation() {
             started = false;
             clearTimeout(pollTimer);
             closeMirror();
-            speechSynthesis.cancel();
+            stopMusic();
+            safeCancel();
             queue.length = 0;
             document.getElementById('stationPanel').classList.add('hidden');
             document.getElementById('startCard').classList.remove('hidden');
@@ -504,6 +786,7 @@
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible' && started) {
                 keepAwake();
+                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
                 if (!polling) { clearTimeout(pollTimer); poll(); }  // catch up right away
             }
         });
@@ -576,18 +859,22 @@
             addLog(name);
             showMirror(name);
 
-            let finished = false;
+            // Silence the music, play the robot chirp, then speak
+            duckMusic(true);
+
             const done = () => {
-                if (finished) return;
-                finished = true;
-                setTimeout(() => { busy = false; processQueue(); }, TOM_REPEAT_GAP);
+                // Keep quiet while Tom repeats, then bring the music back
+                setTimeout(() => {
+                    duckMusic(false);
+                    busy = false;
+                    processQueue();
+                }, TOM_REPEAT_GAP);
             };
 
-            const u = makeUtterance(`Hello ${name}! Welcome to Gen AI Robot City!`);
-            u.onend = done;
-            u.onerror = done;
-            setTimeout(done, 10000); // safety net if the browser never reports "end"
-            speechSynthesis.speak(u);
+            setTimeout(() => {
+                playChirp();
+                setTimeout(() => speakText(`Hello ${name}! Welcome to Gen AI Robot City!`, done), 400);
+            }, 300);
         }
 
         function addLog(name) {
