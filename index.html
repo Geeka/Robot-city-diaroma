@@ -282,6 +282,142 @@
             box-shadow: 0 0 12px #ffe66d;
         }
 
+        /* Zone navigation (breadcrumb) */
+        .zone-nav-wrap {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(15, 15, 35, 0.95);
+            border: 1px solid #4a5568;
+            border-radius: 12px;
+            padding: 8px;
+            margin: 10px 0;
+        }
+
+        .zone-nav-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #4ecdc4;
+            margin-bottom: 6px;
+            gap: 8px;
+        }
+
+        .map-btn {
+            background: #4a5568;
+            color: #e2e8f0;
+            border: none;
+            border-radius: 15px;
+            padding: 6px 12px;
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .zone-nav {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scroll-behavior: smooth;
+        }
+
+        .zone-chip {
+            flex-shrink: 0;
+            background: rgba(45, 55, 72, 0.8);
+            border: 2px solid #4a5568;
+            color: #a0aec0;
+            border-radius: 16px;
+            padding: 6px 10px;
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .zone-chip.visited { border-color: #00ff88; color: #e2e8f0; }
+
+        .zone-chip.current {
+            background: linear-gradient(45deg, #00ff88, #4ecdc4);
+            color: #0f0f23;
+            border-color: #00ff88;
+            font-weight: bold;
+        }
+
+        .zone-chip.locked { opacity: 0.55; }
+
+        .nav-toast {
+            position: fixed;
+            left: 50%;
+            bottom: 20px;
+            transform: translateX(-50%);
+            background: #1a202c;
+            border: 2px solid #ffe66d;
+            color: #ffe66d;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            z-index: 200;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        /* City map */
+        .map-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 5, 20, 0.94);
+            z-index: 150;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .map-box { max-width: 600px; margin: 0 auto; text-align: center; }
+
+        .map-frame { position: relative; width: 100%; margin-top: 10px; }
+
+        .map-frame img {
+            width: 100%;
+            border-radius: 12px;
+            border: 2px solid #4ecdc4;
+            display: block;
+        }
+
+        .map-pins { position: absolute; inset: 0; }
+
+        .map-pin {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            background: rgba(15, 15, 35, 0.88);
+            border: 2px solid #ffe66d;
+            color: #fff;
+            border-radius: 20px;
+            padding: 4px 8px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+            animation: pinPulse 1.6s ease-in-out infinite;
+        }
+
+        .map-pin.visited { border-color: #00ff88; }
+
+        @keyframes pinPulse {
+            0%, 100% { box-shadow: 0 0 6px rgba(255, 230, 109, 0.5); }
+            50% { box-shadow: 0 0 16px rgba(255, 230, 109, 1); }
+        }
+
+        .map-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin: 14px 0;
+        }
+
         /* AI Agents page */
         .agent-grid {
             display: grid;
@@ -425,6 +561,16 @@
 
             <!-- CITY TOUR (shown after tapping Enter the City) -->
             <div id="cityTour" class="hidden">
+
+                <!-- Zone navigation: stays at the top while scrolling -->
+                <div class="zone-nav-wrap">
+                    <div class="zone-nav-top">
+                        <span id="zoneProgress">🧭 1 of 7 zones explored</span>
+                        <button class="map-btn" onclick="openMap()">🗺️ City Map</button>
+                    </div>
+                    <div id="zoneNav" class="zone-nav"></div>
+                </div>
+
                 <div class="status-bar">
                     <div><strong>CITY STATUS:</strong> <span id="status">WELCOMING VISITOR</span></div>
                     <div id="visitor-stats" style="font-size: 12px; color: #4ecdc4; opacity: 0.8;">>>> Physical-digital bridge active...</div>
@@ -450,9 +596,9 @@
                         <strong>What You're Seeing:</strong> LED houses and Data Valley on the city level, the AI Cloud dome at the end of the street, and the Neural Core circuits on the level below.
                     </div>
                     <div class="qr-notice">
-                        📱 <strong>Interactive QR Codes</strong> are placed throughout the physical diorama for easy access to this digital experience
+                        🗺️ Tip: tap <strong>City Map</strong> at the top to jump to any zone in any order!
                     </div>
-                    <button class="continue-btn" onclick="nextSection(2)">Enter Data Valley →</button>
+                    <button class="continue-btn" onclick="goToZone(2)">Enter Data Valley →</button>
                 </div>
 
                 <!-- 2: Data Valley -->
@@ -471,7 +617,7 @@
                     <div class="feature-highlight">
                         <strong>Natural AI Integration:</strong> The fiber optic palm trees show how artificial intelligence can blend with natural forms, creating data networks that feel both organic and futuristic.
                     </div>
-                    <button class="continue-btn" onclick="nextSection(3)">Descend to Neural Core →</button>
+                    <button class="continue-btn" onclick="goToZone(3)">Descend to Neural Core →</button>
                 </div>
 
                 <!-- 3: Neural Core -->
@@ -487,7 +633,7 @@
                     <div class="feature-highlight">
                         <strong>Robot Citizens:</strong> Each colorful robot has a specialty - red handles creative algorithms, blue handles logical processing, yellow manages energy, and the maintenance crew keeps the physical infrastructure running.
                     </div>
-                    <button class="continue-btn" onclick="nextSection(4)">Meet the Robot Citizens →</button>
+                    <button class="continue-btn" onclick="goToZone(4)">Meet the Robot Citizens →</button>
                 </div>
 
                 <!-- 4: Robot Citizens -->
@@ -515,7 +661,7 @@
                     <div class="feature-highlight">
                         <strong>Multi-Level Robot Society:</strong> Our robots live across the whole structure - the LED city and Data Valley above, the AI Cloud at the end of the street, the purple recreation deck below, and the Neural Core at the foundation.
                     </div>
-                    <button class="continue-btn" onclick="nextSection(5)">Ascend to AI Cloud →</button>
+                    <button class="continue-btn" onclick="goToZone(5)">Ascend to AI Cloud →</button>
                 </div>
 
                 <!-- 5: AI Cloud -->
@@ -531,7 +677,7 @@
                     <div class="feature-highlight">
                         <strong>Philosophy:</strong> Advanced AI can keep emotional intelligence, ethical reasoning, and genuine care for others at its core.
                     </div>
-                    <button class="continue-btn" onclick="nextSection(6)">Meet the AI Agents →</button>
+                    <button class="continue-btn" onclick="goToZone(6)">Meet the AI Agents →</button>
                 </div>
 
                 <!-- 6: AI Agents -->
@@ -598,7 +744,7 @@
                         <strong>Example:</strong> Goal = "Welcome a new visitor." The Planner splits it into steps, the Memory Agent saves the name, the Creator makes an award with your avatar, the Safety Agent checks everything is friendly - and the Voice Agent says hello!
                     </div>
 
-                    <button class="continue-btn" onclick="nextSection(7)">Complete the Journey →</button>
+                    <button class="continue-btn" onclick="goToZone(7)">Complete the Journey →</button>
                 </div>
 
                 <!-- 7: Finale + Award of Completion -->
@@ -663,12 +809,42 @@
         </div>
     </div>
 
+    <!-- CITY MAP (overlay) -->
+    <div id="mapOverlay" class="map-overlay hidden">
+        <div class="map-box">
+            <h2 style="color: #00ff88;">🗺️ Gen AI Robot City Map</h2>
+            <p style="font-size: 13px; margin: 6px 0 4px;">Tap a pin to jump to that zone. Green pins = visited.</p>
+            <div class="map-frame" id="mapFrame">
+                <img src="images/city-overview.jpg" alt="Map of Gen AI Robot City"
+                     onerror="document.getElementById('mapFrame').style.display='none'">
+                <div id="mapPins" class="map-pins"></div>
+            </div>
+            <div id="mapLegend" class="map-legend"></div>
+            <button class="continue-btn" onclick="closeMap()">✖ Close Map</button>
+        </div>
+    </div>
+
+    <div id="navToast" class="nav-toast hidden"></div>
+
     <script>
         // ================= CONFIG =================
         const VISITOR_API = 'https://script.google.com/macros/s/AKfycbzpu0Co2yrL6g73tj4aMMKGyaJL5Ef1s-9NtqIeCvFsJoPGCJtt26_KX9-PwfmPIQWA/exec';
         // Photos load from the "images" folder next to this page, so they work in any repo name
         const IMG = 'images/';
         const TOTAL_ZONES = 7;
+
+        // ================= ZONES + MAP PINS =================
+        // Pin positions are percentages across (x) and down (y) the city-overview photo.
+        // If a pin doesn't sit on the right spot of your photo, just adjust its x / y numbers.
+        const ZONES = [
+            { n: 1, icon: '🏙️', name: 'Entrance',       pin: { x: 50, y: 57 } },
+            { n: 2, icon: '🌴', name: 'Data Valley',    pin: { x: 50, y: 42 } },
+            { n: 3, icon: '🧠', name: 'Neural Core',    pin: { x: 50, y: 88 } },
+            { n: 4, icon: '🤖', name: 'Robot Citizens', pin: { x: 18, y: 52 } },
+            { n: 5, icon: '☁️', name: 'AI Cloud',       pin: { x: 45, y: 26 } },
+            { n: 6, icon: '🕹️', name: 'AI Agents',      pin: { x: 82, y: 52 } },
+            { n: 7, icon: '🏆', name: 'Finale',         pin: null }
+        ];
 
         // ================= AVATARS =================
         const AVATARS = [
@@ -686,6 +862,7 @@
 
         // ================= STATE =================
         let currentSection = 1;
+        let visitedZones = new Set([1]);
         let visitorName = '';
         let visitorRow = null;
         let visitorCount = null;
@@ -693,6 +870,7 @@
         let sessionStartTime = null;
         let statsTimer = null;
         let photoTimer = null;
+        let toastTimer = null;
         let participationReady = false;
         let completionReady = false;
         let gbRating = 0;
@@ -725,6 +903,11 @@
             speechSynthesis.speak(u);
         }
 
+        function sayNow(text) {
+            if ('speechSynthesis' in window) speechSynthesis.cancel();
+            speak(text);
+        }
+
         // ================= AVATAR PICKER =================
         function renderAvatars() {
             const grid = document.getElementById('avatarGrid');
@@ -746,8 +929,7 @@
             selectedAvatar = avatar;
             document.querySelectorAll('.avatar-option').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
-            if ('speechSynthesis' in window) speechSynthesis.cancel();
-            speak(`${avatar.name} selected!`);
+            sayNow(`${avatar.name} selected!`);
         }
 
         renderAvatars();
@@ -763,8 +945,7 @@
                 memory: `I am the Memory Agent. I saved your name, ${visitorName}, on the visitor board, so the city remembers you.`,
                 voice: 'I am the Voice Agent. I speak to you in this robot voice, and I tell the Tom Station to greet you.'
             };
-            if ('speechSynthesis' in window) speechSynthesis.cancel();
-            speak(lines[agent] || '');
+            sayNow(lines[agent] || '');
         }
 
         // ================= STEP 1: NAME + AVATAR =================
@@ -824,6 +1005,142 @@
                 `>>> Thank you for visiting, ${visitorName}!${visitorCount ? ' • Total visitors: ' + visitorCount : ''} • Status: Forever evolving`;
         }
 
+        // ================= ZONE NAVIGATION =================
+        function missingZones() {
+            return ZONES.filter(z => z.n < TOTAL_ZONES && !visitedZones.has(z.n));
+        }
+
+        function finaleLocked() {
+            return missingZones().length > 0;
+        }
+
+        function renderZoneNav() {
+            const nav = document.getElementById('zoneNav');
+            nav.innerHTML = '';
+            ZONES.forEach(z => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                const locked = z.n === TOTAL_ZONES && finaleLocked();
+                const visited = visitedZones.has(z.n);
+                btn.className = 'zone-chip' +
+                    (z.n === currentSection ? ' current' : '') +
+                    (visited ? ' visited' : '') +
+                    (locked ? ' locked' : '');
+                const mark = locked ? '🔒' : (visited && z.n !== currentSection ? '✓' : z.icon);
+                btn.textContent = `${z.n} ${mark} ${z.name}`;
+                btn.onclick = () => goToZone(z.n);
+                nav.appendChild(btn);
+            });
+
+            document.getElementById('zoneProgress').textContent =
+                `🧭 ${visitedZones.size} of ${TOTAL_ZONES} zones explored`;
+
+            // Keep the current zone chip visible in the bar
+            const current = nav.querySelector('.current');
+            if (current) nav.scrollLeft = current.offsetLeft - nav.clientWidth / 2 + current.clientWidth / 2;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('navToast');
+            toast.textContent = message;
+            toast.classList.remove('hidden');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.add('hidden'), 4000);
+        }
+
+        // Jump to any zone; the Finale stays locked until zones 1-6 are visited
+        function goToZone(n) {
+            if (n === TOTAL_ZONES && finaleLocked()) {
+                const list = missingZones().map(z => `${z.n} ${z.name}`).join(', ');
+                showToast(`🔒 Explore these zones first to unlock the Finale: ${list}`);
+                sayNow('Explore all the zones first to unlock the finale!');
+                return;
+            }
+            if (n === currentSection) {
+                window.scrollTo(0, 0);
+                return;
+            }
+            showZone(n);
+        }
+
+        function showZone(n) {
+            document.getElementById(`section${currentSection}`).classList.add('hidden');
+            const nextSec = document.getElementById(`section${n}`);
+            nextSec.classList.remove('hidden');
+            window.scrollTo(0, 0);
+            setTimeout(() => nextSec.classList.add('visible'), 100);
+            currentSection = n;
+            visitedZones.add(n);
+            renderZoneNav();
+
+            const statuses = {
+                1: 'EXPLORING THE CITY ENTRANCE',
+                2: 'PROCESSING DATA VALLEY',
+                3: 'ACCESSING NEURAL CORE',
+                4: 'MEETING ROBOT CITIZENS',
+                5: 'CONNECTING TO AI CLOUD',
+                6: 'MEETING THE AI AGENTS',
+                7: 'TOUR COMPLETE • AWARD UNLOCKED'
+            };
+            document.getElementById('status').textContent = statuses[n] || 'EXPLORING';
+
+            if (n === 6) {
+                sayNow('Welcome to the AI Agents zone! Tap any agent to hear it introduce itself.');
+            }
+
+            if (n === TOTAL_ZONES) {
+                // All zones explored: unlock the Award of Completion
+                completionReady = true;
+                drawAward('completion');
+                sayNow(`Congratulations ${visitorName}! You explored all ${TOTAL_ZONES} zones of Gen AI Robot City and earned your Award of Completion!`);
+                setTimeout(() => {
+                    cyclePhotos();
+                    document.getElementById('final-status').classList.remove('hidden');
+                }, 2000);
+            } else if (!finaleLocked() && n !== TOTAL_ZONES) {
+                showToast('🏆 All zones explored! The Finale is unlocked.');
+            }
+        }
+
+        // ================= CITY MAP =================
+        function openMap() {
+            const pins = document.getElementById('mapPins');
+            const legend = document.getElementById('mapLegend');
+            pins.innerHTML = '';
+            legend.innerHTML = '';
+
+            ZONES.forEach(z => {
+                const visited = visitedZones.has(z.n);
+                const locked = z.n === TOTAL_ZONES && finaleLocked();
+
+                if (z.pin) {
+                    const pin = document.createElement('button');
+                    pin.type = 'button';
+                    pin.className = 'map-pin' + (visited ? ' visited' : '');
+                    pin.style.left = z.pin.x + '%';
+                    pin.style.top = z.pin.y + '%';
+                    pin.textContent = `${z.n} ${z.icon}`;
+                    pin.onclick = () => { closeMap(); goToZone(z.n); };
+                    pins.appendChild(pin);
+                }
+
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = 'zone-chip' + (visited ? ' visited' : '') + (locked ? ' locked' : '') +
+                                 (z.n === currentSection ? ' current' : '');
+                chip.textContent = `${z.n} ${locked ? '🔒' : z.icon} ${z.name}${visited && !locked ? ' ✓' : ''}`;
+                chip.onclick = () => { closeMap(); goToZone(z.n); };
+                legend.appendChild(chip);
+            });
+
+            document.getElementById('mapOverlay').classList.remove('hidden');
+            sayNow('Here is the city map. Tap a pin to jump to a zone.');
+        }
+
+        function closeMap() {
+            document.getElementById('mapOverlay').classList.add('hidden');
+        }
+
         // ================= GUEST BOOK =================
         function setRating(n) {
             gbRating = n;
@@ -839,8 +1156,7 @@
             document.getElementById('guestbookBlock').classList.remove('hidden');
             window.scrollTo(0, 0);
             if (!gbSigned) {
-                if ('speechSynthesis' in window) speechSynthesis.cancel();
-                speak(`${visitorName}, we would love to hear what you think of Gen AI Robot City!`);
+                sayNow(`${visitorName}, we would love to hear what you think of Gen AI Robot City!`);
             }
         }
 
@@ -879,8 +1195,7 @@
                 document.getElementById('gbForm').classList.add('hidden');
                 document.getElementById('gbThanksName').textContent = visitorName;
                 document.getElementById('gbThanks').classList.remove('hidden');
-                if ('speechSynthesis' in window) speechSynthesis.cancel();
-                speak(`Thank you ${visitorName}! Your message has been saved in our guest book.`);
+                sayNow(`Thank you ${visitorName}! Your message has been saved in our guest book.`);
             } catch (e) {
                 errorEl.textContent = 'Could not save right now. Please check your internet and try again.';
                 btn.disabled = false;
@@ -1059,8 +1374,7 @@
             participationReady = true;
             drawAward('participation');
 
-            if ('speechSynthesis' in window) speechSynthesis.cancel();
-            speak(`Hello ${visitorName}! Welcome to Gen AI Robot City! You have earned your Participation Award. Tap Enter the City to begin your tour!`);
+            sayNow(`Hello ${visitorName}! Welcome to Gen AI Robot City! You have earned your Participation Award. Tap Enter the City to begin your tour!`);
 
             if (!statsTimer) statsTimer = setInterval(updateVisitorDisplay, 60000);
             window.scrollTo(0, 0);
@@ -1070,8 +1384,9 @@
         function startTour() {
             document.getElementById('welcomeBlock').classList.add('hidden');
             document.getElementById('cityTour').classList.remove('hidden');
-            if ('speechSynthesis' in window) speechSynthesis.cancel();
-            speak(`Let's go, ${visitorName}! Explore all ${TOTAL_ZONES} zones to unlock your Award of Completion.`);
+            visitedZones.add(1);
+            renderZoneNav();
+            sayNow(`Let's go, ${visitorName}! Explore all ${TOTAL_ZONES} zones to unlock your Award of Completion. Tap City Map to jump anywhere!`);
             window.scrollTo(0, 0);
         }
 
@@ -1080,44 +1395,6 @@
                 const el = document.getElementById(id);
                 if (el) el.textContent = visitorName;
             });
-        }
-
-        // ================= STORY NAVIGATION =================
-        function nextSection(sectionNum) {
-            document.getElementById(`section${currentSection}`).classList.add('hidden');
-            const nextSec = document.getElementById(`section${sectionNum}`);
-            nextSec.classList.remove('hidden');
-            window.scrollTo(0, 0);
-            setTimeout(() => nextSec.classList.add('visible'), 100);
-            currentSection = sectionNum;
-
-            const statuses = {
-                2: 'PROCESSING DATA VALLEY',
-                3: 'ACCESSING NEURAL CORE',
-                4: 'MEETING ROBOT CITIZENS',
-                5: 'CONNECTING TO AI CLOUD',
-                6: 'MEETING THE AI AGENTS',
-                7: 'TOUR COMPLETE • AWARD UNLOCKED'
-            };
-            document.getElementById('status').textContent = statuses[sectionNum] || 'TOUR COMPLETE';
-
-            if (sectionNum === 6) {
-                if ('speechSynthesis' in window) speechSynthesis.cancel();
-                speak('Welcome to the AI Agents zone! Tap any agent to hear it introduce itself.');
-            }
-
-            if (sectionNum === TOTAL_ZONES) {
-                // All zones explored: unlock the Award of Completion
-                completionReady = true;
-                drawAward('completion');
-
-                if ('speechSynthesis' in window) speechSynthesis.cancel();
-                speak(`Congratulations ${visitorName}! You explored all ${TOTAL_ZONES} zones of Gen AI Robot City and earned your Award of Completion!`);
-                setTimeout(() => {
-                    cyclePhotos();
-                    document.getElementById('final-status').classList.remove('hidden');
-                }, 2000);
-            }
         }
 
         function cyclePhotos() {
@@ -1143,8 +1420,10 @@
             document.getElementById('section1').classList.add('visible');
             document.getElementById('final-status').classList.add('hidden');
             document.getElementById('finalPhoto').src = IMG + 'city-overview.jpg';
-            window.scrollTo(0, 0);
             currentSection = 1;
+            visitedZones = new Set([1]);
+            renderZoneNav();
+            window.scrollTo(0, 0);
             document.getElementById('status').textContent = 'WELCOMING NEW VISITOR';
         }
 
