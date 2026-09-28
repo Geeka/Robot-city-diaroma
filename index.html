@@ -111,14 +111,6 @@
 
         .center { display: block; margin-left: auto; margin-right: auto; text-align: center; }
 
-        .status-bar {
-            background: #1a202c;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 20px 0;
-            border-left: 4px solid #00ff88;
-        }
-
         .ai-response {
             background: rgba(0, 255, 136, 0.1);
             border-left: 4px solid #00ff88;
@@ -571,20 +563,6 @@
                     <div id="zoneNav" class="zone-nav"></div>
                 </div>
 
-                <div class="status-bar">
-                    <div><strong>CITY STATUS:</strong> <span id="status">WELCOMING VISITOR</span></div>
-                    <div id="visitor-stats" style="font-size: 12px; color: #4ecdc4; opacity: 0.8;">>>> Physical-digital bridge active...</div>
-                </div>
-
-                <div class="status-bar" style="background: rgba(78, 205, 196, 0.1); border-left-color: #4ecdc4;">
-                    <div style="font-size: 14px; color: #00ff88;"><strong>📊 LIVE VISITOR BOARD</strong></div>
-                    <div style="font-size: 12px; margin-top: 8px;">
-                        <span id="visitor-count">Loading visitor data...</span><br>
-                        <span id="visit-time">Session started</span><br>
-                        <span id="visitor-list" style="color: #4ecdc4; font-size: 11px;"></span>
-                    </div>
-                </div>
-
                 <!-- 1: Entrance -->
                 <div class="story-section visible" id="section1">
                     <div class="location-indicator">ZONE 1 OF 7 • CITY ENTRANCE</div>
@@ -772,10 +750,6 @@
                     </div>
                     <button class="continue-btn" onclick="restart()">Begin New Journey →</button>
                 </div>
-
-                <div class="status-bar hidden" id="final-status">
-                    <div style="font-size: 12px; color: #4ecdc4;"><span id="farewell-message"></span></div>
-                </div>
             </div>
 
             <!-- GUEST BOOK -->
@@ -864,11 +838,7 @@
         let currentSection = 1;
         let visitedZones = new Set([1]);
         let visitorName = '';
-        let visitorRow = null;
         let visitorCount = null;
-        let recentVisitors = [];
-        let sessionStartTime = null;
-        let statsTimer = null;
         let photoTimer = null;
         let toastTimer = null;
         let participationReady = false;
@@ -956,7 +926,6 @@
                 return;
             }
             visitorName = name;
-            sessionStartTime = new Date();
             document.getElementById('nameModal').classList.add('hidden');
             logVisit();
             enterCity();   // straight to the welcome screen (inside the tap, so the voice can play)
@@ -966,43 +935,20 @@
             if (e.key === 'Enter') submitName();
         });
 
-        // ================= SHARED VISITOR BOARD =================
-        // Only the first name goes to the visitor board. No camera or photos are used.
+        // ================= VISITOR BOARD (shown on the Tom Station) =================
+        // Only the first name is sent. The visitor number is used on the awards.
         async function logVisit() {
-            if (!VISITOR_API) { updateVisitorDisplay(); return; }
+            if (!VISITOR_API) return;
             try {
                 const res = await fetch(`${VISITOR_API}?action=visit&name=${encodeURIComponent(visitorName)}`);
                 const data = await res.json();
-                visitorRow = data.row;
                 visitorCount = data.count;
-                recentVisitors = data.recent || [];
             } catch (e) {
                 console.log('Visitor board offline:', e);
             }
-            updateVisitorDisplay();
             // add the visitor number to any award already shown
             if (participationReady) drawAward('participation');
             if (completionReady) drawAward('completion');
-        }
-
-        function updateVisitorDisplay() {
-            const mins = sessionStartTime ? Math.floor((Date.now() - sessionStartTime) / 60000) : 0;
-            const countEl = document.getElementById('visitor-count');
-
-            if (visitorCount) countEl.textContent = `${visitorName}, you are visitor #${visitorCount} to Gen AI Robot City`;
-            else countEl.textContent = `${visitorName}, connecting to the visitor board...`;
-
-            document.getElementById('visit-time').textContent =
-                mins === 0 ? 'Just arrived' : `Exploring for ${mins} minute${mins === 1 ? '' : 's'}`;
-
-            document.getElementById('visitor-list').textContent =
-                recentVisitors.length ? `Recent visitors: ${recentVisitors.join(', ')}` : '';
-
-            document.getElementById('visitor-stats').textContent =
-                `>>> Welcome ${visitorName}${visitorCount ? ' • Visitor #' + visitorCount : ''} • Session: ${mins}min • Avatar: ${selectedAvatar.name}`;
-
-            document.getElementById('farewell-message').textContent =
-                `>>> Thank you for visiting, ${visitorName}!${visitorCount ? ' • Total visitors: ' + visitorCount : ''} • Status: Forever evolving`;
         }
 
         // ================= ZONE NAVIGATION =================
@@ -1073,17 +1019,6 @@
             visitedZones.add(n);
             renderZoneNav();
 
-            const statuses = {
-                1: 'EXPLORING THE CITY ENTRANCE',
-                2: 'PROCESSING DATA VALLEY',
-                3: 'ACCESSING NEURAL CORE',
-                4: 'MEETING ROBOT CITIZENS',
-                5: 'CONNECTING TO AI CLOUD',
-                6: 'MEETING THE AI AGENTS',
-                7: 'TOUR COMPLETE • AWARD UNLOCKED'
-            };
-            document.getElementById('status').textContent = statuses[n] || 'EXPLORING';
-
             if (n === 6) {
                 sayNow('Welcome to the AI Agents zone! Tap any agent to hear it introduce itself.');
             }
@@ -1093,11 +1028,8 @@
                 completionReady = true;
                 drawAward('completion');
                 sayNow(`Congratulations ${visitorName}! You explored all ${TOTAL_ZONES} zones of Gen AI Robot City and earned your Award of Completion!`);
-                setTimeout(() => {
-                    cyclePhotos();
-                    document.getElementById('final-status').classList.remove('hidden');
-                }, 2000);
-            } else if (!finaleLocked() && n !== TOTAL_ZONES) {
+                setTimeout(cyclePhotos, 2000);
+            } else if (!finaleLocked()) {
                 showToast('🏆 All zones explored! The Finale is unlocked.');
             }
         }
@@ -1358,7 +1290,6 @@
             document.getElementById('personalGreeting').textContent =
                 `Welcome, ${visitorName}! Prepare for an extraordinary journey.`;
             updateNamePlaceholders();
-            updateVisitorDisplay();
 
             // Robot greets the visitor by name, with their avatar
             const greeterAvatar = document.getElementById('greeterAvatar');
@@ -1375,8 +1306,6 @@
             drawAward('participation');
 
             sayNow(`Hello ${visitorName}! Welcome to Gen AI Robot City! You have earned your Participation Award. Tap Enter the City to begin your tour!`);
-
-            if (!statsTimer) statsTimer = setInterval(updateVisitorDisplay, 60000);
             window.scrollTo(0, 0);
         }
 
@@ -1418,13 +1347,11 @@
             }
             document.getElementById('section1').classList.remove('hidden');
             document.getElementById('section1').classList.add('visible');
-            document.getElementById('final-status').classList.add('hidden');
             document.getElementById('finalPhoto').src = IMG + 'city-overview.jpg';
             currentSection = 1;
             visitedZones = new Set([1]);
             renderZoneNav();
             window.scrollTo(0, 0);
-            document.getElementById('status').textContent = 'WELCOMING NEW VISITOR';
         }
 
         // Hide any photo that fails to load
