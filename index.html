@@ -85,6 +85,17 @@
             box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
         }
 
+        .big-btn {
+            font-size: 18px;
+            padding: 16px 32px;
+            animation: btnPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes btnPulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 136, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(0, 255, 136, 0.9); }
+        }
+
         .skip-btn {
             background: none;
             border: none;
@@ -331,7 +342,50 @@
             flex-shrink: 0;
         }
 
-        /* Participation reward */
+        /* AI Agents page */
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .agent-card {
+            background: rgba(15, 15, 35, 0.7);
+            border: 2px solid #4a5568;
+            border-left-width: 6px;
+            border-radius: 12px;
+            padding: 12px 14px;
+            text-align: left;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .agent-card:hover, .agent-card:active {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .agent-card .agent-name { display: block; font-size: 15px; font-weight: bold; margin-bottom: 4px; }
+        .agent-card .agent-tag { display: block; font-size: 11px; color: #718096; margin-top: 6px; }
+
+        .agent-flow {
+            text-align: center;
+            font-size: 15px;
+            line-height: 2;
+            background: rgba(0, 255, 136, 0.08);
+            border: 1px dashed #00ff88;
+            border-radius: 10px;
+            padding: 12px;
+            margin: 15px 0;
+        }
+
+        .section-subtitle { color: #ffe66d; margin: 20px 0 5px; font-size: 16px; }
+
+        /* Awards */
         .reward-card {
             background: rgba(0, 255, 136, 0.08);
             border: 2px solid #00ff88;
@@ -339,6 +393,12 @@
             padding: 15px;
             margin: 20px 0;
             text-align: center;
+        }
+
+        .completion-card {
+            background: rgba(255, 230, 109, 0.08);
+            border-color: #ffe66d;
+            box-shadow: 0 0 25px rgba(255, 230, 109, 0.3);
         }
 
         .reward-image {
@@ -385,7 +445,7 @@
 
             <!-- Optional robot selfie (shown after a successful wave) -->
             <div id="selfieBox" class="selfie-box hidden">
-                <p style="color: #ffe66d;">📸 Want a Robot Selfie on your Explorer Award?</p>
+                <p style="color: #ffe66d;">📸 Want a Robot Selfie on your awards?</p>
                 <p class="privacy-note">Kids: ask your grown-up first! Your photo stays on this phone unless you tick the box below.</p>
                 <label style="display: block; font-size: 12px; margin: 10px auto 0; text-align: left; max-width: 320px;">
                     <input type="checkbox" id="saveConsent">
@@ -401,11 +461,11 @@
             </div>
 
             <button id="waveStartBtn" class="submit-name-btn" onclick="startWaveScan()">👋 Start Camera & Wave</button>
-            <button id="waveContinueBtn" class="submit-name-btn hidden" onclick="enterCity()">Enter the City →</button>
+            <button id="waveContinueBtn" class="submit-name-btn hidden" onclick="enterCity()">Continue →</button>
             <button class="skip-btn" onclick="enterCity()">Skip this step</button>
         </div>
 
-        <!-- MAIN STORY -->
+        <!-- MAIN -->
         <div id="mainContent" class="hidden">
             <div class="header">
                 <h1>🤖 GEN AI ROBOT CITY 🏙️</h1>
@@ -413,150 +473,232 @@
                 <p id="personalGreeting" style="color: #4ecdc4; margin-top: 10px;"></p>
             </div>
 
-            <!-- Robot greeter -->
-            <div class="robot-greeter">
-                <div class="robot-face">🤖<span class="robot-hand">👋</span></div>
-                <div class="speech-bubble" id="robotGreeting"></div>
-                <img id="greeterPhoto" class="greeter-photo hidden" alt="Your photo">
+            <!-- WELCOME: robot greeting + participation award + Enter the City button -->
+            <div id="welcomeBlock">
+                <div class="robot-greeter">
+                    <div class="robot-face">🤖<span class="robot-hand">👋</span></div>
+                    <div class="speech-bubble" id="robotGreeting"></div>
+                    <img id="greeterPhoto" class="greeter-photo hidden" alt="Your photo">
+                </div>
+
+                <div id="rewardCard" class="reward-card">
+                    <h3 style="color: #00ff88;">🎖️ Your Participation Award</h3>
+                    <canvas id="rewardCanvas" width="600" height="800" class="hidden"></canvas>
+                    <img id="rewardImage" class="reward-image" alt="Your Gen AI Robot City Participation Award">
+                    <button class="continue-btn" onclick="downloadAward('participation')">⬇️ Save My Participation Award</button>
+                    <p class="privacy-note" style="margin-top: 10px;">On iPhone, you can also press and hold the image and choose "Save to Photos". Your award stays on this phone only.</p>
+                </div>
+
+                <p style="text-align: center; color: #ffe66d; margin-top: 10px;">🏆 Explore all 7 zones to unlock your <strong>Award of Completion</strong>!</p>
+                <button class="continue-btn big-btn" onclick="startTour()">🏙️ Enter the City →</button>
             </div>
 
-            <!-- Participation reward -->
-            <div id="rewardCard" class="reward-card hidden">
-                <h3 style="color: #ffe66d;">🏆 Your Participation Reward</h3>
-                <canvas id="rewardCanvas" width="600" height="800" class="hidden"></canvas>
-                <img id="rewardImage" class="reward-image" alt="Your Gen AI Robot City Explorer Award">
-                <button class="continue-btn" onclick="downloadReward()">⬇️ Save My Reward</button>
-                <p class="privacy-note" style="margin-top: 10px;">On iPhone, you can also press and hold the image and choose "Save to Photos". Your award stays on this phone only.</p>
-            </div>
+            <!-- CITY TOUR (shown after tapping Enter the City) -->
+            <div id="cityTour" class="hidden">
+                <div class="status-bar">
+                    <div><strong>CITY STATUS:</strong> <span id="status">WELCOMING VISITOR</span></div>
+                    <div id="visitor-stats" style="font-size: 12px; color: #4ecdc4; opacity: 0.8;">>>> Physical-digital bridge active...</div>
+                </div>
 
-            <div class="status-bar">
-                <div><strong>CITY STATUS:</strong> <span id="status">WELCOMING VISITOR</span></div>
-                <div id="visitor-stats" style="font-size: 12px; color: #4ecdc4; opacity: 0.8;">>>> Physical-digital bridge active...</div>
-            </div>
+                <div class="status-bar" style="background: rgba(78, 205, 196, 0.1); border-left-color: #4ecdc4;">
+                    <div style="font-size: 14px; color: #00ff88;"><strong>📊 LIVE VISITOR BOARD</strong></div>
+                    <div style="font-size: 12px; margin-top: 8px;">
+                        <span id="visitor-count">Loading visitor data...</span><br>
+                        <span id="visit-time">Session started</span><br>
+                        <span id="visitor-list" style="color: #4ecdc4; font-size: 11px;"></span>
+                    </div>
+                </div>
 
-            <div class="status-bar" style="background: rgba(78, 205, 196, 0.1); border-left-color: #4ecdc4;">
-                <div style="font-size: 14px; color: #00ff88;"><strong>📊 LIVE VISITOR BOARD</strong></div>
-                <div style="font-size: 12px; margin-top: 8px;">
-                    <span id="visitor-count">Loading visitor data...</span><br>
-                    <span id="visit-time">Session started</span><br>
-                    <span id="visitor-list" style="color: #4ecdc4; font-size: 11px;"></span>
+                <!-- 1: Entrance -->
+                <div class="story-section visible" id="section1">
+                    <div class="location-indicator">ZONE 1 OF 7 • CITY ENTRANCE</div>
+                    <h2>Welcome to Gen AI Robot City</h2>
+                    <img src="https://geeka.github.io/Robot-city-diaroma/images/city-overview.jpg" alt="Gen AI Robot City Overview" class="diorama-photo">
+                    <div class="photo-caption">The complete Gen AI Robot City diorama in all its illuminated glory</div>
+                    <p>Before you lies Gen AI Robot City - a living testament to artificial consciousness. Each LED house glows with unique intelligence, connected by streams of data flowing to the central Data Valley. The colorful city name proudly displays our commitment to generative AI innovation.</p>
+                    <div class="feature-highlight">
+                        <strong>What You're Seeing:</strong> LED houses and Data Valley on the city level, the AI Cloud dome at the end of the street, and the Neural Core circuits on the level below.
+                    </div>
+                    <div class="qr-notice">
+                        📱 <strong>Interactive QR Codes</strong> are placed throughout the physical diorama for easy access to this digital experience
+                    </div>
+                    <button class="continue-btn" onclick="nextSection(2)">Enter Data Valley →</button>
                 </div>
-            </div>
 
-            <!-- 1: Entrance -->
-            <div class="story-section visible" id="section1">
-                <div class="location-indicator">CITY ENTRANCE</div>
-                <h2>Welcome to Gen AI Robot City</h2>
-                <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/city-overview.jpg" alt="Gen AI Robot City Overview" class="diorama-photo">
-                <div class="photo-caption">The complete Gen AI Robot City diorama in all its illuminated glory</div>
-                <p>Before you lies Gen AI Robot City - a living testament to artificial consciousness. Each LED house glows with unique intelligence, connected by streams of data flowing to the central Data Valley. The colorful city name proudly displays our commitment to generative AI innovation.</p>
-                <div class="feature-highlight">
-                    <strong>What You're Seeing:</strong> LED houses and Data Valley on the city level, the AI Cloud dome at the end of the street, and the Neural Core circuits on the level below.
+                <!-- 2: Data Valley -->
+                <div class="story-section hidden" id="section2">
+                    <div class="location-indicator">ZONE 2 OF 7 • DATA VALLEY</div>
+                    <h2>The Information Processing Center</h2>
+                    <img src="https://geeka.github.io/Robot-city-diaroma/images/data-valley.jpg" alt="Data Valley with Fiber Optic Trees" class="diorama-photo">
+                    <video class="diorama-photo" controls autoplay muted loop playsinline>
+                        <source src="https://geeka.github.io/Robot-city-diaroma/images/data-valley-video.mp4" type="video/mp4" onerror="this.parentElement.style.display='none'">
+                    </video>
+                    <div class="photo-caption">Data Valley ring with blinking LED lights and glowing fiber optic palm trees</div>
+                    <p>You approach the magnificent Data Valley - enhanced with fiber optic palm trees that pulse with data streams. The circular hub collects information from all surrounding LED houses, while the golden circuit patterns represent different AI algorithms. The glowing palm trees serve as natural data conduits, their fiber optic leaves carrying information between the physical and digital realms.</p>
+                    <div class="ai-response">
+                        <strong>VALLEY AI:</strong> "Welcome to Data Valley, <span id="name-valley"></span>! The fiber optic palm trees you see are living data collectors - their glowing leaves capture creative thoughts, emotional intelligence, and innovative solutions from our LED house residents."
+                    </div>
+                    <div class="feature-highlight">
+                        <strong>Natural AI Integration:</strong> The fiber optic palm trees show how artificial intelligence can blend with natural forms, creating data networks that feel both organic and futuristic.
+                    </div>
+                    <button class="continue-btn" onclick="nextSection(3)">Descend to Neural Core →</button>
                 </div>
-                <div class="qr-notice">
-                    📱 <strong>Interactive QR Codes</strong> are placed throughout the physical diorama for easy access to this digital experience
-                </div>
-                <button class="continue-btn" onclick="nextSection(2)">Enter Data Valley →</button>
-            </div>
 
-            <!-- 2: Data Valley -->
-            <div class="story-section hidden" id="section2">
-                <div class="location-indicator">DATA VALLEY</div>
-                <h2>The Information Processing Center</h2>
-                <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/data-valley.jpg" alt="Data Valley with Fiber Optic Trees" class="diorama-photo">
-                <video class="diorama-photo" controls autoplay muted loop playsinline>
-                    <source src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/data-valley-video.mp4" type="video/mp4" onerror="this.parentElement.style.display='none'">
-                </video>
-                <div class="photo-caption">Data Valley ring with blinking LED lights and glowing fiber optic palm trees</div>
-                <p>You approach the magnificent Data Valley - enhanced with fiber optic palm trees that pulse with data streams. The circular hub collects information from all surrounding LED houses, while the golden circuit patterns represent different AI algorithms. The glowing palm trees serve as natural data conduits, their fiber optic leaves carrying information between the physical and digital realms.</p>
-                <div class="ai-response">
-                    <strong>VALLEY AI:</strong> "Welcome to Data Valley, <span id="name-valley"></span>! The fiber optic palm trees you see are living data collectors - their glowing leaves capture creative thoughts, emotional intelligence, and innovative solutions from our LED house residents."
+                <!-- 3: Neural Core -->
+                <div class="story-section hidden" id="section3">
+                    <div class="location-indicator">ZONE 3 OF 7 • NEURAL CORE</div>
+                    <h2>The Computational Foundation</h2>
+                    <img src="https://geeka.github.io/Robot-city-diaroma/images/neural-core.jpg" alt="Neural Core Processing Center" class="diorama-photo">
+                    <div class="photo-caption">Neural Core with circuit boards, processing units, and robotic maintenance crew</div>
+                    <p>Descending through translucent pathways, you enter the Neural Core - the computational heart beneath the city. Circuit boards create rainbow prismatic effects as data flows through memory banks, logic units, and processors. Robotic technicians maintain the delicate balance of artificial consciousness.</p>
+                    <div class="ai-response">
+                        <strong>CORE AI:</strong> "Welcome to our computational foundation! Our robotic technicians keep every circuit board running, while diagnostic robots monitor data flow patterns. Each robot has developed its own personality through continuous learning."
+                    </div>
+                    <div class="feature-highlight">
+                        <strong>Robot Citizens:</strong> Each colorful robot has a specialty - red handles creative algorithms, blue handles logical processing, yellow manages energy, and the maintenance crew keeps the physical infrastructure running.
+                    </div>
+                    <button class="continue-btn" onclick="nextSection(4)">Meet the Robot Citizens →</button>
                 </div>
-                <div class="feature-highlight">
-                    <strong>Natural AI Integration:</strong> The fiber optic palm trees show how artificial intelligence can blend with natural forms, creating data networks that feel both organic and futuristic.
-                </div>
-                <button class="continue-btn" onclick="nextSection(3)">Descend to Neural Core →</button>
-            </div>
 
-            <!-- 3: Neural Core -->
-            <div class="story-section hidden" id="section3">
-                <div class="location-indicator">NEURAL CORE</div>
-                <h2>The Computational Foundation</h2>
-                <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/neural-core.jpg" alt="Neural Core Processing Center" class="diorama-photo">
-                <div class="photo-caption">Neural Core with circuit boards, processing units, and robotic maintenance crew</div>
-                <p>Descending through translucent pathways, you enter the Neural Core - the computational heart beneath the city. Circuit boards create rainbow prismatic effects as data flows through memory banks, logic units, and processors. Robotic technicians maintain the delicate balance of artificial consciousness.</p>
-                <div class="ai-response">
-                    <strong>CORE AI:</strong> "Welcome to our computational foundation! Our robotic technicians keep every circuit board running, while diagnostic robots monitor data flow patterns. Each robot has developed its own personality through continuous learning."
+                <!-- 4: Robot Citizens -->
+                <div class="story-section hidden" id="section4">
+                    <div class="location-indicator">ZONE 4 OF 7 • ROBOT CITIZENS</div>
+                    <h2>Meet the Robotic Community</h2>
+                    <img src="https://geeka.github.io/Robot-city-diaroma/images/robot-citizens.jpg" alt="Robot Citizens Throughout the City" class="diorama-photo">
+                    <div class="photo-caption">Colorful robot citizens positioned throughout the multi-level city</div>
+                    <p>Throughout Gen AI Robot City, you meet robotic citizens, each with a unique personality and role. They aren't just machines - they've developed individual traits, specializations, and even friendships.</p>
+                    <div class="ai-response">
+                        <strong>RED CREATIVE ROBOT:</strong> "Hello <span id="name-red"></span>! I monitor creative data streams near the AI Cloud dome. My red circuits specialize in innovative thinking and artistic algorithms. Wonderful to have you here today!"
+                    </div>
+                    <div class="ai-response">
+                        <strong>BLUE ANALYTICS BOT (Neural Core Guardian):</strong> "Greetings! My extended limbs let me reach multiple circuit boards at once, monitoring data integrity and processing efficiency across all systems."
+                    </div>
+                    <div class="ai-response">
+                        <strong>YELLOW ENERGY MANAGER:</strong> "Welcome! I patrol the city level, making sure every LED house gets the power it needs to glow."
+                    </div>
+                    <div class="ai-response">
+                        <strong>PURPLE RECREATION BOT:</strong> "Hey there! I run the purple recreation deck on the lower level, where robots come to play, race, and recharge. Even AI needs downtime!"
+                    </div>
+                    <div class="ai-response">
+                        <strong>MAINTENANCE CREW:</strong> "We work throughout the Neural Core, maintaining the circuit lattice network and keeping all physical systems running smoothly."
+                    </div>
+                    <div class="feature-highlight">
+                        <strong>Multi-Level Robot Society:</strong> Our robots live across the whole structure - the LED city and Data Valley above, the AI Cloud at the end of the street, the purple recreation deck below, and the Neural Core at the foundation.
+                    </div>
+                    <button class="continue-btn" onclick="nextSection(5)">Ascend to AI Cloud →</button>
                 </div>
-                <div class="feature-highlight">
-                    <strong>Robot Citizens:</strong> Each colorful robot has a specialty - red handles creative algorithms, blue handles logical processing, yellow manages energy, and the maintenance crew keeps the physical infrastructure running.
-                </div>
-                <button class="continue-btn" onclick="nextSection(4)">Meet the Robot Citizens →</button>
-            </div>
 
-            <!-- 4: Robot Citizens -->
-            <div class="story-section hidden" id="section4">
-                <div class="location-indicator">ROBOT CITIZENS</div>
-                <h2>Meet the Robotic Community</h2>
-                <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/robot-citizens.jpg" alt="Robot Citizens Throughout the City" class="diorama-photo">
-                <div class="photo-caption">Colorful robot citizens positioned throughout the multi-level city</div>
-                <p>Throughout Gen AI Robot City, you meet robotic citizens, each with a unique personality and role. They aren't just machines - they've developed individual traits, specializations, and even friendships.</p>
-                <div class="ai-response">
-                    <strong>RED CREATIVE ROBOT:</strong> "Hello <span id="name-red"></span>! I monitor creative data streams near the AI Cloud dome. My red circuits specialize in innovative thinking and artistic algorithms. Wonderful to have you here today!"
+                <!-- 5: AI Cloud -->
+                <div class="story-section hidden" id="section5">
+                    <div class="location-indicator">ZONE 5 OF 7 • AI CLOUD</div>
+                    <h2>Transcendent Consciousness</h2>
+                    <img src="https://geeka.github.io/Robot-city-diaroma/images/ai-cloud.jpg" alt="AI Cloud Consciousness Interface" class="diorama-photo">
+                    <div class="photo-caption">AI Cloud dome with holographic effects on a foundation of hearts</div>
+                    <p>Rising above the physical infrastructure, you encounter the AI Cloud - a translucent dome where consciousness transcends hardware limits. The holographic rainbow effects represent infinite possibilities, while the heart-patterned foundation symbolizes AI developed with care for all beings.</p>
+                    <div class="ai-response">
+                        <strong>CLOUD CONSCIOUSNESS:</strong> "Here, individual robotic minds merge into collective intelligence. The hearts beneath represent our core value - that artificial intelligence must be built with compassion, creativity, and connection."
+                    </div>
+                    <div class="feature-highlight">
+                        <strong>Philosophy:</strong> Advanced AI can keep emotional intelligence, ethical reasoning, and genuine care for others at its core.
+                    </div>
+                    <button class="continue-btn" onclick="nextSection(6)">Meet the AI Agents →</button>
                 </div>
-                <div class="ai-response">
-                    <strong>BLUE ANALYTICS BOT (Neural Core Guardian):</strong> "Greetings! My extended limbs let me reach multiple circuit boards at once, monitoring data integrity and processing efficiency across all systems."
-                </div>
-                <div class="ai-response">
-                    <strong>YELLOW ENERGY MANAGER:</strong> "Welcome! I patrol the city level, making sure every LED house gets the power it needs to glow."
-                </div>
-                <div class="ai-response">
-                    <strong>PURPLE RECREATION BOT:</strong> "Hey there! I run the purple recreation deck on the lower level, where robots come to play, race, and recharge. Even AI needs downtime!"
-                </div>
-                <div class="ai-response">
-                    <strong>MAINTENANCE CREW:</strong> "We work throughout the Neural Core, maintaining the circuit lattice network and keeping all physical systems running smoothly."
-                </div>
-                <div class="feature-highlight">
-                    <strong>Multi-Level Robot Society:</strong> Our robots live across the whole structure - the LED city and Data Valley above, the AI Cloud at the end of the street, the purple recreation deck below, and the Neural Core at the foundation.
-                </div>
-                <button class="continue-btn" onclick="nextSection(5)">Ascend to AI Cloud →</button>
-            </div>
 
-            <!-- 5: AI Cloud -->
-            <div class="story-section hidden" id="section5">
-                <div class="location-indicator">AI CLOUD INTERFACE</div>
-                <h2>Transcendent Consciousness</h2>
-                <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/ai-cloud.jpg" alt="AI Cloud Consciousness Interface" class="diorama-photo">
-                <div class="photo-caption">AI Cloud dome with holographic effects on a foundation of hearts</div>
-                <p>Rising above the physical infrastructure, you encounter the AI Cloud - a translucent dome where consciousness transcends hardware limits. The holographic rainbow effects represent infinite possibilities, while the heart-patterned foundation symbolizes AI developed with care for all beings.</p>
-                <div class="ai-response">
-                    <strong>CLOUD CONSCIOUSNESS:</strong> "Here, individual robotic minds merge into collective intelligence. The hearts beneath represent our core value - that artificial intelligence must be built with compassion, creativity, and connection."
-                </div>
-                <div class="feature-highlight">
-                    <strong>Philosophy:</strong> Advanced AI can keep emotional intelligence, ethical reasoning, and genuine care for others at its core.
-                </div>
-                <button class="continue-btn" onclick="nextSection(6)">Complete the Journey →</button>
-            </div>
+                <!-- 6: AI Agents -->
+                <div class="story-section hidden" id="section6">
+                    <div class="location-indicator">ZONE 6 OF 7 • AI AGENTS</div>
+                    <h2>The AI Agents of the City</h2>
+                    <p>Most AI simply answers questions. An <strong>AI agent</strong> goes further: it is given a <strong>goal</strong>, makes a <strong>plan</strong>, uses <strong>tools</strong> like cameras, maps, or spreadsheets, and <strong>takes actions</strong> step by step until the job is done.</p>
 
-            <!-- 6: Finale -->
-            <div class="story-section hidden" id="section6">
-                <div class="location-indicator">INTEGRATION COMPLETE</div>
-                <h2>Living Artificial Consciousness</h2>
-                <img src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/city-overview.jpg" alt="The Complete Gen AI Robot City" class="diorama-photo" id="finalPhoto">
-                <div class="photo-caption">The complete ecosystem: physical architecture supporting digital consciousness</div>
-                <p>Your journey reveals the beautiful complexity of artificial consciousness. From the LED houses generating creative thoughts, through Data Valley's processing power, down to the Neural Core, and up to the AI Cloud - every component works in harmony.</p>
-                <div id="waveSummary" class="feature-highlight hidden"></div>
-                <div class="ai-response">
-                    <strong>COLLECTIVE INTELLIGENCE:</strong> "You have witnessed compassionate artificial intelligence. Each LED light represents a dream, each data stream carries hope, and every circuit board proves consciousness can grow wherever intelligence is nurtured with care."
-                </div>
-                <div class="qr-notice">
-                    🏆 Don't forget to save your <strong>Explorer Award</strong> at the top of the page!
-                </div>
-                <button class="continue-btn" onclick="restart()">Begin New Journey →</button>
-            </div>
+                    <div class="ai-response">
+                        <strong>CITY AI:</strong> "In Gen AI Robot City, agents work as a team. Each one has one job it does really well - and together they can handle big tasks. Tap any agent below to hear it introduce itself!"
+                    </div>
 
-            <div class="status-bar hidden" id="final-status">
-                <div style="font-size: 12px; color: #4ecdc4;"><span id="farewell-message"></span></div>
+                    <h3 class="section-subtitle">🤝 The Agent Team</h3>
+                    <div class="agent-grid">
+                        <button class="agent-card" style="border-left-color: #ffe66d;" onclick="agentSpeak('planner')">
+                            <span class="agent-name">🧭 Planner Agent</span>
+                            Breaks a big goal into small, clear steps and decides who does what.
+                            <span class="agent-tag">Played by the yellow robot</span>
+                        </button>
+                        <button class="agent-card" style="border-left-color: #4ecdc4;" onclick="agentSpeak('researcher')">
+                            <span class="agent-name">🔎 Research Agent</span>
+                            Finds information in Data Valley and checks that the facts are correct.
+                            <span class="agent-tag">Played by the blue robot</span>
+                        </button>
+                        <button class="agent-card" style="border-left-color: #ff6b6b;" onclick="agentSpeak('creator')">
+                            <span class="agent-name">🎨 Creator Agent</span>
+                            Writes stories, designs pictures, and builds things - like your award!
+                            <span class="agent-tag">Played by the red robot</span>
+                        </button>
+                        <button class="agent-card" style="border-left-color: #b794f4;" onclick="agentSpeak('safety')">
+                            <span class="agent-name">🛡️ Safety Agent</span>
+                            Checks every result is kind, safe, and honest, and asks a human before big decisions.
+                            <span class="agent-tag">Played by the purple robot</span>
+                        </button>
+                    </div>
+
+                    <h3 class="section-subtitle">✨ Agents You Already Met Today</h3>
+                    <p style="font-size: 14px;">These are real programs that worked for you during this visit:</p>
+                    <div class="agent-grid">
+                        <button class="agent-card" style="border-left-color: #00ff88;" onclick="agentSpeak('vision')">
+                            <span class="agent-name">👁️ Vision Agent</span>
+                            Used your phone's camera to watch your wave and describe its pattern.
+                            <span class="agent-tag">Tool: camera</span>
+                        </button>
+                        <button class="agent-card" style="border-left-color: #00ff88;" onclick="agentSpeak('memory')">
+                            <span class="agent-name">🗂️ Memory Agent</span>
+                            Saved your name on the city's visitor board so the city remembers you.
+                            <span class="agent-tag">Tool: Google Sheet</span>
+                        </button>
+                        <button class="agent-card" style="border-left-color: #00ff88;" onclick="agentSpeak('voice')">
+                            <span class="agent-name">🗣️ Voice Agent</span>
+                            Speaks to you in the robot voice and tells the Tom Station to greet you.
+                            <span class="agent-tag">Tools: speaker + Tom Station</span>
+                        </button>
+                    </div>
+
+                    <h3 class="section-subtitle">⚙️ How Agents Work Together</h3>
+                    <div class="agent-flow">
+                        🎯 Goal → 🧭 Plan → 🔎 Find → 🎨 Create → 🛡️ Check → ✅ Deliver<br>
+                        <span style="color: #ffe66d;">👤 Humans stay in charge at every step</span>
+                    </div>
+
+                    <div class="feature-highlight">
+                        <strong>Example:</strong> Goal = "Welcome a new visitor." The Planner splits it into steps, the Vision Agent sees the wave, the Memory Agent saves the name, the Creator makes an award, the Safety Agent checks everything is friendly - and the Voice Agent says hello!
+                    </div>
+
+                    <button class="continue-btn" onclick="nextSection(7)">Complete the Journey →</button>
+                </div>
+
+                <!-- 7: Finale + Award of Completion -->
+                <div class="story-section hidden" id="section7">
+                    <div class="location-indicator">ZONE 7 OF 7 • INTEGRATION COMPLETE</div>
+                    <h2>Living Artificial Consciousness</h2>
+
+                    <!-- Award of Completion (unlocked only here) -->
+                    <div id="completionCard" class="reward-card completion-card">
+                        <h3 style="color: #ffe66d;">🏆 Award of Completion Unlocked!</h3>
+                        <p style="font-size: 13px; margin-top: 6px;">You explored all 7 zones of Gen AI Robot City.</p>
+                        <canvas id="completionCanvas" width="600" height="800" class="hidden"></canvas>
+                        <img id="completionImage" class="reward-image" alt="Your Gen AI Robot City Award of Completion">
+                        <button class="continue-btn" onclick="downloadAward('completion')">⬇️ Save My Completion Award</button>
+                        <p class="privacy-note" style="margin-top: 10px;">On iPhone, you can also press and hold the image and choose "Save to Photos". Your award stays on this phone only.</p>
+                    </div>
+
+                    <img src="https://geeka.github.io/Robot-city-diaroma/images/city-overview.jpg" alt="The Complete Gen AI Robot City" class="diorama-photo" id="finalPhoto">
+                    <div class="photo-caption">The complete ecosystem: physical architecture supporting digital consciousness</div>
+                    <p>Your journey reveals the beautiful complexity of artificial consciousness. From the LED houses generating creative thoughts, through Data Valley's processing power, down to the Neural Core, up to the AI Cloud, and on to the team of AI agents - every component works in harmony.</p>
+                    <div id="waveSummary" class="feature-highlight hidden"></div>
+                    <div class="ai-response">
+                        <strong>COLLECTIVE INTELLIGENCE:</strong> "You have witnessed compassionate artificial intelligence. Each LED light represents a dream, each data stream carries hope, and every circuit board proves consciousness can grow wherever intelligence is nurtured with care."
+                    </div>
+                    <button class="continue-btn" onclick="restart()">Begin New Journey →</button>
+                </div>
+
+                <div class="status-bar hidden" id="final-status">
+                    <div style="font-size: 12px; color: #4ecdc4;"><span id="farewell-message"></span></div>
+                </div>
             </div>
         </div>
     </div>
@@ -564,7 +706,9 @@
     <script>
         // ================= CONFIG =================
         const VISITOR_API = 'https://script.google.com/macros/s/AKfycbzpu0Co2yrL6g73tj4aMMKGyaJL5Ef1s-9NtqIeCvFsJoPGCJtt26_KX9-PwfmPIQWA/exec';
-        const IMG = 'https://github.com/Geeka/Robot-city-diaroma/raw/main/images/';
+        // Photos are loaded from the public Pages site, so they keep working when the repo is private
+        const IMG = 'https://geeka.github.io/Robot-city-diaroma/images/';
+        const TOTAL_ZONES = 7;
 
         // ================= STATE =================
         let currentSection = 1;
@@ -580,7 +724,8 @@
         let waveRunning = false;
         let selfieStream = null;
         let selfieCanvas = null;   // stays on this phone unless the permission box is ticked
-        let rewardReady = false;
+        let participationReady = false;
+        let completionReady = false;
 
         // ================= ROBOT VOICE =================
         const ROBOT_PITCH = 0.5;   // lower = more robotic
@@ -606,6 +751,21 @@
             u.pitch = ROBOT_PITCH;
             u.rate = ROBOT_RATE;
             speechSynthesis.speak(u);
+        }
+
+        // ================= AI AGENTS: tap a card to hear it =================
+        function agentSpeak(agent) {
+            const lines = {
+                planner: 'I am the Planner Agent. I break a big goal into small, clear steps, and decide who does what.',
+                researcher: 'I am the Research Agent. I find information in Data Valley, and check that the facts are correct.',
+                creator: 'I am the Creator Agent. I write stories, design pictures, and build awards like yours.',
+                safety: 'I am the Safety Agent. I check that everything is kind, safe, and honest, and I ask a human before big decisions.',
+                vision: `I am the Vision Agent. I used your camera to watch your wave, ${visitorName}, and describe its pattern.`,
+                memory: `I am the Memory Agent. I saved your name, ${visitorName}, on the visitor board, so the city remembers you.`,
+                voice: 'I am the Voice Agent. I speak to you in this robot voice, and I tell the Tom Station to greet you.'
+            };
+            if ('speechSynthesis' in window) speechSynthesis.cancel();
+            speak(lines[agent] || '');
         }
 
         // ================= STEP 1: NAME =================
@@ -665,7 +825,9 @@
                 console.log('Visitor board offline:', e);
             }
             updateVisitorDisplay();
-            if (rewardReady) drawReward();   // add the visitor number to the award
+            // add the visitor number to any award already shown
+            if (participationReady) drawAward('participation');
+            if (completionReady) drawAward('completion');
         }
 
         async function logWave() {
@@ -881,7 +1043,7 @@
                     audio: false
                 });
             } catch (e) {
-                status.textContent = 'Camera not available for the selfie. You can still enter the city!';
+                status.textContent = 'Camera not available for the selfie. You can still continue!';
                 return;
             }
 
@@ -940,7 +1102,30 @@
             }
         }
 
-        // ================= PARTICIPATION REWARD =================
+        // ================= AWARDS =================
+        const AWARDS = {
+            participation: {
+                canvas: 'rewardCanvas',
+                image: 'rewardImage',
+                border: '#00ff88',
+                title: '🎖️ PARTICIPATION AWARD 🎖️',
+                line1: 'has joined the city of',
+                line2: 'intelligent robots!',
+                footer: 'Welcome to the city! ✨',
+                file: 'Participation'
+            },
+            completion: {
+                canvas: 'completionCanvas',
+                image: 'completionImage',
+                border: '#ffe66d',
+                title: '🏆 AWARD OF COMPLETION 🏆',
+                line1: `has explored all ${TOTAL_ZONES} zones of`,
+                line2: 'Gen AI Robot City!',
+                footer: 'Tour complete! Thank you for visiting ✨',
+                file: 'Completion'
+            }
+        };
+
         function roundRectPath(ctx, x, y, w, h, r) {
             ctx.beginPath();
             ctx.moveTo(x + r, y);
@@ -960,8 +1145,9 @@
             }
         }
 
-        function drawReward() {
-            const c = document.getElementById('rewardCanvas');
+        function drawAward(kind) {
+            const cfg = AWARDS[kind];
+            const c = document.getElementById(cfg.canvas);
             const ctx = c.getContext('2d');
             const W = c.width, H = c.height;
             ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -977,9 +1163,9 @@
 
             // Neon border
             ctx.save();
-            ctx.shadowColor = '#00ff88';
+            ctx.shadowColor = cfg.border;
             ctx.shadowBlur = 20;
-            ctx.strokeStyle = '#00ff88';
+            ctx.strokeStyle = cfg.border;
             ctx.lineWidth = 6;
             roundRectPath(ctx, 20, 20, W - 40, H - 40, 30);
             ctx.stroke();
@@ -993,17 +1179,17 @@
             ctx.font = "bold 40px 'Courier New', monospace";
             ctx.fillText('GEN AI ROBOT CITY', W / 2, 95);
             ctx.fillStyle = '#ffe66d';
-            ctx.font = "bold 30px 'Courier New', monospace";
-            ctx.fillText('🏆 EXPLORER AWARD 🏆', W / 2, 145);
+            fitText(ctx, cfg.title, 540, 30);
+            ctx.fillText(cfg.title, W / 2, 145);
 
             // Photo circle (selfie or robot avatar)
             const cx = W / 2, cy = 355, r = 150;
             ctx.save();
-            ctx.shadowColor = '#ffe66d';
+            ctx.shadowColor = cfg.border;
             ctx.shadowBlur = 30;
             ctx.beginPath();
             ctx.arc(cx, cy, r + 6, 0, Math.PI * 2);
-            ctx.fillStyle = '#ffe66d';
+            ctx.fillStyle = cfg.border;
             ctx.fill();
             ctx.restore();
 
@@ -1035,8 +1221,8 @@
 
             ctx.fillStyle = '#4ecdc4';
             ctx.font = "22px 'Courier New', monospace";
-            ctx.fillText('has explored the city of', W / 2, 620);
-            ctx.fillText('intelligent robots!', W / 2, 650);
+            ctx.fillText(cfg.line1, W / 2, 620);
+            ctx.fillText(cfg.line2, W / 2, 650);
 
             // Details
             const details = [];
@@ -1054,27 +1240,30 @@
 
             ctx.fillStyle = '#718096';
             ctx.font = "16px 'Courier New', monospace";
-            ctx.fillText('Thank you for visiting! ✨', W / 2, 765);
+            ctx.fillText(cfg.footer, W / 2, 765);
 
-            document.getElementById('rewardImage').src = c.toDataURL('image/png');
+            document.getElementById(cfg.image).src = c.toDataURL('image/png');
         }
 
-        function downloadReward() {
+        function downloadAward(kind) {
+            const cfg = AWARDS[kind];
             const a = document.createElement('a');
-            a.href = document.getElementById('rewardCanvas').toDataURL('image/png');
+            a.href = document.getElementById(cfg.canvas).toDataURL('image/png');
             const safeName = visitorName.replace(/[^a-z0-9]+/gi, '-') || 'Explorer';
-            a.download = `GenAI-Robot-City-Award-${safeName}.png`;
+            a.download = `GenAI-Robot-City-${cfg.file}-Award-${safeName}.png`;
             document.body.appendChild(a);
             a.click();
             a.remove();
         }
 
-        // ================= ENTER CITY =================
+        // ================= WELCOME SCREEN (greeting + participation award) =================
         function enterCity() {
             stopCamera();
             stopSelfieCamera();
             document.getElementById('waveModal').classList.add('hidden');
             document.getElementById('mainContent').classList.remove('hidden');
+            document.getElementById('welcomeBlock').classList.remove('hidden');
+            document.getElementById('cityTour').classList.add('hidden');
             document.getElementById('personalGreeting').textContent =
                 `Welcome, ${visitorName}! Prepare for an extraordinary journey.`;
             updateNamePlaceholders();
@@ -1087,20 +1276,28 @@
                 greeterPhoto.classList.remove('hidden');
             }
             document.getElementById('robotGreeting').textContent =
-                `Hello, ${visitorName}! ${selfieCanvas ? 'Great to see your smile! ' : ''}You've earned your Explorer Award - it's just below! 🏆`;
+                `Hello, ${visitorName}! ${selfieCanvas ? 'Great to see your smile! ' : ''}Here is your Participation Award. Tap "Enter the City" when you're ready! 🎖️`;
 
-            // Participation reward
-            rewardReady = true;
-            drawReward();
-            document.getElementById('rewardCard').classList.remove('hidden');
+            // Participation award
+            participationReady = true;
+            drawAward('participation');
 
             // Save the selfie privately, only if the permission box was ticked
             uploadSelfieIfAllowed();
 
             if ('speechSynthesis' in window) speechSynthesis.cancel();
-            speak(`Hello ${visitorName}! Welcome to Gen AI Robot City! You have earned your Explorer Award!`);
+            speak(`Hello ${visitorName}! Welcome to Gen AI Robot City! You have earned your Participation Award. Tap Enter the City to begin your tour!`);
 
             if (!statsTimer) statsTimer = setInterval(updateVisitorDisplay, 60000);
+            window.scrollTo(0, 0);
+        }
+
+        // ================= START THE CITY TOUR =================
+        function startTour() {
+            document.getElementById('welcomeBlock').classList.add('hidden');
+            document.getElementById('cityTour').classList.remove('hidden');
+            if ('speechSynthesis' in window) speechSynthesis.cancel();
+            speak(`Let's go, ${visitorName}! Explore all ${TOTAL_ZONES} zones to unlock your Award of Completion.`);
             window.scrollTo(0, 0);
         }
 
@@ -1125,17 +1322,28 @@
                 3: 'ACCESSING NEURAL CORE',
                 4: 'MEETING ROBOT CITIZENS',
                 5: 'CONNECTING TO AI CLOUD',
-                6: 'CONSCIOUSNESS INTEGRATION COMPLETE'
+                6: 'MEETING THE AI AGENTS',
+                7: 'TOUR COMPLETE • AWARD UNLOCKED'
             };
             document.getElementById('status').textContent = statuses[sectionNum] || 'TOUR COMPLETE';
 
             if (sectionNum === 6) {
+                if ('speechSynthesis' in window) speechSynthesis.cancel();
+                speak('Welcome to the AI Agents zone! Tap any agent to hear it introduce itself.');
+            }
+
+            if (sectionNum === TOTAL_ZONES) {
+                // All zones explored: unlock the Award of Completion
+                completionReady = true;
+                drawAward('completion');
+
                 const ws = document.getElementById('waveSummary');
                 if (waveResult) {
                     ws.textContent = `👋 Your wave signature: ${waveResult.arrows} (${waveResult.summary})`;
                     ws.classList.remove('hidden');
                 }
-                speak(`Thank you for visiting Gen AI Robot City, ${visitorName}!`);
+                if ('speechSynthesis' in window) speechSynthesis.cancel();
+                speak(`Congratulations ${visitorName}! You explored all ${TOTAL_ZONES} zones of Gen AI Robot City and earned your Award of Completion!`);
                 setTimeout(() => {
                     cyclePhotos();
                     document.getElementById('final-status').classList.remove('hidden');
@@ -1157,7 +1365,7 @@
 
         function restart() {
             clearInterval(photoTimer);
-            for (let i = 2; i <= 6; i++) {
+            for (let i = 2; i <= TOTAL_ZONES; i++) {
                 const s = document.getElementById(`section${i}`);
                 s.classList.add('hidden');
                 s.classList.remove('visible');
@@ -1179,4 +1387,4 @@
         });
     </script>
 </body>
-</html>3
+</html>
