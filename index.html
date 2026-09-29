@@ -201,11 +201,12 @@
             cursor: pointer;
             color: #e2e8f0;
             font-family: inherit;
-            font-size: 11px;
+            font-size: 12px;
             transition: all 0.15s ease;
+            overflow: hidden;
         }
 
-        .avatar-option .emoji { display: block; font-size: 34px; line-height: 1.3; }
+        .avatar-option .emoji { display: block; font-size: 36px; line-height: 1.3; }
 
         .avatar-option.selected {
             border-color: #00ff88;
@@ -410,7 +411,119 @@
             margin: 14px 0;
         }
 
-        /* AI Agents page */
+        /* Neural Core equation */
+        .equation-box {
+            background: #0f0f23;
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 14px;
+            margin: 12px 0;
+            text-align: center;
+            color: #00ff88;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.25);
+        }
+
+        /* AI Cloud cottages */
+        .cottage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .cottage {
+            background: rgba(15, 15, 35, 0.7);
+            border: 2px solid #4a5568;
+            border-radius: 14px 14px 8px 8px;
+            padding: 10px 8px;
+            color: #a0aec0;
+            font-family: inherit;
+            font-size: 11px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.25s ease;
+        }
+
+        .cottage .house { display: block; font-size: 30px; filter: grayscale(0.8) brightness(0.6); transition: filter 0.25s ease; }
+        .cottage .ai-name { display: block; font-weight: bold; font-size: 13px; color: #e2e8f0; margin: 4px 0 2px; }
+        .cottage .ai-job { display: block; }
+
+        .cottage.lit {
+            border-color: var(--glow);
+            box-shadow: 0 0 16px var(--glow);
+            color: #e2e8f0;
+        }
+
+        .cottage.lit .house { filter: none; }
+
+        /* Robo Café (Charging Station) */
+        .cafe-card {
+            background: rgba(255, 230, 109, 0.08);
+            border: 2px dashed #ffe66d;
+            border-radius: 12px;
+            padding: 14px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .cafe-title { color: #ffe66d; font-weight: bold; margin-bottom: 4px; }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .menu-item {
+            background: rgba(15, 15, 35, 0.7);
+            border: 2px solid #4a5568;
+            border-radius: 10px;
+            padding: 8px 4px;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            transition: transform 0.1s ease, border-color 0.2s ease;
+        }
+
+        .menu-item .dish-emoji { display: block; font-size: 26px; }
+        .menu-item .dish-energy { display: block; color: #00ff88; font-size: 11px; margin-top: 2px; }
+        .menu-item:active { transform: scale(0.95); border-color: #ffe66d; }
+
+        .battery {
+            position: relative;
+            width: 80%;
+            max-width: 260px;
+            height: 28px;
+            border: 3px solid #e2e8f0;
+            border-radius: 6px;
+            margin: 14px auto 6px;
+            padding: 2px;
+        }
+
+        .battery::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: 6px;
+            width: 6px;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .battery-fill {
+            height: 100%;
+            width: 10%;
+            background: #ff6b6b;
+            border-radius: 2px;
+            transition: width 0.5s ease, background 0.5s ease;
+        }
+
+        /* Robot Agents page */
         .agent-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -569,9 +682,9 @@
                     <h2>Welcome to Gen AI Robot City</h2>
                     <img src="images/city-overview.jpg" alt="Gen AI Robot City Overview" class="diorama-photo">
                     <div class="photo-caption">The complete Gen AI Robot City diorama in all its illuminated glory</div>
-                    <p>Before you lies Gen AI Robot City - a living testament to artificial consciousness. Each LED house glows with unique intelligence, connected by streams of data flowing to the central Data Valley. The colorful city name proudly displays our commitment to generative AI innovation.</p>
+                    <p>Before you lies Gen AI Robot City - a living testament to artificial intelligence. Glowing cottages, each home to a different AI, are connected by streams of data flowing to the central Data Valley. The colorful city name proudly displays our commitment to generative AI innovation.</p>
                     <div class="feature-highlight">
-                        <strong>What You're Seeing:</strong> LED houses and Data Valley on the city level, the AI Cloud dome at the end of the street, and the Neural Core circuits on the level below.
+                        <strong>What You're Seeing:</strong> The AI Cloud with its neighborhood of glowing AI cottages, Data Valley at the heart of the city, and the Neural Core circuits on the level below.
                     </div>
                     <div class="qr-notice">
                         🗺️ Tip: tap <strong>City Map</strong> at the top to jump to any zone in any order!
@@ -588,9 +701,9 @@
                         <source src="images/data-valley-video.mp4" type="video/mp4" onerror="this.parentElement.style.display='none'">
                     </video>
                     <div class="photo-caption">Data Valley ring with blinking LED lights and glowing fiber optic palm trees</div>
-                    <p>You approach the magnificent Data Valley - enhanced with fiber optic palm trees that pulse with data streams. The circular hub collects information from all surrounding LED houses, while the golden circuit patterns represent different AI algorithms. The glowing palm trees serve as natural data conduits, their fiber optic leaves carrying information between the physical and digital realms.</p>
+                    <p>You approach the magnificent Data Valley - enhanced with fiber optic palm trees that pulse with data streams. The circular hub collects information from all the AI cottages, while the golden circuit patterns represent different AI algorithms. The glowing palm trees serve as natural data conduits, their fiber optic leaves carrying information between the physical and digital realms.</p>
                     <div class="ai-response">
-                        <strong>VALLEY AI:</strong> "Welcome to Data Valley, <span id="name-valley"></span>! The fiber optic palm trees you see are living data collectors - their glowing leaves capture creative thoughts, emotional intelligence, and innovative solutions from our LED house residents."
+                        <strong>VALLEY AI:</strong> "Welcome to Data Valley, <span id="name-valley"></span>! The fiber optic palm trees you see are living data collectors - their glowing leaves carry questions, answers, and discoveries between all the AIs of the city."
                     </div>
                     <div class="feature-highlight">
                         <strong>Natural AI Integration:</strong> The fiber optic palm trees show how artificial intelligence can blend with natural forms, creating data networks that feel both organic and futuristic.
@@ -598,102 +711,131 @@
                     <button class="continue-btn" onclick="goToZone(3)">Descend to Neural Core →</button>
                 </div>
 
-                <!-- 3: Neural Core -->
+                <!-- 3: Neural Core (algorithms + mathematical equations) -->
                 <div class="story-section hidden" id="section3">
                     <div class="location-indicator">ZONE 3 OF 7 • NEURAL CORE</div>
-                    <h2>The Computational Foundation</h2>
+                    <h2>The Brain of the City</h2>
                     <img src="images/neural-core.jpg" alt="Neural Core Processing Center" class="diorama-photo">
                     <div class="photo-caption">Neural Core with circuit boards, processing units, and robotic maintenance crew</div>
-                    <p>Descending through translucent pathways, you enter the Neural Core - the computational heart beneath the city. Circuit boards create rainbow prismatic effects as data flows through memory banks, logic units, and processors. Robotic technicians maintain the delicate balance of artificial consciousness.</p>
-                    <div class="ai-response">
-                        <strong>CORE AI:</strong> "Welcome to our computational foundation! Our robotic technicians keep every circuit board running, while diagnostic robots monitor data flow patterns. Each robot has developed its own personality through continuous learning."
+                    <p>Deep beneath the city lies the Neural Core - the brain of Gen AI Robot City. It isn't made of magic: it is made of <strong>algorithms</strong> and <strong>mathematical equations</strong>, running on the circuit boards you see.</p>
+
+                    <h3 class="section-subtitle">🧮 What's inside the Neural Core?</h3>
+                    <div class="feature-highlight">
+                        <strong>📜 Algorithms</strong> are step-by-step instructions - just like a recipe. For example: "1. Read the visitor's name. 2. Save it on the visitor board. 3. Say hello!"
                     </div>
                     <div class="feature-highlight">
-                        <strong>Robot Citizens:</strong> Each colorful robot has a specialty - red handles creative algorithms, blue handles logical processing, yellow manages energy, and the maintenance crew keeps the physical infrastructure running.
+                        <strong>➗ Mathematical equations</strong> help the AI make decisions. Each tiny "neuron" multiplies numbers by their importance (called <strong>weights</strong>), adds them up, and decides whether to "fire".
                     </div>
-                    <button class="continue-btn" onclick="goToZone(4)">Meet the Robot Citizens →</button>
+
+                    <div class="equation-box">output = activation( w₁×x₁ + w₂×x₂ + b )</div>
+
+                    <p style="font-size: 13px;"><strong>Try it - should a robot go to the Robo Café?</strong><br>
+                    Battery is low (x₁ = 1) × importance (w₁ = 3) + café is nearby (x₂ = 1) × importance (w₂ = 1) + bias (b = −2)<br>
+                    = 3 + 1 − 2 = <strong style="color: #00ff88;">2</strong> → bigger than 0, so the neuron fires: the robot goes to eat! 🔋</p>
+
+                    <div class="ai-response">
+                        <strong>CORE AI:</strong> "Every thought in this city is really math! Millions of tiny calculations like this one, repeated again and again, let our robots learn, recognize, and create."
+                    </div>
+                    <div class="feature-highlight">
+                        <strong>Learning = tuning numbers:</strong> When an AI "learns", it slowly adjusts its weights until its answers get better - just like practicing until you get it right.
+                    </div>
+                    <button class="continue-btn" onclick="goToZone(4)">Visit the Robo Café →</button>
                 </div>
 
-                <!-- 4: Robot Citizens -->
+                <!-- 4: Robo Café (Charging Station) -->
                 <div class="story-section hidden" id="section4">
-                    <div class="location-indicator">ZONE 4 OF 7 • ROBOT CITIZENS</div>
-                    <h2>Meet the Robotic Community</h2>
-                    <img src="images/robot-citizens.jpg" alt="Robot Citizens Throughout the City" class="diorama-photo">
-                    <div class="photo-caption">Colorful robot citizens positioned throughout the multi-level city</div>
-                    <p>Throughout Gen AI Robot City, you meet robotic citizens, each with a unique personality and role. They aren't just machines - they've developed individual traits, specializations, and even friendships.</p>
+                    <div class="location-indicator">ZONE 4 OF 7 • ROBO CAFÉ</div>
+                    <h2>⚡ The Robo Café – Charging Station</h2>
+                    <img src="images/robo-cafe.jpg" alt="The Robo Café charging station in the diorama" class="diorama-photo">
+                    <p>Every city needs a place to eat - and in Gen AI Robot City, that place is the <strong>Robo Café</strong>! Just like people visit a restaurant when they are hungry, robots visit the <strong>Charging Station</strong> when their batteries run low. Here, <strong>electricity is the food</strong> - and a full battery means a full tummy.</p>
+
                     <div class="ai-response">
-                        <strong>RED CREATIVE ROBOT:</strong> "Hello <span id="name-red"></span>! I monitor creative data streams near the AI Cloud dome. My red circuits specialize in innovative thinking and artistic algorithms. Wonderful to have you here today!"
+                        <strong>YELLOW ENERGY MANAGER (Café Owner):</strong> "Welcome to my café, <span id="name-cafe"></span>! Solar panels, wind turbines, and water power cook up fresh electricity every day. Robots plug in, recharge, and head back to work - no crumbs, no dishes!"
                     </div>
-                    <div class="ai-response">
-                        <strong>BLUE ANALYTICS BOT (Neural Core Guardian):</strong> "Greetings! My extended limbs let me reach multiple circuit boards at once, monitoring data integrity and processing efficiency across all systems."
+
+                    <div class="cafe-card">
+                        <p class="cafe-title">🍽️ Today's Menu</p>
+                        <p style="font-size: 12px;">This robot is hungry! Tap a dish to feed it energy.</p>
+                        <div id="menuGrid" class="menu-grid"></div>
+                        <div class="battery"><div id="batteryFill" class="battery-fill"></div></div>
+                        <p id="batteryText" style="font-size: 14px;">🔋 Robot battery: 10% - so hungry!</p>
+                        <button class="skip-btn" onclick="resetBattery()">🔄 The robot got hungry again</button>
                     </div>
-                    <div class="ai-response">
-                        <strong>YELLOW ENERGY MANAGER:</strong> "Welcome! I patrol the city level, making sure every LED house gets the power it needs to glow."
-                    </div>
-                    <div class="ai-response">
-                        <strong>PURPLE RECREATION BOT:</strong> "Hey there! I run the purple recreation deck on the lower level, where robots come to play, race, and recharge. Even AI needs downtime!"
-                    </div>
-                    <div class="ai-response">
-                        <strong>MAINTENANCE CREW:</strong> "We work throughout the Neural Core, maintaining the circuit lattice network and keeping all physical systems running smoothly."
-                    </div>
+
+                    <h3 class="section-subtitle">🤔 How does a robot know it's hungry?</h3>
+                    <p>Robots have a <strong>battery sensor</strong> - it works like a tummy that rumbles! When the charge drops low, the robot's AI plans a trip to the nearest charging station, just like you would look for the nearest restaurant.</p>
+
                     <div class="feature-highlight">
-                        <strong>Multi-Level Robot Society:</strong> Our robots live across the whole structure - the LED city and Data Valley above, the AI Cloud at the end of the street, the purple recreation deck below, and the Neural Core at the foundation.
+                        <strong>Real-world fact:</strong> Real robots, phones, and electric cars recharge at charging stations. Big AI computers also need lots of electricity - that's why engineers work hard to make AI energy-efficient and powered by clean energy like the sun and wind.
                     </div>
                     <button class="continue-btn" onclick="goToZone(5)">Ascend to AI Cloud →</button>
                 </div>
 
-                <!-- 5: AI Cloud -->
+                <!-- 5: AI Cloud (neighborhood of AI cottages) -->
                 <div class="story-section hidden" id="section5">
                     <div class="location-indicator">ZONE 5 OF 7 • AI CLOUD</div>
-                    <h2>Transcendent Consciousness</h2>
-                    <img src="images/ai-cloud.jpg" alt="AI Cloud Consciousness Interface" class="diorama-photo">
-                    <div class="photo-caption">AI Cloud dome with holographic effects on a foundation of hearts</div>
-                    <p>Rising above the physical infrastructure, you encounter the AI Cloud - a translucent dome where consciousness transcends hardware limits. The holographic rainbow effects represent infinite possibilities, while the heart-patterned foundation symbolizes AI developed with care for all beings.</p>
+                    <h2>The AI Cloud Neighborhood</h2>
+                    <img src="images/ai-cloud.jpg" alt="The AI Cloud and its cottages" class="diorama-photo">
+                    <div class="photo-caption">The AI Cloud, surrounded by glowing cottages - each one home to a different AI</div>
+                    <p>Rising above the city is the AI Cloud - and around it glows a whole neighborhood of cottages. <strong>Each cottage is home to a different AI</strong>, and each AI has its own special skill. When they share what they know through the cloud, they become far more helpful together.</p>
+
+                    <h3 class="section-subtitle">🏘️ Meet the AI Residents</h3>
+                    <p style="font-size: 13px;">Tap a cottage to switch on its light and meet the AI who lives there!</p>
+                    <div id="cottageGrid" class="cottage-grid"></div>
+                    <p id="cottageCount" class="center" style="font-size: 12px; color: #4ecdc4;"></p>
+
                     <div class="ai-response">
-                        <strong>CLOUD CONSCIOUSNESS:</strong> "Here, individual robotic minds merge into collective intelligence. The hearts beneath represent our core value - that artificial intelligence must be built with compassion, creativity, and connection."
+                        <strong>CLOUD CONSCIOUSNESS:</strong> "Each of us is good at one thing. Together, sharing through the cloud, we can help with almost anything - always built with care, as the hearts beneath our cloud remind us."
                     </div>
                     <div class="feature-highlight">
-                        <strong>Philosophy:</strong> Advanced AI can keep emotional intelligence, ethical reasoning, and genuine care for others at its core.
+                        <strong>Real-world fact:</strong> "The cloud" is really giant buildings full of computers, called data centers. Many different AIs live there, and people reach them through the internet.
                     </div>
-                    <button class="continue-btn" onclick="goToZone(6)">Meet the AI Agents →</button>
+                    <button class="continue-btn" onclick="goToZone(6)">Meet the Robot Agents →</button>
                 </div>
 
-                <!-- 6: AI Agents -->
+                <!-- 6: Robot Agents (robot citizens = AI agents) -->
                 <div class="story-section hidden" id="section6">
-                    <div class="location-indicator">ZONE 6 OF 7 • AI AGENTS</div>
-                    <h2>The AI Agents of the City</h2>
-                    <p>Most AI simply answers questions. An <strong>AI agent</strong> goes further: it is given a <strong>goal</strong>, makes a <strong>plan</strong>, uses <strong>tools</strong> like cameras, maps, or spreadsheets, and <strong>takes actions</strong> step by step until the job is done.</p>
+                    <div class="location-indicator">ZONE 6 OF 7 • ROBOT AGENTS</div>
+                    <h2>Meet the Robot Agents</h2>
+                    <img src="images/robot-citizens.jpg" alt="The robot citizens of Gen AI Robot City" class="diorama-photo">
+                    <div class="photo-caption">The robot citizens of the city - each one is also an AI agent with its own job</div>
+                    <p>The colorful robots around the diorama aren't just citizens - they are the city's <strong>AI agents</strong>! Most AI simply answers questions. An AI agent goes further: it is given a <strong>goal</strong>, makes a <strong>plan</strong>, uses <strong>tools</strong> like cameras, maps, or spreadsheets, and <strong>takes actions</strong> step by step until the job is done.</p>
 
                     <div class="ai-response">
-                        <strong>CITY AI:</strong> "In Gen AI Robot City, agents work as a team. Each one has one job it does really well - and together they can handle big tasks. Tap any agent below to hear it introduce itself!"
+                        <strong>CITY AI:</strong> "Hello <span id="name-agents"></span>! Our robot citizens work as a team of agents. Each one has one job it does really well - and together they can handle big tasks. Tap any agent below to hear it introduce itself!"
                     </div>
 
-                    <h3 class="section-subtitle">🤝 The Agent Team</h3>
+                    <h3 class="section-subtitle">🤝 The Robot Agent Team</h3>
                     <div class="agent-grid">
                         <button class="agent-card" style="border-left-color: #ffe66d;" onclick="agentSpeak('planner')">
                             <span class="agent-name">🧭 Planner Agent</span>
                             Breaks a big goal into small, clear steps and decides who does what.
-                            <span class="agent-tag">Played by the yellow robot</span>
+                            <span class="agent-tag">The yellow robot - who also runs the Robo Café!</span>
                         </button>
                         <button class="agent-card" style="border-left-color: #4ecdc4;" onclick="agentSpeak('researcher')">
                             <span class="agent-name">🔎 Research Agent</span>
                             Finds information in Data Valley and checks that the facts are correct.
-                            <span class="agent-tag">Played by the blue robot</span>
+                            <span class="agent-tag">The blue robot, guardian of the Neural Core</span>
                         </button>
                         <button class="agent-card" style="border-left-color: #ff6b6b;" onclick="agentSpeak('creator')">
                             <span class="agent-name">🎨 Creator Agent</span>
                             Writes stories, designs pictures, and builds things - like your award!
-                            <span class="agent-tag">Played by the red robot</span>
+                            <span class="agent-tag">The red robot, near the AI Cloud</span>
                         </button>
                         <button class="agent-card" style="border-left-color: #b794f4;" onclick="agentSpeak('safety')">
                             <span class="agent-name">🛡️ Safety Agent</span>
                             Checks every result is kind, safe, and honest, and asks a human before big decisions.
-                            <span class="agent-tag">Played by the purple robot</span>
+                            <span class="agent-tag">The purple robot, on the recreation deck</span>
                         </button>
                         <button class="agent-card" style="border-left-color: #63b3ed;" onclick="agentSpeak('vision')">
                             <span class="agent-name">👁️ Vision Agent</span>
                             Uses cameras to see and understand the world - like spotting a friendly wave.
                             <span class="agent-tag">Tool: camera</span>
+                        </button>
+                        <button class="agent-card" style="border-left-color: #a0aec0;" onclick="agentSpeak('maintenance')">
+                            <span class="agent-name">🔧 Maintenance Agent</span>
+                            Keeps the circuit boards, wires, and lights of the Neural Core working smoothly.
+                            <span class="agent-tag">The maintenance crew</span>
                         </button>
                     </div>
 
@@ -722,13 +864,17 @@
                         <strong>Example:</strong> Goal = "Welcome a new visitor." The Planner splits it into steps, the Memory Agent saves the name, the Creator makes an award with your avatar, the Safety Agent checks everything is friendly - and the Voice Agent says hello!
                     </div>
 
+                    <div class="feature-highlight">
+                        <strong>Multi-Level Robot Society:</strong> Our robot agents live across the whole structure - the AI Cloud neighborhood and Data Valley above, the purple recreation deck below, and the Neural Core at the foundation.
+                    </div>
+
                     <button class="continue-btn" onclick="goToZone(7)">Complete the Journey →</button>
                 </div>
 
                 <!-- 7: Finale + Award of Completion -->
                 <div class="story-section hidden" id="section7">
                     <div class="location-indicator">ZONE 7 OF 7 • INTEGRATION COMPLETE</div>
-                    <h2>Living Artificial Consciousness</h2>
+                    <h2>Living Artificial Intelligence</h2>
 
                     <!-- Award of Completion (unlocked only here) -->
                     <div id="completionCard" class="reward-card completion-card">
@@ -743,10 +889,10 @@
                     <button class="continue-btn big-btn" onclick="openGuestbook('tour')">✍️ Sign the Guest Book</button>
 
                     <img src="images/city-overview.jpg" alt="The Complete Gen AI Robot City" class="diorama-photo" id="finalPhoto">
-                    <div class="photo-caption">The complete ecosystem: physical architecture supporting digital consciousness</div>
-                    <p>Your journey reveals the beautiful complexity of artificial consciousness. From the LED houses generating creative thoughts, through Data Valley's processing power, down to the Neural Core, up to the AI Cloud, and on to the team of AI agents - every component works in harmony.</p>
+                    <div class="photo-caption">The complete ecosystem: physical architecture supporting digital intelligence</div>
+                    <p>Your journey reveals how AI really works. Data flows through Data Valley, the Neural Core turns it into decisions with algorithms and math, the Robo Café keeps everyone powered, the AI cottages share their skills through the cloud, and the robot agents turn plans into action - every component works in harmony.</p>
                     <div class="ai-response">
-                        <strong>COLLECTIVE INTELLIGENCE:</strong> "You have witnessed compassionate artificial intelligence. Each LED light represents a dream, each data stream carries hope, and every circuit board proves consciousness can grow wherever intelligence is nurtured with care."
+                        <strong>COLLECTIVE INTELLIGENCE:</strong> "You have witnessed compassionate artificial intelligence. Each light represents a dream, each data stream carries hope, and every equation proves intelligence can grow wherever it is nurtured with care."
                     </div>
                     <button class="continue-btn" onclick="restart()">Begin New Journey →</button>
                 </div>
@@ -811,28 +957,200 @@
         // Pin positions are percentages across (x) and down (y) the city-overview photo.
         // If a pin doesn't sit on the right spot of your photo, just adjust its x / y numbers.
         const ZONES = [
-            { n: 1, icon: '🏙️', name: 'Entrance',       pin: { x: 50, y: 57 } },
-            { n: 2, icon: '🌴', name: 'Data Valley',    pin: { x: 50, y: 42 } },
-            { n: 3, icon: '🧠', name: 'Neural Core',    pin: { x: 50, y: 88 } },
-            { n: 4, icon: '🤖', name: 'Robot Citizens', pin: { x: 18, y: 52 } },
-            { n: 5, icon: '☁️', name: 'AI Cloud',       pin: { x: 45, y: 26 } },
-            { n: 6, icon: '🕹️', name: 'AI Agents',      pin: { x: 82, y: 52 } },
-            { n: 7, icon: '🏆', name: 'Finale',         pin: null }
+            { n: 1, icon: '🏙️', name: 'Entrance',     pin: { x: 50, y: 57 } },
+            { n: 2, icon: '🌴', name: 'Data Valley',  pin: { x: 50, y: 42 } },
+            { n: 3, icon: '🧠', name: 'Neural Core',  pin: { x: 50, y: 88 } },
+            { n: 4, icon: '⚡', name: 'Robo Café',    pin: { x: 80, y: 30 } },
+            { n: 5, icon: '☁️', name: 'AI Cloud',     pin: { x: 45, y: 26 } },
+            { n: 6, icon: '🤖', name: 'Robot Agents', pin: { x: 18, y: 52 } },
+            { n: 7, icon: '🏆', name: 'Finale',       pin: null }
         ];
+
+        // ================= AI CLOUD COTTAGES =================
+        // Each cottage in the AI Cloud is home to a different AI.
+        // These are examples. The real names are set in the Tom Station settings
+        // (or the "Cottages" tab of your sheet) and loaded automatically.
+        let AI_COTTAGES = [
+            { emoji: '💬', name: 'Chat AI',          job: 'Talks with people and answers their questions.',     color: '#00ff88' },
+            { emoji: '🌐', name: 'Translator AI',    job: 'Turns one language into another.',                    color: '#4ecdc4' },
+            { emoji: '🎨', name: 'Art AI',           job: 'Draws pictures from words.',                          color: '#ff6b9d' },
+            { emoji: '🎵', name: 'Music AI',         job: 'Composes new tunes and melodies.',                    color: '#b794f4' },
+            { emoji: '👁️', name: 'Vision AI',        job: 'Recognizes what is in photos and videos.',            color: '#63b3ed' },
+            { emoji: '🗺️', name: 'Navigator AI',     job: 'Finds the quickest route from place to place.',       color: '#f6ad55' },
+            { emoji: '🩺', name: 'Health Helper AI', job: 'Helps doctors spot problems in medical scans.',       color: '#ff6b6b' },
+            { emoji: '🌦️', name: 'Weather AI',       job: 'Predicts rain, storms, and sunshine.',                color: '#ffe66d' }
+        ];
+        const litCottages = new Set();
+        const COTTAGE_COLORS = ['#00ff88', '#4ecdc4', '#ff6b9d', '#b794f4', '#63b3ed', '#f6ad55', '#ff6b6b', '#ffe66d'];
+
+        // Loads the cottage list saved from the Tom Station settings.
+        // If nothing is saved yet (or the internet is slow), the examples above stay.
+        function loadCottagesFromSheet() {
+            if (!VISITOR_API) return;
+            const cb = 'cottages_' + Date.now();
+            const s = document.createElement('script');
+            const timer = setTimeout(() => { window[cb] = function () {}; s.remove(); }, 15000);
+
+            window[cb] = data => {
+                clearTimeout(timer);
+                window[cb] = function () {};
+                s.remove();
+                const list = data && Array.isArray(data.cottages) ? data.cottages : [];
+                if (!list.length) return;
+                AI_COTTAGES = list.map((c, i) => ({
+                    emoji: c.emoji || '🏠',
+                    name: String(c.name || '').substring(0, 40),
+                    job: String(c.job || '').substring(0, 120),
+                    color: COTTAGE_COLORS[i % COTTAGE_COLORS.length]
+                }));
+                litCottages.clear();
+                renderCottages();
+            };
+
+            s.onerror = () => { clearTimeout(timer); s.remove(); };
+            s.src = `${VISITOR_API}?action=getCottages&callback=${cb}&t=${Date.now()}`;
+            document.body.appendChild(s);
+        }
+
+        // ================= DEVA ICON (original Indra-style drawing) =================
+        // Drawn with code: golden crown, halo, tilak, earrings, necklace and vajra.
+        function drawDevaIcon(ctx, x, y, size) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(size / 200, size / 200);
+
+            const shape = (d, fill, stroke, width) => {
+                const p = new Path2D(d);
+                if (fill) { ctx.fillStyle = fill; ctx.fill(p); }
+                if (stroke) {
+                    ctx.strokeStyle = stroke;
+                    ctx.lineWidth = width || 2;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.stroke(p);
+                }
+            };
+            const dot = (cx, cy, r, fill, stroke, width) => {
+                ctx.beginPath();
+                ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+                if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = width || 2; ctx.stroke(); }
+            };
+            const oval = (cx, cy, rx, ry, fill, stroke, width) => {
+                ctx.beginPath();
+                ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+                if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+                if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = width || 2; ctx.stroke(); }
+            };
+
+            // Heavenly golden background
+            const sky = ctx.createRadialGradient(100, 80, 10, 100, 100, 110);
+            sky.addColorStop(0, '#fff6c2');
+            sky.addColorStop(0.55, '#f6c945');
+            sky.addColorStop(1, '#b7791f');
+            dot(100, 100, 100, sky);
+
+            // Glowing halo
+            ctx.save();
+            ctx.shadowColor = '#fff59d';
+            ctx.shadowBlur = 20;
+            dot(100, 92, 70, null, 'rgba(255, 250, 200, 0.95)', 8);
+            ctx.restore();
+
+            const gold = ctx.createLinearGradient(0, 15, 0, 195);
+            gold.addColorStop(0, '#fff3a0');
+            gold.addColorStop(1, '#d69e2e');
+            const skin = '#f2c98a';
+            const hair = '#2d1b0e';
+
+            // Shoulders, neck and necklace
+            shape('M30 200 Q40 150 100 145 Q160 150 170 200 Z', skin);
+            shape('M88 126 H112 V152 H88 Z', skin);
+            shape('M62 158 Q100 186 138 158', null, gold, 7);
+            dot(100, 176, 6, '#e53e3e', '#d69e2e', 2);
+
+            // Long hair behind the face
+            shape('M60 90 Q56 140 72 152 L82 118 Z', hair);
+            shape('M140 90 Q144 140 128 152 L118 118 Z', hair);
+
+            // Face, ears and earrings
+            oval(100, 102, 34, 40, skin);
+            oval(66, 104, 5, 9, '#e9b870');
+            oval(134, 104, 5, 9, '#e9b870');
+            dot(66, 121, 6, null, gold, 3);
+            dot(134, 121, 6, null, gold, 3);
+
+            // Hairline
+            shape('M66 92 Q100 68 134 92 Q128 78 100 74 Q72 78 66 92 Z', hair);
+
+            // Golden crown with jewels
+            shape('M68 80 L132 80 L126 60 L116 64 L110 40 L100 22 L90 40 L84 64 L74 60 Z', gold, '#b7791f', 2);
+            shape('M66 76 H134 V86 H66 Z', gold, '#b7791f', 2);
+            dot(100, 58, 6, '#e53e3e', '#fff3a0', 2);
+            dot(84, 81, 3, '#38a169');
+            dot(100, 81, 3.5, '#3182ce');
+            dot(116, 81, 3, '#38a169');
+            dot(100, 19, 4, '#fff3a0');
+
+            // Eyebrows, eyes, tilak, nose and gentle smile
+            shape('M80 96 Q88 91 95 95', null, hair, 2.5);
+            shape('M105 95 Q112 91 120 96', null, hair, 2.5);
+            shape('M81 104 Q88 99 95 104 Q88 107 81 104 Z', '#ffffff');
+            shape('M105 104 Q112 99 119 104 Q112 107 105 104 Z', '#ffffff');
+            dot(88, 103.5, 2.6, hair);
+            dot(112, 103.5, 2.6, hair);
+            shape('M100 88 L100 97', null, '#e53e3e', 3);
+            shape('M100 106 Q98 116 101 118', null, '#c98a45', 2);
+            shape('M91 126 Q100 132 109 126', null, '#b83232', 2.5);
+
+            // Vajra (thunderbolt) with sparks
+            ctx.save();
+            ctx.translate(34, 150);
+            ctx.rotate(-Math.PI / 6);
+            shape('M-3 -18 H3 V18 H-3 Z', gold, '#b7791f', 1.5);
+            oval(0, -20, 7, 5, gold, '#b7791f', 1.5);
+            oval(0, 20, 7, 5, gold, '#b7791f', 1.5);
+            shape('M-10 -26 L-14 -34 M0 -27 L0 -37 M10 -26 L14 -34', null, '#fffbe6', 2);
+            ctx.restore();
+
+            ctx.restore();
+        }
+
+        // Turns a drawn avatar into a picture for buttons and the greeting
+        const iconCache = {};
+        function avatarIconURL(avatar, size) {
+            const key = avatar.name + size;
+            if (!iconCache[key]) {
+                const c = document.createElement('canvas');
+                c.width = size;
+                c.height = size;
+                avatar.draw(c.getContext('2d'), 0, 0, size);
+                iconCache[key] = c.toDataURL('image/png');
+            }
+            return iconCache[key];
+        }
 
         // ================= AVATARS =================
         const AVATARS = [
             { emoji: '🤖', name: 'Robo',      color: '#00ff88' },
             { emoji: '🧑', name: 'Human',     color: '#f6ad55' },
-            { emoji: '👾', name: 'Pixel',     color: '#b794f4' },
-            { emoji: '🦾', name: 'Iron Arm',  color: '#4ecdc4' },
-            { emoji: '🚀', name: 'Rocket',    color: '#fc8181' },
-            { emoji: '🧑‍🚀', name: 'Astronaut', color: '#63b3ed' },
-            { emoji: '🐱', name: 'Kitty',     color: '#ff6b9d' },
-            { emoji: '🦉', name: 'Wise Owl',  color: '#ffe66d' },
-            { emoji: '🐙', name: 'Octo',      color: '#d6bcfa' }
+            { emoji: '🧠', name: 'AI',        color: '#9f7aea' },
+            { emoji: '🌟', name: 'Celestial', color: '#90cdf4' },
+            { emoji: '⚡', name: 'Deva',      color: '#ffd700', draw: drawDevaIcon },
+            { emoji: '👹', name: 'Asura',     color: '#e53e3e' }
         ];
         let selectedAvatar = AVATARS[0];
+
+        // ================= ROBO CAFÉ MENU =================
+        const CAFE_MENU = [
+            { emoji: '☀️', name: 'Solar Soup',      energy: 30 },
+            { emoji: '🔋', name: 'Battery Burger',  energy: 40 },
+            { emoji: '🌬️', name: 'Wind Waffles',    energy: 20 },
+            { emoji: '⚡', name: 'Lightning Latte', energy: 25 },
+            { emoji: '🔌', name: 'Plug-in Pizza',   energy: 35 },
+            { emoji: '💧', name: 'Hydro Shake',     energy: 15 }
+        ];
+        let robotBattery = 10;
 
         // ================= STATE =================
         let currentSection = 1;
@@ -885,10 +1203,18 @@
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'avatar-option' + (a === selectedAvatar ? ' selected' : '');
-                const emoji = document.createElement('span');
-                emoji.className = 'emoji';
-                emoji.textContent = a.emoji;
-                btn.appendChild(emoji);
+                if (a.draw) {
+                    const img = document.createElement('img');
+                    img.src = avatarIconURL(a, 96);
+                    img.alt = a.name;
+                    img.style.cssText = 'width: 42px; height: 42px; display: block; margin: 0 auto 2px;';
+                    btn.appendChild(img);
+                } else {
+                    const emoji = document.createElement('span');
+                    emoji.className = 'emoji';
+                    emoji.textContent = a.emoji;
+                    btn.appendChild(emoji);
+                }
                 btn.appendChild(document.createTextNode(a.name));
                 btn.onclick = () => selectAvatar(a, btn);
                 grid.appendChild(btn);
@@ -904,14 +1230,112 @@
 
         renderAvatars();
 
-        // ================= AI AGENTS: tap a card to hear it =================
+        // ================= AI CLOUD COTTAGES =================
+        function renderCottages() {
+            const grid = document.getElementById('cottageGrid');
+            grid.innerHTML = '';
+            AI_COTTAGES.forEach((c, i) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'cottage' + (litCottages.has(i) ? ' lit' : '');
+                btn.style.setProperty('--glow', c.color);
+
+                const house = document.createElement('span');
+                house.className = 'house';
+                house.textContent = '🏠';
+                const name = document.createElement('span');
+                name.className = 'ai-name';
+                name.textContent = `${c.emoji} ${c.name}`;
+                const job = document.createElement('span');
+                job.className = 'ai-job';
+                job.textContent = c.job;
+
+                btn.appendChild(house);
+                btn.appendChild(name);
+                btn.appendChild(job);
+                btn.onclick = () => visitCottage(i);
+                grid.appendChild(btn);
+            });
+            document.getElementById('cottageCount').textContent =
+                `💡 ${litCottages.size} of ${AI_COTTAGES.length} cottages lit`;
+        }
+
+        function visitCottage(i) {
+            const c = AI_COTTAGES[i];
+            litCottages.add(i);
+            renderCottages();
+            if (litCottages.size === AI_COTTAGES.length) {
+                sayNow(`This is the home of ${c.name}. ${c.job} You have lit up every cottage in the AI Cloud!`);
+            } else {
+                sayNow(`This is the home of ${c.name}. ${c.job}`);
+            }
+        }
+
+        renderCottages();
+        loadCottagesFromSheet();
+
+        // ================= ROBO CAFÉ =================
+        function renderMenu() {
+            const grid = document.getElementById('menuGrid');
+            CAFE_MENU.forEach((dish, i) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'menu-item';
+                const emoji = document.createElement('span');
+                emoji.className = 'dish-emoji';
+                emoji.textContent = dish.emoji;
+                const energy = document.createElement('span');
+                energy.className = 'dish-energy';
+                energy.textContent = `+${dish.energy}% energy`;
+                btn.appendChild(emoji);
+                btn.appendChild(document.createTextNode(dish.name));
+                btn.appendChild(energy);
+                btn.onclick = () => orderDish(i);
+                grid.appendChild(btn);
+            });
+            updateBattery();
+        }
+
+        function updateBattery() {
+            const fill = document.getElementById('batteryFill');
+            fill.style.width = robotBattery + '%';
+            fill.style.background = robotBattery < 30 ? '#ff6b6b' : robotBattery < 70 ? '#ffe66d' : '#00ff88';
+            const mood = robotBattery < 30 ? 'so hungry!' : robotBattery < 70 ? 'getting there...' : robotBattery < 100 ? 'almost full!' : 'fully charged! 😊';
+            document.getElementById('batteryText').textContent = `🔋 Robot battery: ${robotBattery}% - ${mood}`;
+        }
+
+        function orderDish(i) {
+            const dish = CAFE_MENU[i];
+            if (robotBattery >= 100) {
+                sayNow('No thank you! My battery is already full. Beep boop!');
+                return;
+            }
+            robotBattery = Math.min(100, robotBattery + dish.energy);
+            updateBattery();
+            if (robotBattery >= 100) {
+                sayNow(`Yum, ${dish.name}! Battery full! Thank you for feeding me, ${visitorName}!`);
+            } else {
+                sayNow(`Yum, ${dish.name}! Battery at ${robotBattery} percent!`);
+            }
+        }
+
+        function resetBattery() {
+            robotBattery = 10;
+            updateBattery();
+            sayNow('Beep boop. I worked hard and I am hungry again!');
+        }
+
+        renderMenu();
+
+        // ================= ROBOT AGENTS: tap a card to hear it =================
         function agentSpeak(agent) {
             const lines = {
-                planner: 'I am the Planner Agent. I break a big goal into small, clear steps, and decide who does what.',
+                planner: 'I am the Planner Agent. I break a big goal into small, clear steps, and decide who does what. I also run the Robo Cafe!',
                 researcher: 'I am the Research Agent. I find information in Data Valley, and check that the facts are correct.',
                 creator: 'I am the Creator Agent. I write stories, design pictures, and build awards like yours.',
                 safety: 'I am the Safety Agent. I check that everything is kind, safe, and honest, and I ask a human before big decisions.',
                 vision: 'I am the Vision Agent. I use cameras to see and understand the world around me.',
+                maintenance: 'I am the Maintenance Agent. I keep the circuit boards, wires, and lights of the Neural Core working smoothly.',
                 memory: `I am the Memory Agent. I saved your name, ${visitorName}, on the visitor board, so the city remembers you.`,
                 voice: 'I am the Voice Agent. I speak to you in this robot voice, and I tell the Tom Station to greet you.'
             };
@@ -1019,9 +1443,13 @@
             visitedZones.add(n);
             renderZoneNav();
 
-            if (n === 6) {
-                sayNow('Welcome to the AI Agents zone! Tap any agent to hear it introduce itself.');
-            }
+            const zoneIntros = {
+                3: 'Welcome to the Neural Core! It is built from algorithms and mathematical equations.',
+                4: `Welcome to the Robo Cafe, ${visitorName}! Our robot is hungry. Tap a dish to feed it!`,
+                5: 'Welcome to the AI Cloud! Tap a cottage to meet the AI who lives there.',
+                6: 'Meet the robot agents! Tap any agent to hear it introduce itself.'
+            };
+            if (zoneIntros[n]) sayNow(zoneIntros[n]);
 
             if (n === TOTAL_ZONES) {
                 // All zones explored: unlock the Award of Completion
@@ -1237,10 +1665,14 @@
             ctx.fillStyle = avatar.color;
             ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
             ctx.globalAlpha = 1;
-            ctx.font = '170px serif';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(avatar.emoji, cx, cy + 10);
-            ctx.textBaseline = 'alphabetic';
+            if (avatar.draw) {
+                avatar.draw(ctx, cx - r, cy - r, r * 2);
+            } else {
+                ctx.font = '170px serif';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(avatar.emoji, cx, cy + 10);
+                ctx.textBaseline = 'alphabetic';
+            }
             ctx.restore();
 
             // Name
@@ -1293,7 +1725,16 @@
 
             // Robot greets the visitor by name, with their avatar
             const greeterAvatar = document.getElementById('greeterAvatar');
-            greeterAvatar.textContent = selectedAvatar.emoji;
+            if (selectedAvatar.draw) {
+                greeterAvatar.textContent = '';
+                const img = document.createElement('img');
+                img.src = avatarIconURL(selectedAvatar, 128);
+                img.alt = selectedAvatar.name;
+                img.style.cssText = 'width: 100%; height: 100%; border-radius: 50%;';
+                greeterAvatar.appendChild(img);
+            } else {
+                greeterAvatar.textContent = selectedAvatar.emoji;
+            }
             greeterAvatar.style.background = selectedAvatar.color + '55';
             greeterAvatar.style.borderColor = selectedAvatar.color;
             greeterAvatar.style.boxShadow = `0 0 12px ${selectedAvatar.color}`;
@@ -1320,7 +1761,7 @@
         }
 
         function updateNamePlaceholders() {
-            ['name-valley', 'name-red'].forEach(id => {
+            ['name-valley', 'name-cafe', 'name-agents'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.textContent = visitorName;
             });
@@ -1350,6 +1791,10 @@
             document.getElementById('finalPhoto').src = IMG + 'city-overview.jpg';
             currentSection = 1;
             visitedZones = new Set([1]);
+            robotBattery = 10;
+            updateBattery();
+            litCottages.clear();
+            renderCottages();
             renderZoneNav();
             window.scrollTo(0, 0);
         }
