@@ -55,10 +55,15 @@
             color: #e2e8f0;
         }
 
+        .btn.save {
+            font-size: 14px;
+            padding: 12px 22px;
+        }
+
         .setting { text-align: left; margin: 12px 0; font-size: 13px; }
         .setting label { display: block; color: #4ecdc4; margin-bottom: 6px; }
 
-        .select {
+        .select, .text-input {
             width: 100%;
             background: rgba(15, 15, 35, 0.8);
             border: 2px solid #4a5568;
@@ -74,6 +79,56 @@
         #sampleStatus { font-size: 12px; color: #ffe66d; min-height: 16px; margin-bottom: 6px; }
 
         .toggle { display: block; margin-top: 12px; font-size: 13px; color: #e2e8f0; text-align: left; }
+
+        /* Cottage editor */
+        details.setting {
+            background: rgba(15, 15, 35, 0.4);
+            border: 1px solid #4a5568;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        details.setting summary {
+            color: #4ecdc4;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .cottage-row {
+            background: rgba(15, 15, 35, 0.6);
+            border: 1px solid #4a5568;
+            border-radius: 10px;
+            padding: 8px;
+            margin: 8px 0;
+        }
+
+        .cottage-top { display: flex; gap: 6px; }
+
+        .cottage-row input {
+            background: rgba(15, 15, 35, 0.8);
+            border: 2px solid #4a5568;
+            border-radius: 8px;
+            padding: 8px;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .cottage-row .c-emoji { width: 54px; text-align: center; }
+        .cottage-row .c-name { flex: 1; min-width: 0; }
+        .cottage-row .c-job { width: 100%; margin-top: 6px; }
+
+        .remove-btn {
+            background: #4a5568;
+            border: none;
+            color: #e2e8f0;
+            border-radius: 8px;
+            width: 38px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        #cottageStatus { font-size: 12px; color: #ffe66d; min-height: 16px; margin-top: 8px; text-align: left; }
 
         #status { color: #4ecdc4; font-size: 14px; margin-top: 10px; }
 
@@ -227,6 +282,21 @@
             Show Robot Mirror (live camera view, nothing recorded)
         </label>
 
+        <!-- AI Cloud cottages editor -->
+        <details class="setting" id="cottageSettings">
+            <summary>🏘️ AI Cloud Cottages (tap to edit)</summary>
+            <p class="note" style="margin-top: 8px;">Each cottage in the AI Cloud is home to a different AI. Type the names from your diorama's houses. The story page shows these to every new visitor.</p>
+            <div id="cottageRows"></div>
+            <button class="btn small" onclick="addCottageRow()">➕ Add cottage</button>
+            <div class="setting">
+                <label for="adminPin">🔑 Admin PIN (from your Apps Script)</label>
+                <input type="password" id="adminPin" class="text-input" inputmode="numeric" autocomplete="off" placeholder="Enter PIN to save">
+            </div>
+            <button class="btn save" onclick="saveCottages()">💾 Save cottages</button>
+            <button class="btn small" onclick="loadCottages()">🔄 Reload</button>
+            <p id="cottageStatus">Loading cottages...</p>
+        </details>
+
         <button class="btn" id="startBtn" onclick="startStation()">▶ Start Station</button>
         <p id="startError" class="error"></p>
     </div>
@@ -261,7 +331,7 @@
     </div>
 
     <div class="card" style="font-size: 11px; color: #718096; text-align: left;">
-        <p><strong>Diagnostics</strong> (station v13 • robot music • machine voice)</p>
+        <p><strong>Diagnostics</strong> (station v15 • cottage settings)</p>
         <p id="diagLink"></p>
         <p id="diag" style="word-break: break-all;">Waiting to start...</p>
     </div>
@@ -278,6 +348,18 @@
         const REPLY_TIMEOUT = 15000;   // wait up to 15 seconds for Google to reply
         const TOM_REPEAT_GAP = 6000;   // silence after each greeting so Tom can repeat it
         const MIRROR_MS = 12000;       // how long the Robot Mirror stays on screen
+
+        // Example cottages shown until you save your own
+        const DEFAULT_COTTAGES = [
+            { emoji: '💬', name: 'Chat AI',          job: 'Talks with people and answers their questions.' },
+            { emoji: '🌐', name: 'Translator AI',    job: 'Turns one language into another.' },
+            { emoji: '🎨', name: 'Art AI',           job: 'Draws pictures from words.' },
+            { emoji: '🎵', name: 'Music AI',         job: 'Composes new tunes and melodies.' },
+            { emoji: '👁️', name: 'Vision AI',        job: 'Recognizes what is in photos and videos.' },
+            { emoji: '🗺️', name: 'Navigator AI',     job: 'Finds the quickest route from place to place.' },
+            { emoji: '🩺', name: 'Health Helper AI', job: 'Helps doctors spot problems in medical scans.' },
+            { emoji: '🌦️', name: 'Weather AI',       job: 'Predicts rain, storms, and sunshine.' }
+        ];
 
         let lastCount = null;
         let started = false;
@@ -303,7 +385,7 @@
         document.getElementById('diagLink').textContent =
             `Script ends with: ...${VISITOR_API.slice(-15)} • Sheet backup: ...${SHEET_ID.slice(-6)}`;
 
-        // ================= LOADING VISITOR DATA =================
+        // ================= LOADING DATA FROM GOOGLE =================
         // Loads data like a script file, so browser security rules don't block it
         function loadJsonp(makeSrc, parse, timeoutMsg) {
             return new Promise((resolve, reject) => {
@@ -393,6 +475,126 @@
                 }
             }
         }
+
+        // ================= AI CLOUD COTTAGES (settings) =================
+        function setCottageStatus(msg) {
+            document.getElementById('cottageStatus').textContent = msg;
+        }
+
+        function addCottageRow(c) {
+            c = c || { emoji: '🏠', name: '', job: '' };
+            const row = document.createElement('div');
+            row.className = 'cottage-row';
+
+            const top = document.createElement('div');
+            top.className = 'cottage-top';
+
+            const emoji = document.createElement('input');
+            emoji.className = 'c-emoji';
+            emoji.maxLength = 8;
+            emoji.value = c.emoji || '🏠';
+            emoji.setAttribute('aria-label', 'Emoji');
+
+            const name = document.createElement('input');
+            name.className = 'c-name';
+            name.maxLength = 40;
+            name.placeholder = 'AI name (e.g. Chat AI)';
+            name.value = c.name || '';
+
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'remove-btn';
+            remove.textContent = '✖';
+            remove.setAttribute('aria-label', 'Remove cottage');
+            remove.onclick = () => row.remove();
+
+            const job = document.createElement('input');
+            job.className = 'c-job';
+            job.maxLength = 100;
+            job.placeholder = 'What this AI does';
+            job.value = c.job || '';
+
+            top.appendChild(emoji);
+            top.appendChild(name);
+            top.appendChild(remove);
+            row.appendChild(top);
+            row.appendChild(job);
+            document.getElementById('cottageRows').appendChild(row);
+        }
+
+        function renderCottageEditor(list) {
+            document.getElementById('cottageRows').innerHTML = '';
+            list.forEach(c => addCottageRow(c));
+        }
+
+        function collectCottages() {
+            return [...document.querySelectorAll('#cottageRows .cottage-row')]
+                .map(row => ({
+                    emoji: row.querySelector('.c-emoji').value.trim() || '🏠',
+                    name: row.querySelector('.c-name').value.trim(),
+                    job: row.querySelector('.c-job').value.trim()
+                }))
+                .filter(c => c.name !== '');
+        }
+
+        async function loadCottages() {
+            setCottageStatus('Loading cottages...');
+            try {
+                const list = await loadJsonp(
+                    cb => `${VISITOR_API}?action=getCottages&callback=${cb}&t=${Date.now()}`,
+                    data => {
+                        if (!data) throw new Error('empty reply');
+                        if (data.error) throw new Error(data.error);
+                        return data.cottages || [];
+                    },
+                    'no reply in 15s'
+                );
+                if (list.length) {
+                    renderCottageEditor(list);
+                    setCottageStatus(`✅ Loaded ${list.length} cottages from your sheet.`);
+                } else {
+                    renderCottageEditor(DEFAULT_COTTAGES);
+                    setCottageStatus('No cottages saved yet - showing examples. Edit them and tap Save.');
+                }
+            } catch (e) {
+                renderCottageEditor(DEFAULT_COTTAGES);
+                setCottageStatus(`Could not load saved cottages (${e.message}). Showing examples.`);
+            }
+        }
+
+        async function saveCottages() {
+            const list = collectCottages();
+            const pin = document.getElementById('adminPin').value.trim();
+            if (!list.length) {
+                setCottageStatus('⚠️ Add at least one cottage with a name.');
+                return;
+            }
+            if (!pin) {
+                setCottageStatus('⚠️ Enter your admin PIN to save.');
+                return;
+            }
+            setCottageStatus('Saving...');
+            try {
+                const data = encodeURIComponent(JSON.stringify(list));
+                const saved = await loadJsonp(
+                    cb => `${VISITOR_API}?action=setCottages&pin=${encodeURIComponent(pin)}&data=${data}&callback=${cb}&t=${Date.now()}`,
+                    reply => {
+                        if (!reply) throw new Error('empty reply');
+                        if (reply.error) throw new Error(reply.error);
+                        return reply.cottages || [];
+                    },
+                    'no reply in 15s'
+                );
+                renderCottageEditor(saved);
+                setCottageStatus(`✅ Saved ${saved.length} cottages. New visitors will see them on the story page.`);
+            } catch (e) {
+                setCottageStatus(e.message === 'Wrong PIN'
+                    ? '❌ Wrong PIN. Check the ADMIN_PIN in your Apps Script.'
+                    : `❌ Could not save (${e.message}).`);
+            }
+        }
+
+        loadCottages();
 
         // ================= ROBOT BACKGROUND MUSIC (generated live, no files) =================
         let audioCtx = null;
@@ -730,11 +932,7 @@
 
         // ================= START / PAUSE =================
         function startStation() {
-            if (!('speechSynthesis' in window)) {
-                document.getElementById('startError').textContent =
-                    'This browser cannot speak. Try Chrome or Safari.';
-                return;
-            }
+            const canSpeak = 'speechSynthesis' in window;
 
             // Tapping Start unlocks sound and voice for the rest of the session
             ensureAudio();
@@ -753,6 +951,14 @@
             document.getElementById('stationPanel').classList.remove('hidden');
             keepAwake();
             poll();
+
+            // Warn (but keep running) if this browser has no voice
+            if (!canSpeak) {
+                const li = document.createElement('li');
+                li.style.color = '#ff6b6b';
+                li.textContent = '⚠️ This browser cannot speak. Open this page directly in Chrome or Safari for voice.';
+                document.getElementById('log').appendChild(li);
+            }
 
             // Background music starts after the ready message
             setTimeout(() => { if (started) startMusic(); }, 2500);
