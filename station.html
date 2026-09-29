@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tom Station - Gen AI Robot City</title>
+    <!-- Load shared configuration -->
+    <script src="config.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -338,14 +340,12 @@
 
     <script>
         // ================= CONFIG =================
-        // Main source: your Apps Script (same link as index.html)
-        const VISITOR_API = 'https://script.google.com/macros/s/AKfycbzpu0Co2yrL6g73tj4aMMKGyaJL5Ef1s-9NtqIeCvFsJoPGCJtt26_KX9-PwfmPIQWA/exec';
+        // All config is loaded from config.js - including VISITOR_API and VOICE_SETTINGS
         // Backup source: your Google Sheet (shared as "Anyone with the link → Viewer")
         const SHEET_ID = '1Ft_qacgU9QPFXL_AwEx8xrliJkgZ60D-WmcB76xHIQE';
         const SHEET_TAB = 'Visitors';
 
-        const POLL_MS = 4000;          // check for new visitors every 4 seconds
-        const REPLY_TIMEOUT = 15000;   // wait up to 15 seconds for Google to reply
+        // Station-specific timing (not in shared config)
         const TOM_REPEAT_GAP = 6000;   // silence after each greeting so Tom can repeat it
         const MIRROR_MS = 12000;       // how long the Robot Mirror stays on screen
 
