@@ -111,9 +111,8 @@
 
     <script>
         // ================= CONFIG =================
-        // All configuration is now loaded from config.js
-        // This includes: VISITOR_API, POLL_MS, REPLY_TIMEOUT, 
-        // SETTINGS_REFRESH_MS, DEFAULT_GREETING, voice settings, etc.
+        // All configuration loaded from config.js
+        // VISITOR_API, VOICE_SETTINGS, POLL_MS, REPLY_TIMEOUT, SETTINGS_REFRESH_MS, etc.
 
         // ================= STATE =================
         let settings = {};                 // saved from the Tom Station (Settings sheet)
@@ -156,8 +155,9 @@
         }
 
         function updateDiag() {
+            const url = typeof VISITOR_API !== 'undefined' ? VISITOR_API.slice(-20) : 'NOT LOADED';
             document.getElementById('diag').textContent =
-                `greeter v1 • settings: ${settingsNote}` + (lastChecked ? ` • checked ${lastChecked}` : '');
+                `greeter v2 • API: ...${url} • settings: ${settingsNote}` + (lastChecked ? ` • checked ${lastChecked}` : '');
         }
 
         // ================= LOADING DATA FROM GOOGLE =================
@@ -291,8 +291,9 @@
 
         function pickVoice(c) {
             const voices = englishVoices();
+            const prefer_female = c.female !== false;
             return voices.find(v => ROBOTIC_VOICE_NAMES.test(v.name)) ||
-                   (c.female ? voices.find(v => FEMALE_VOICE_NAMES.test(v.name)) : null) ||
+                   (prefer_female ? voices.find(v => FEMALE_VOICE_NAMES.test(v.name)) : null) ||
                    voices.find(v => v.lang === 'en-IN') ||
                    voices[0] || null;
         }
@@ -401,6 +402,12 @@
 
         // ================= START =================
         function startGreeter() {
+            // Verify config.js loaded
+            if (typeof VISITOR_API === 'undefined') {
+                document.getElementById('startError').textContent = '❌ config.js not loaded. Make sure config.js is in the same folder as this file.';
+                return;
+            }
+            
             ensureAudio();
             const canSpeak = 'speechSynthesis' in window;
 
@@ -469,8 +476,9 @@
                 lastChecked = new Date().toLocaleTimeString();
                 updateDiag();
             } catch (e) {
+                const errorMsg = e.message || 'unknown error';
                 status.textContent = '🟠 Connection problem, retrying...';
-                document.getElementById('diag').textContent = 'Error: ' + e.message;
+                document.getElementById('diag').textContent = `Error: ${errorMsg} • API: ...${VISITOR_API.slice(-20)}`;
             } finally {
                 polling = false;
                 if (started) {
@@ -487,6 +495,9 @@
                 poll();
             }
         }, 5000);
+
+        // Show config on page load
+        updateDiag();
     </script>
 </body>
 </html>
