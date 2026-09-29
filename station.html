@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tom Station - Gen AI Robot City</title>
-    <!-- Load shared configuration -->
     <script src="config.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: 'Courier New', monospace;
             background: linear-gradient(135deg, #0f0f23, #1a1a2e, #16213e);
@@ -17,17 +15,9 @@
             padding: 20px;
             text-align: center;
         }
-
-        h1 {
-            color: #00ff88;
-            margin: 10px 0 5px;
-            text-shadow: 0 0 15px #00ff88;
-        }
-
+        h1 { color: #00ff88; margin: 10px 0 5px; text-shadow: 0 0 15px #00ff88; }
         h2 { color: #00ff88; font-size: 18px; margin-bottom: 12px; }
-
         .subtitle { color: #718096; font-size: 13px; margin-bottom: 20px; }
-
         .card {
             background: rgba(45, 55, 72, 0.8);
             border: 2px solid #4a5568;
@@ -36,7 +26,6 @@
             margin: 15px auto;
             max-width: 500px;
         }
-
         .btn {
             background: linear-gradient(45deg, #00ff88, #4ecdc4);
             border: none;
@@ -49,190 +38,16 @@
             cursor: pointer;
             margin: 10px 5px;
         }
-
-        .btn.small {
-            font-size: 13px;
-            padding: 10px 18px;
-            background: #4a5568;
-            color: #e2e8f0;
-        }
-
-        .btn.save {
-            font-size: 14px;
-            padding: 12px 22px;
-        }
-
+        .btn.small { font-size: 13px; padding: 10px 18px; background: #4a5568; color: #e2e8f0; }
         .setting { text-align: left; margin: 12px 0; font-size: 13px; }
         .setting label { display: block; color: #4ecdc4; margin-bottom: 6px; }
-
-        .select, .text-input {
-            width: 100%;
-            background: rgba(15, 15, 35, 0.8);
-            border: 2px solid #4a5568;
-            border-radius: 8px;
-            padding: 10px;
-            color: #e2e8f0;
-            font-family: inherit;
-            font-size: 15px;
-        }
-
+        .select, input { width: 100%; background: rgba(15, 15, 35, 0.8); border: 2px solid #4a5568; border-radius: 8px; padding: 10px; color: #e2e8f0; font-family: inherit; font-size: 15px; }
         .note { font-size: 11px; color: #718096; text-align: left; margin-top: 4px; }
-
         #sampleStatus { font-size: 12px; color: #ffe66d; min-height: 16px; margin-bottom: 6px; }
-
-        .toggle { display: block; margin-top: 12px; font-size: 13px; color: #e2e8f0; text-align: left; }
-
-        /* Cottage editor */
-        details.setting {
-            background: rgba(15, 15, 35, 0.4);
-            border: 1px solid #4a5568;
-            border-radius: 10px;
-            padding: 10px;
-        }
-
-        details.setting summary {
-            color: #4ecdc4;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .cottage-row {
-            background: rgba(15, 15, 35, 0.6);
-            border: 1px solid #4a5568;
-            border-radius: 10px;
-            padding: 8px;
-            margin: 8px 0;
-        }
-
-        .cottage-top { display: flex; gap: 6px; }
-
-        .cottage-row input {
-            background: rgba(15, 15, 35, 0.8);
-            border: 2px solid #4a5568;
-            border-radius: 8px;
-            padding: 8px;
-            color: #e2e8f0;
-            font-family: inherit;
-            font-size: 14px;
-        }
-
-        .cottage-row .c-emoji { width: 54px; text-align: center; }
-        .cottage-row .c-name { flex: 1; min-width: 0; }
-        .cottage-row .c-job { width: 100%; margin-top: 6px; }
-
-        .remove-btn {
-            background: #4a5568;
-            border: none;
-            color: #e2e8f0;
-            border-radius: 8px;
-            width: 38px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        #cottageStatus { font-size: 12px; color: #ffe66d; min-height: 16px; margin-top: 8px; text-align: left; }
-
         #status { color: #4ecdc4; font-size: 14px; margin-top: 10px; }
-
-        .greeting-label { color: #718096; font-size: 12px; }
-
-        #currentName {
-            font-size: 42px;
-            color: #ffe66d;
-            margin: 10px 0;
-            word-break: break-word;
-            min-height: 50px;
-        }
-
-        .pulse { animation: pulse 1s ease-in-out 4; }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); text-shadow: none; }
-            50% { transform: scale(1.1); text-shadow: 0 0 25px #ffe66d; }
-        }
-
-        /* Music indicator */
-        .music-bar {
-            display: inline-flex;
-            align-items: flex-end;
-            gap: 3px;
-            height: 18px;
-            margin-left: 8px;
-            vertical-align: middle;
-        }
-
-        .music-bar span {
-            width: 4px;
-            background: #00ff88;
-            animation: eq 0.8s ease-in-out infinite;
-        }
-
-        .music-bar span:nth-child(2) { animation-delay: 0.2s; }
-        .music-bar span:nth-child(3) { animation-delay: 0.4s; }
-        .music-bar span:nth-child(4) { animation-delay: 0.1s; }
-
-        @keyframes eq {
-            0%, 100% { height: 4px; }
-            50% { height: 18px; }
-        }
-
-        .music-bar.paused span { animation: none; height: 4px; background: #718096; }
-
-        /* Robot Mirror */
-        .mirror-card {
-            border-color: #ffe66d;
-            box-shadow: 0 0 25px rgba(255, 230, 109, 0.4);
-        }
-
-        .mirror-wrap { position: relative; max-width: 320px; margin: 0 auto; }
-
-        #mirrorVideo {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 4px solid #ffe66d;
-            box-shadow: 0 0 30px #ffe66d;
-            transform: scaleX(-1);
-            background: #000;
-            display: block;
-        }
-
-        .mirror-robot {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            font-size: 56px;
-            animation: bob 2s ease-in-out infinite;
-        }
-
-        @keyframes bob {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-6px); }
-        }
-
-        .mirror-name {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: -12px;
-            background: rgba(15, 15, 35, 0.9);
-            color: #ffe66d;
-            font-size: 26px;
-            font-weight: bold;
-            padding: 8px;
-            border-radius: 20px;
-            border: 2px solid #ffe66d;
-            word-break: break-word;
-        }
-
-        .mirror-note { font-size: 11px; color: #718096; margin-top: 24px; }
-
+        #currentName { font-size: 42px; color: #ffe66d; margin: 10px 0; word-break: break-word; min-height: 50px; }
         #log { list-style: none; text-align: left; font-size: 13px; max-height: 200px; overflow-y: auto; }
         #log li { padding: 6px 0; border-bottom: 1px solid #2d3748; }
-        #log .time { color: #718096; margin-right: 8px; }
-
-        .count { font-size: 13px; color: #00ff88; margin-top: 8px; }
         .error { color: #ff6b6b; }
         .hidden { display: none !important; }
     </style>
@@ -241,11 +56,9 @@
     <h1>🐱 TOM STATION</h1>
     <p class="subtitle">Gen AI Robot City • Greeting relay for Talking Tom</p>
 
-    <!-- SETTINGS -->
-    <div class="card" id="startCard">
-        <h2>⚙️ Station Settings</h2>
-        <p style="font-size: 13px;">Place this phone next to Talking Tom, turn the volume up, and plug in the charger.</p>
-
+    <div id="setupCard" class="card">
+        <h2>⚙️ Settings</h2>
+        
         <div class="setting">
             <label for="voiceStyle">🔊 Voice style</label>
             <select id="voiceStyle" class="select">
@@ -259,7 +72,7 @@
         <div class="setting">
             <label for="voiceSelect">🗣️ Voice</label>
             <select id="voiceSelect" class="select">
-                <option value="">Auto (most robotic available)</option>
+                <option value="">🎤 Auto (most robotic available)</option>
             </select>
             <p class="note">Tip: robotic voices like "Zarvox" or "Trinoids" (iPhone) or "eSpeak" (Android) sound the most machine-like.</p>
         </div>
@@ -279,80 +92,28 @@
 
         <button class="btn small" id="musicPreviewBtn" onclick="toggleMusicPreview()">🎵 Preview music</button>
 
-        <label class="toggle">
-            <input type="checkbox" id="mirrorToggle">
-            Show Robot Mirror (live camera view, nothing recorded)
-        </label>
-
-        <!-- AI Cloud cottages editor -->
-        <details class="setting" id="cottageSettings">
-            <summary>🏘️ AI Cloud Cottages (tap to edit)</summary>
-            <p class="note" style="margin-top: 8px;">Each cottage in the AI Cloud is home to a different AI. Type the names from your diorama's houses. The story page shows these to every new visitor.</p>
-            <div id="cottageRows"></div>
-            <button class="btn small" onclick="addCottageRow()">➕ Add cottage</button>
-            <div class="setting">
-                <label for="adminPin">🔑 Admin PIN (from your Apps Script)</label>
-                <input type="password" id="adminPin" class="text-input" inputmode="numeric" autocomplete="off" placeholder="Enter PIN to save">
-            </div>
-            <button class="btn save" onclick="saveCottages()">💾 Save cottages</button>
-            <button class="btn small" onclick="loadCottages()">🔄 Reload</button>
-            <p id="cottageStatus">Loading cottages...</p>
-        </details>
-
-        <button class="btn" id="startBtn" onclick="startStation()">▶ Start Station</button>
-        <p id="startError" class="error"></p>
+        <button class="btn" onclick="startStation()">▶ START STATION</button>
+        <p id="setupError" class="error"></p>
     </div>
 
-    <!-- RUNNING STATION -->
-    <div id="stationPanel" class="hidden">
-        <!-- Robot Mirror: live view of the visitor while they are greeted -->
-        <div id="mirrorCard" class="card mirror-card hidden">
-            <div class="mirror-wrap">
-                <video id="mirrorVideo" playsinline muted></video>
-                <div class="mirror-robot">🤖</div>
-                <div class="mirror-name" id="mirrorName"></div>
-            </div>
-            <p class="mirror-note">🤖 Robot Mirror • live view only, nothing is recorded or saved</p>
-        </div>
-
-        <div class="card">
-            <p class="greeting-label">LAST GREETED</p>
-            <div id="currentName">—</div>
-            <p id="status">Connecting to visitor board...</p>
-            <p class="count" id="visitorTotal"></p>
-            <p class="count" id="lastChecked" style="color: #718096;"></p>
-            <p class="count" id="musicStatus" style="color: #718096;">🎵 Music: off</p>
-            <button class="btn small" onclick="greet('Test Visitor')">🔊 Test Greeting</button>
-            <button class="btn small" onclick="pauseStation()">⚙️ Settings</button>
-        </div>
-
-        <div class="card">
-            <p class="greeting-label" style="margin-bottom: 8px;">GREETING LOG</p>
-            <ul id="log"></ul>
-        </div>
+    <div id="runningCard" class="card hidden">
+        <h2>🟢 STATION RUNNING</h2>
+        <p style="font-size: 12px; color: #718096; margin-bottom: 12px;">Listening for new visitors...</p>
+        <p class="note">LAST GREETED</p>
+        <div id="currentName">—</div>
+        <p id="status">Connecting...</p>
+        <p id="visitorCount" style="color: #00ff88;"></p>
+        <button class="btn small" onclick="testGreet()">🔊 Test Greeting</button>
+        <button class="btn small" onclick="pauseStation()">⏸️ Pause</button>
     </div>
 
     <div class="card" style="font-size: 11px; color: #718096; text-align: left;">
-        <p><strong>Diagnostics</strong> (station v15 • cottage settings)</p>
-        <p id="diagLink">Loading config...</p>
-        <p id="diag" style="word-break: break-all;">Checking for config.js...</p>
+        <p><strong>Status:</strong> <span id="configStatus">Loading...</span></p>
+        <p id="diag"></p>
     </div>
 
     <script>
-        // Immediate check - before anything else
-        if (typeof VISITOR_API === 'undefined') {
-            document.getElementById('diag').innerHTML = '❌ <strong>ERROR: config.js not loaded!</strong><br>Make sure config.js is in the SAME folder as station.html';
-            document.getElementById('diagLink').innerHTML = '❌ config.js missing or not found';
-        } else {
-            document.getElementById('diag').textContent = 'Config loaded ✓ • Initializing...';
-            document.getElementById('diagLink').textContent = `API: ...${VISITOR_API.slice(-20)}`;
-        }
-    </script>
-
-    <script>
-        // ================= CONFIG =================
-        // All config is loaded from config.js - including VISITOR_API and VOICE_SETTINGS
-        // Fallback defaults if config.js doesn't load
+        // ================= CONFIG FALLBACKS =================
         if (typeof VISITOR_API === 'undefined') {
             var VISITOR_API = 'https://script.google.com/macros/s/AKfycbwLHMAkVKMJX4UYJcTzS0oX1Z2plHMYtv9WA-drsIKhx0WHO6J2bt6N_OI9lDWXPMlJ/exec';
         }
@@ -365,457 +126,14 @@
         if (typeof REPLY_TIMEOUT === 'undefined') {
             var REPLY_TIMEOUT = 15000;
         }
-        if (typeof SETTINGS_REFRESH_MS === 'undefined') {
-            var SETTINGS_REFRESH_MS = 60000;
-        }
         if (typeof DEFAULT_GREETING === 'undefined') {
             var DEFAULT_GREETING = 'Welcome {name}!';
         }
         if (typeof ROBOTIC_VOICE_NAMES === 'undefined') {
             var ROBOTIC_VOICE_NAMES = /zarvox|trinoids|robot|espeak|fred|ralph|junior|albert/i;
         }
-        if (typeof FEMALE_VOICE_NAMES === 'undefined') {
-            var FEMALE_VOICE_NAMES = /female|zira|heera|veena|samantha|karen|moira|tessa|fiona|victoria|allison|ava|susan|zoe|nicky|serena|kate|google us english/i;
-        }
-        
-        // Backup source: your Google Sheet (shared as "Anyone with the link → Viewer")
-        const SHEET_ID = '1Ft_qacgU9QPFXL_AwEx8xrliJkgZ60D-WmcB76xHIQE';
-        const SHEET_TAB = 'Visitors';
 
-        // Station-specific timing (not in shared config)
-        const TOM_REPEAT_GAP = 6000;   // silence after each greeting so Tom can repeat it
-        const MIRROR_MS = 12000;       // how long the Robot Mirror stays on screen
-
-        // Example cottages shown until you save your own
-        const DEFAULT_COTTAGES = [
-            { emoji: '💬', name: 'Chat AI',          job: 'Talks with people and answers their questions.' },
-            { emoji: '🌐', name: 'Translator AI',    job: 'Turns one language into another.' },
-            { emoji: '🎨', name: 'Art AI',           job: 'Draws pictures from words.' },
-            { emoji: '🎵', name: 'Music AI',         job: 'Composes new tunes and melodies.' },
-            { emoji: '👁️', name: 'Vision AI',        job: 'Recognizes what is in photos and videos.' },
-            { emoji: '🗺️', name: 'Navigator AI',     job: 'Finds the quickest route from place to place.' },
-            { emoji: '🩺', name: 'Health Helper AI', job: 'Helps doctors spot problems in medical scans.' },
-            { emoji: '🌦️', name: 'Weather AI',       job: 'Predicts rain, storms, and sunshine.' }
-        ];
-
-        let lastCount = null;
-        let started = false;
-        let wakeLock = null;
-        const queue = [];
-        let busy = false;
-        let polling = false;
-        let pollTimer = null;
-        let lastPollAt = 0;
-        let mirrorEnabled = false;
-        let mirrorStream = null;
-        let mirrorTimer = null;
-
-        // ================= DIAGNOSTICS =================
-        function showDiag(msg) {
-            document.getElementById('diag').textContent = msg;
-        }
-
-        function setSampleStatus(msg) {
-            document.getElementById('sampleStatus').textContent = msg;
-        }
-
-        // Check if config.js loaded
-        if (typeof VISITOR_API === 'undefined') {
-            document.getElementById('diagLink').innerHTML = '❌ <strong>ERROR: config.js not found!</strong> Make sure config.js is in the same folder.';
-            document.getElementById('startError').textContent = '❌ config.js missing. Put config.js in the same folder as this file.';
-        } else {
-            document.getElementById('diagLink').textContent =
-                `Script: ...${VISITOR_API.slice(-15)} • Sheet: ...${SHEET_ID.slice(-6)}`;
-        }
-
-        // ================= LOADING DATA FROM GOOGLE =================
-        // Loads data like a script file, so browser security rules don't block it
-        function loadJsonp(makeSrc, parse, timeoutMsg) {
-            return new Promise((resolve, reject) => {
-                const cb = 'cb_' + Date.now() + '_' + Math.floor(Math.random() * 1000000);
-                const s = document.createElement('script');
-                let settled = false;
-
-                const cleanup = () => {
-                    settled = true;
-                    clearTimeout(timer);
-                    window[cb] = function () {};   // ignore any late reply
-                    s.remove();
-                };
-
-                const timer = setTimeout(() => {
-                    if (settled) return;
-                    cleanup();
-                    reject(new Error(timeoutMsg));
-                }, REPLY_TIMEOUT);
-
-                window[cb] = data => {
-                    if (settled) return;
-                    cleanup();
-                    try { resolve(parse(data)); } catch (e) { reject(e); }
-                };
-
-                s.onerror = () => {
-                    if (settled) return;
-                    cleanup();
-                    reject(new Error('network problem'));
-                };
-
-                s.src = makeSrc(cb);
-                document.body.appendChild(s);
-            });
-        }
-
-        // Main: ask the Apps Script (same place the story page saves visitors)
-        function readFromScript() {
-            return loadJsonp(
-                cb => `${VISITOR_API}?callback=${cb}&t=${Date.now()}`,
-                data => {
-                    if (!data) throw new Error('empty reply');
-                    if (data.error) throw new Error(data.error);
-                    return { count: data.count || 0, recent: data.recent || [] };
-                },
-                'no reply in 15s'
-            );
-        }
-
-        // Backup: read the Name column straight from the Google Sheet
-        function readFromSheet() {
-            const query = encodeURIComponent('select B where B is not null');
-            return loadJsonp(
-                cb => `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq` +
-                      `?tqx=responseHandler:${cb}&headers=1` +
-                      `&sheet=${encodeURIComponent(SHEET_TAB)}&tq=${query}&t=${Date.now()}`,
-                response => {
-                    if (!response || response.status === 'error') {
-                        const msg = response && response.errors && response.errors[0]
-                            ? response.errors[0].detailed_message || response.errors[0].message
-                            : 'unknown sheet error';
-                        throw new Error(msg);
-                    }
-                    const rows = (response.table && response.table.rows) || [];
-                    const names = rows
-                        .map(r => (r.c && r.c[0] && r.c[0].v != null) ? String(r.c[0].v) : '')
-                        .filter(n => n !== '');
-                    return { count: names.length, recent: names.slice(-5).reverse() };
-                },
-                'no reply in 15s'
-            );
-        }
-
-        async function readVisitors() {
-            try {
-                const d = await readFromScript();
-                d.source = 'script';
-                return d;
-            } catch (scriptErr) {
-                try {
-                    const d = await readFromSheet();
-                    d.source = `sheet backup (script: ${scriptErr.message})`;
-                    return d;
-                } catch (sheetErr) {
-                    throw new Error(`Script: ${scriptErr.message} | Sheet: ${sheetErr.message}`);
-                }
-            }
-        }
-
-        // ================= AI CLOUD COTTAGES (settings) =================
-        function setCottageStatus(msg) {
-            document.getElementById('cottageStatus').textContent = msg;
-        }
-
-        function addCottageRow(c) {
-            c = c || { emoji: '🏠', name: '', job: '' };
-            const row = document.createElement('div');
-            row.className = 'cottage-row';
-
-            const top = document.createElement('div');
-            top.className = 'cottage-top';
-
-            const emoji = document.createElement('input');
-            emoji.className = 'c-emoji';
-            emoji.maxLength = 8;
-            emoji.value = c.emoji || '🏠';
-            emoji.setAttribute('aria-label', 'Emoji');
-
-            const name = document.createElement('input');
-            name.className = 'c-name';
-            name.maxLength = 40;
-            name.placeholder = 'AI name (e.g. Chat AI)';
-            name.value = c.name || '';
-
-            const remove = document.createElement('button');
-            remove.type = 'button';
-            remove.className = 'remove-btn';
-            remove.textContent = '✖';
-            remove.setAttribute('aria-label', 'Remove cottage');
-            remove.onclick = () => row.remove();
-
-            const job = document.createElement('input');
-            job.className = 'c-job';
-            job.maxLength = 100;
-            job.placeholder = 'What this AI does';
-            job.value = c.job || '';
-
-            top.appendChild(emoji);
-            top.appendChild(name);
-            top.appendChild(remove);
-            row.appendChild(top);
-            row.appendChild(job);
-            document.getElementById('cottageRows').appendChild(row);
-        }
-
-        function renderCottageEditor(list) {
-            document.getElementById('cottageRows').innerHTML = '';
-            list.forEach(c => addCottageRow(c));
-        }
-
-        function collectCottages() {
-            return [...document.querySelectorAll('#cottageRows .cottage-row')]
-                .map(row => ({
-                    emoji: row.querySelector('.c-emoji').value.trim() || '🏠',
-                    name: row.querySelector('.c-name').value.trim(),
-                    job: row.querySelector('.c-job').value.trim()
-                }))
-                .filter(c => c.name !== '');
-        }
-
-        async function loadCottages() {
-            setCottageStatus('Loading cottages...');
-            try {
-                const list = await loadJsonp(
-                    cb => `${VISITOR_API}?action=getCottages&callback=${cb}&t=${Date.now()}`,
-                    data => {
-                        if (!data) throw new Error('empty reply');
-                        if (data.error) throw new Error(data.error);
-                        return data.cottages || [];
-                    },
-                    'no reply in 15s'
-                );
-                if (list.length) {
-                    renderCottageEditor(list);
-                    setCottageStatus(`✅ Loaded ${list.length} cottages from your sheet.`);
-                } else {
-                    renderCottageEditor(DEFAULT_COTTAGES);
-                    setCottageStatus('No cottages saved yet - showing examples. Edit them and tap Save.');
-                }
-            } catch (e) {
-                renderCottageEditor(DEFAULT_COTTAGES);
-                setCottageStatus(`Could not load saved cottages (${e.message}). Showing examples.`);
-            }
-        }
-
-        async function saveCottages() {
-            const list = collectCottages();
-            const pin = document.getElementById('adminPin').value.trim();
-            if (!list.length) {
-                setCottageStatus('⚠️ Add at least one cottage with a name.');
-                return;
-            }
-            if (!pin) {
-                setCottageStatus('⚠️ Enter your admin PIN to save.');
-                return;
-            }
-            setCottageStatus('Saving...');
-            try {
-                const data = encodeURIComponent(JSON.stringify(list));
-                const saved = await loadJsonp(
-                    cb => `${VISITOR_API}?action=setCottages&pin=${encodeURIComponent(pin)}&data=${data}&callback=${cb}&t=${Date.now()}`,
-                    reply => {
-                        if (!reply) throw new Error('empty reply');
-                        if (reply.error) throw new Error(reply.error);
-                        return reply.cottages || [];
-                    },
-                    'no reply in 15s'
-                );
-                renderCottageEditor(saved);
-                setCottageStatus(`✅ Saved ${saved.length} cottages. New visitors will see them on the story page.`);
-            } catch (e) {
-                setCottageStatus(e.message === 'Wrong PIN'
-                    ? '❌ Wrong PIN. Check the ADMIN_PIN in your Apps Script.'
-                    : `❌ Could not save (${e.message}).`);
-            }
-        }
-
-        // Load cottages only if config.js is available
-        if (typeof VISITOR_API !== 'undefined') {
-            loadCottages();
-        } else {
-            document.getElementById('cottageStatus').textContent = '❌ config.js not loaded';
-        }
-
-        // ================= ROBOT BACKGROUND MUSIC (generated live, no files) =================
-        let audioCtx = null;
-        let musicGain = null;
-        let musicTimer = null;
-        let musicOn = false;
-        let musicDucked = false;
-        let musicStep = 0;
-        let nextNoteTime = 0;
-
-        const MUSIC_LEVELS = { off: 0, low: 0.12, medium: 0.25 };
-        const BPM = 108;
-        const STEP_TIME = 60 / BPM / 2;          // eighth notes
-        const ARPEGGIO = [0, 7, 12, 15, 19, 15, 12, 7];   // sci-fi minor arpeggio
-        const ROOTS = [45, 45, 41, 43];          // A, A, F, G (one bar each)
-
-        function ensureAudio() {
-            if (!audioCtx) {
-                const Ctx = window.AudioContext || window.webkitAudioContext;
-                if (!Ctx) return false;
-                audioCtx = new Ctx();
-                musicGain = audioCtx.createGain();
-                musicGain.gain.value = 0;
-                const softFilter = audioCtx.createBiquadFilter();
-                softFilter.type = 'lowpass';
-                softFilter.frequency.value = 2200;
-                musicGain.connect(softFilter);
-                softFilter.connect(audioCtx.destination);
-            }
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            return true;
-        }
-
-        function mtof(m) { return 440 * Math.pow(2, (m - 69) / 12); }
-
-        function tone(freq, time, dur, type, vol, dest) {
-            const o = audioCtx.createOscillator();
-            const g = audioCtx.createGain();
-            o.type = type;
-            o.frequency.value = freq;
-            g.gain.setValueAtTime(0.0001, time);
-            g.gain.exponentialRampToValueAtTime(vol, time + 0.01);
-            g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
-            o.connect(g);
-            g.connect(dest || musicGain);
-            o.start(time);
-            o.stop(time + dur + 0.05);
-        }
-
-        function scheduleStep(step, time) {
-            const root = ROOTS[Math.floor(step / 8)];
-            if (step % 4 === 0) tone(mtof(root - 12), time, STEP_TIME * 3.5, 'triangle', 0.5);        // pulsing bass
-            tone(mtof(root + 12 + ARPEGGIO[step % 8]), time, STEP_TIME * 0.8, 'square', 0.1);         // arpeggio
-            if (step % 8 === 6) tone(mtof(root + 43), time, 0.06, 'sine', 0.12);                      // data blip
-            if (step % 16 === 15) tone(mtof(root + 48), time, 0.05, 'sine', 0.1);                     // high blip
-        }
-
-        function musicScheduler() {
-            if (!musicOn) return;
-            while (nextNoteTime < audioCtx.currentTime + 0.25) {
-                scheduleStep(musicStep, nextNoteTime);
-                nextNoteTime += STEP_TIME;
-                musicStep = (musicStep + 1) % 32;
-            }
-            musicTimer = setTimeout(musicScheduler, 50);
-        }
-
-        function currentMusicLevel() {
-            return MUSIC_LEVELS[document.getElementById('musicLevel').value] || 0;
-        }
-
-        function applyMusicVolume() {
-            if (!musicGain) return;
-            const target = (musicOn && !musicDucked) ? currentMusicLevel() : 0;
-            musicGain.gain.setTargetAtTime(target, audioCtx.currentTime, musicDucked ? 0.05 : 0.6);
-            updateMusicStatus();
-        }
-
-        function startMusic() {
-            if (currentMusicLevel() === 0 || !ensureAudio()) return;
-            if (!musicOn) {
-                musicOn = true;
-                nextNoteTime = audioCtx.currentTime + 0.1;
-                musicScheduler();
-            }
-            applyMusicVolume();
-        }
-
-        function stopMusic() {
-            musicOn = false;
-            clearTimeout(musicTimer);
-            if (musicGain) musicGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
-            updateMusicStatus();
-        }
-
-        // Silence the music while greeting, then fade it back in
-        function duckMusic(on) {
-            musicDucked = on;
-            applyMusicVolume();
-        }
-
-        function updateMusicStatus() {
-            const el = document.getElementById('musicStatus');
-            const btn = document.getElementById('musicPreviewBtn');
-            if (!musicOn) {
-                el.textContent = '🎵 Music: off';
-                btn.textContent = '🎵 Preview music';
-            } else if (musicDucked) {
-                el.innerHTML = '🎵 Music: paused for greeting <span class="music-bar paused"><span></span><span></span><span></span><span></span></span>';
-                btn.textContent = '⏹ Stop music';
-            } else {
-                el.innerHTML = '🎵 Music: playing <span class="music-bar"><span></span><span></span><span></span><span></span></span>';
-                btn.textContent = '⏹ Stop music';
-            }
-        }
-
-        function toggleMusicPreview() {
-            if (musicOn) stopMusic();
-            else startMusic();
-        }
-
-        function onMusicLevelChange() {
-            if (currentMusicLevel() === 0) stopMusic();
-            else if (musicOn) applyMusicVolume();
-        }
-
-        // Short robot "boot chirp" before each greeting
-        function playChirp() {
-            if (!audioCtx) return;
-            const t = audioCtx.currentTime + 0.02;
-            [880, 1320, 1760].forEach((f, i) => {
-                tone(f, t + i * 0.09, 0.08, 'square', 0.08, audioCtx.destination);
-            });
-        }
-
-        // ================= MACHINE VOICE =================
-        const VOICE_STYLES = {
-            machine:  { pitch: 0.3, rate: 0.8, wordByWord: true },
-            deep:     { pitch: 0.1, rate: 0.75, wordByWord: false },
-            friendly: { pitch: 1.1, rate: 0.95, wordByWord: false },
-            squeaky:  { pitch: 1.9, rate: 1.1, wordByWord: false }
-        };
-
-        // ROBOTIC_VOICE_NAMES is already defined in the fallback section above
-
-        // Phones only allow speech that starts from a tap. The first tap anywhere
-        // "unlocks" speech so later automatic greetings are allowed too.
-        let speechUnlocked = false;
-        function unlockSpeech() {
-            if (speechUnlocked || !('speechSynthesis' in window)) return;
-            speechUnlocked = true;
-            const u = new SpeechSynthesisUtterance(' ');
-            u.volume = 0;
-            speechSynthesis.speak(u);
-        }
-        document.addEventListener('touchend', unlockSpeech, { once: true });
-        document.addEventListener('click', unlockSpeech, { once: true });
-
-        function safeCancel() {
-            if (!('speechSynthesis' in window)) return;
-            if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
-        }
-
-        function currentStyle() {
-            return VOICE_STYLES[document.getElementById('voiceStyle').value] || VOICE_STYLES.machine;
-        }
-
-        // Say "Gen AI" clearly (some voices read "Gen" as "General")
-        function forSpeech(text, wordByWord) {
-            return text.replace(/\bGen\s*AI\b/gi, wordByWord ? 'Jen Ay Eye' : 'Jen A I');
-        }
-
-        // Fallback list of common voices across browsers
+        // ================= VOICE FALLBACK LIST =================
         const FALLBACK_VOICES = [
             { name: 'Zira', lang: 'en-US' },
             { name: 'David', lang: 'en-US' },
@@ -834,95 +152,94 @@
             { name: 'Alex', lang: 'en-US' }
         ];
 
+        // ================= STATE =================
+        let started = false;
+        let polling = false;
+        let pollTimer = null;
+        let lastCount = null;
+        let audioCtx = null;
+        let musicGain = null;
+        let musicOn = false;
+
+        // ================= CONFIG CHECK =================
+        window.addEventListener('load', function() {
+            if (typeof VISITOR_API !== 'undefined') {
+                document.getElementById('configStatus').textContent = '✅ Config loaded';
+                document.getElementById('diag').textContent = 'API: ...' + VISITOR_API.slice(-20);
+            } else {
+                document.getElementById('configStatus').textContent = '❌ config.js not found';
+                document.getElementById('setupError').textContent = '❌ config.js missing from folder';
+            }
+        });
+
+        // ================= VOICE LIST =================
         function englishVoices() {
             if ('speechSynthesis' in window) {
                 try {
                     const allVoices = speechSynthesis.getVoices();
-                    console.log('📢 Available voices:', allVoices.length, allVoices.map(v => v.name));
                     const english = allVoices.filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
                     if (english.length > 0) return english;
                 } catch (e) {
-                    console.error('Error getting voices:', e);
+                    console.error('Voice error:', e);
                 }
             }
-            // Fallback: return hardcoded voices
-            console.log('📢 Using fallback voice list');
             return FALLBACK_VOICES;
         }
 
         function fillVoiceList() {
             const select = document.getElementById('voiceSelect');
-            if (!select) {
-                console.log('❌ voiceSelect element not found');
-                return;
-            }
+            if (!select) return;
             
             const voices = englishVoices();
-            console.log('📢 Populating voices. Found:', voices.length);
-            
             select.innerHTML = '<option value="">🎤 Auto (most robotic available)</option>';
             
-            if (voices.length > 0) {
-                voices.sort((a, b) => {
-                    const aRobotic = ROBOTIC_VOICE_NAMES.test(a.name) ? 1 : 0;
-                    const bRobotic = ROBOTIC_VOICE_NAMES.test(b.name) ? 1 : 0;
-                    return bRobotic - aRobotic;
-                });
-                
-                voices.forEach(v => {
-                    const isRobotic = ROBOTIC_VOICE_NAMES.test(v.name) ? '🤖 ' : '';
-                    select.innerHTML += `<option value="${v.name}">${isRobotic}${v.name}</option>`;
-                });
-            }
+            voices.sort((a, b) => {
+                const aRobotic = ROBOTIC_VOICE_NAMES.test(a.name) ? 1 : 0;
+                const bRobotic = ROBOTIC_VOICE_NAMES.test(b.name) ? 1 : 0;
+                return bRobotic - aRobotic;
+            });
+            
+            voices.forEach(v => {
+                const isRobotic = ROBOTIC_VOICE_NAMES.test(v.name) ? '🤖 ' : '';
+                select.innerHTML += `<option value="${v.name}">${isRobotic}${v.name}</option>`;
+            });
+            
+            console.log('🎤 Voices loaded:', voices.length);
         }
 
-        // Simple direct approach - populate voices when DOM is ready
-        function populateVoicesWhenReady() {
-            const select = document.getElementById('voiceSelect');
-            if (select) {
-                console.log('✅ voiceSelect found, populating...');
-                fillVoiceList();
-            } else {
-                console.log('⏳ voiceSelect not ready yet, retrying...');
-                setTimeout(populateVoicesWhenReady, 100);
-            }
-        }
-
-        // Start populating voices
+        // Populate voices when page loads
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', populateVoicesWhenReady);
+            document.addEventListener('DOMContentLoaded', fillVoiceList);
         } else {
-            populateVoicesWhenReady();
+            fillVoiceList();
         }
-
-        // Also listen for speech synthesis voices change
         if ('speechSynthesis' in window) {
             speechSynthesis.onvoiceschanged = fillVoiceList;
         }
+        setTimeout(fillVoiceList, 100);
 
-        // Retry after page fully loads
-        window.addEventListener('load', fillVoiceList);
-
-        // Initialize voiceStyle from config.js
-        if (typeof VOICE_SETTINGS !== 'undefined' && VOICE_SETTINGS.style) {
-            const styleEl = document.getElementById('voiceStyle');
-            if (styleEl) {
-                styleEl.value = VOICE_SETTINGS.style;
-            }
-        }
-
-        // Debug helper for console
-        window.debugVoices = function() {
-            const voices = speechSynthesis.getVoices();
-            console.log('=== ALL SYSTEM VOICES ===');
-            voices.forEach(v => console.log(`${v.name} (${v.lang})`));
-            console.log(`Total: ${voices.length}`);
-            console.log('=== ENGLISH VOICES ===');
-            const english = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
-            english.forEach(v => console.log(`${v.name} (${v.lang})`));
-            console.log(`English total: ${english.length}`);
-            fillVoiceList();
+        // ================= VOICE STYLES =================
+        const VOICE_STYLES = {
+            machine:  { pitch: 0.3, rate: 0.8, wordByWord: true },
+            deep:     { pitch: 0.1, rate: 0.75, wordByWord: false },
+            friendly: { pitch: 1.1, rate: 0.95, wordByWord: false },
+            squeaky:  { pitch: 1.9, rate: 1.1, wordByWord: false }
         };
+
+        let speechUnlocked = false;
+        function unlockSpeech() {
+            if (speechUnlocked || !('speechSynthesis' in window)) return;
+            speechUnlocked = true;
+            const u = new SpeechSynthesisUtterance(' ');
+            u.volume = 0;
+            speechSynthesis.speak(u);
+        }
+        document.addEventListener('touchend', unlockSpeech, { once: true });
+        document.addEventListener('click', unlockSpeech, { once: true });
+
+        function currentStyle() {
+            return VOICE_STYLES[document.getElementById('voiceStyle').value] || VOICE_STYLES.machine;
+        }
 
         function pickVoice() {
             const chosen = document.getElementById('voiceSelect').value;
@@ -931,224 +248,150 @@
                 const v = voices.find(x => x.name === chosen);
                 if (v) return v;
             }
-            return voices.find(v => ROBOTIC_VOICE_NAMES.test(v.name)) ||
-                   voices.find(v => v.lang === 'en-IN') ||
-                   voices[0] || null;
+            return voices.find(v => ROBOTIC_VOICE_NAMES.test(v.name)) || voices[0] || null;
         }
 
-        function makeUtterance(text, style) {
+        function speakText(text, onDone) {
+            if (!('speechSynthesis' in window)) {
+                if (onDone) onDone();
+                return;
+            }
+            const style = currentStyle();
             const u = new SpeechSynthesisUtterance(text);
             const voice = pickVoice();
             if (voice) u.voice = voice;
             u.pitch = style.pitch;
             u.rate = style.rate;
-            return u;
+            u.onend = () => { if (onDone) onDone(); };
+            u.onerror = () => { if (onDone) onDone(); };
+            speechSynthesis.speak(u);
         }
 
-        // Speaks text in the chosen style; "Machine" says it word. by. word.
-        // If the chosen voice fails, it automatically retries with the phone's default voice.
-        function speakText(text, onDone, useDefaultVoice) {
-            let finished = false;
-            const finish = () => {
-                if (finished) return;
-                finished = true;
-                if (onDone) onDone();
-            };
-            if (!('speechSynthesis' in window)) {
-                setSampleStatus('This browser cannot speak. Try Chrome or Safari.');
-                finish();
-                return;
+        function previewVoice() {
+            document.getElementById('sampleStatus').textContent = '🔊 Speaking...';
+            speakText('Hello! Tom Station is ready.', () => {
+                document.getElementById('sampleStatus').textContent = '✅ Voice works';
+            });
+        }
+
+        // ================= MUSIC =================
+        const MUSIC_LEVELS = { off: 0, low: 0.12, medium: 0.25 };
+
+        function ensureAudio() {
+            if (!audioCtx) {
+                const Ctx = window.AudioContext || window.webkitAudioContext;
+                if (!Ctx) return false;
+                audioCtx = new Ctx();
+                musicGain = audioCtx.createGain();
+                musicGain.gain.value = 0;
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 2200;
+                musicGain.connect(filter);
+                filter.connect(audioCtx.destination);
             }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return true;
+        }
 
-            const style = currentStyle();
-            const spoken = forSpeech(text, style.wordByWord);
-            const parts = style.wordByWord
-                ? spoken.split(/\s+/).map(w => w.replace(/[^\w']/g, '')).filter(Boolean)
-                : [spoken];
-            let retried = false;
+        function startMusic() {
+            if (!ensureAudio()) return;
+            musicOn = true;
+            const level = MUSIC_LEVELS[document.getElementById('musicLevel').value] || 0;
+            musicGain.gain.setTargetAtTime(level, audioCtx.currentTime, 0.6);
+            playSimpleMusic();
+        }
 
-            parts.forEach((part, i) => {
-                const u = makeUtterance(part, style);
-                if (useDefaultVoice) u.voice = null;
-                if (i === 0) u.onstart = () => setSampleStatus('🔊 Speaking...');
+        function stopMusic() {
+            musicOn = false;
+            if (musicGain) musicGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
+        }
 
-                u.onerror = e => {
-                    const err = (e && e.error) ? e.error : 'unknown';
-                    if (err === 'interrupted' || err === 'canceled') {
-                        if (i === parts.length - 1) finish();
-                        return;
-                    }
-                    if (!useDefaultVoice && !retried) {
-                        retried = true;
-                        finished = true;   // the retry takes over from here
-                        safeCancel();
-                        setSampleStatus(`Voice problem (${err}), trying the default voice...`);
-                        speakText(text, onDone, true);
-                        return;
-                    }
-                    setSampleStatus(`Voice error: ${err}`);
-                    showDiag(`Voice error: ${err}`);
-                    if (i === parts.length - 1) finish();
+        function playSimpleMusic() {
+            if (!musicOn || !audioCtx) return;
+            const t = audioCtx.currentTime;
+            [440, 550, 660, 550].forEach((f, i) => {
+                const o = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                o.frequency.value = f;
+                o.type = 'square';
+                g.gain.setValueAtTime(0, t + i * 0.3);
+                g.gain.linearRampToValueAtTime(0.1, t + i * 0.3 + 0.05);
+                g.gain.linearRampToValueAtTime(0, t + i * 0.3 + 0.25);
+                o.connect(g);
+                g.connect(musicGain);
+                o.start(t + i * 0.3);
+                o.stop(t + i * 0.3 + 0.3);
+            });
+        }
+
+        function toggleMusicPreview() {
+            ensureAudio();
+            if (musicOn) stopMusic();
+            else startMusic();
+        }
+
+        function onMusicLevelChange() {
+            if (MUSIC_LEVELS[document.getElementById('musicLevel').value] === 0) stopMusic();
+            else if (musicOn) startMusic();
+        }
+
+        // ================= GREETING =================
+        function greet(name) {
+            console.log('👋 Greeting:', name);
+            document.getElementById('currentName').textContent = name;
+            speakText(`Hello ${name}! Welcome to Gen AI Robot City!`);
+        }
+
+        function testGreet() {
+            ensureAudio();
+            greet('Test Visitor');
+        }
+
+        // ================= POLLING =================
+        function loadJsonp(url, timeout) {
+            return new Promise((resolve, reject) => {
+                const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+                const script = document.createElement('script');
+                
+                window[cb] = data => {
+                    clearTimeout(timer);
+                    script.remove();
+                    delete window[cb];
+                    resolve(data);
                 };
 
-                if (i === parts.length - 1) {
-                    u.onend = () => {
-                        setSampleStatus('✅ Voice working');
-                        finish();
-                    };
-                }
-                speechSynthesis.speak(u);
+                script.onerror = () => {
+                    clearTimeout(timer);
+                    script.remove();
+                    delete window[cb];
+                    reject(new Error('Network error'));
+                };
+
+                const timer = setTimeout(() => {
+                    script.remove();
+                    delete window[cb];
+                    reject(new Error('Timeout'));
+                }, timeout);
+
+                script.src = url + '?callback=' + cb + '&t=' + Date.now();
+                document.body.appendChild(script);
             });
-            setTimeout(finish, 2000 + parts.length * 1000);   // safety net
-        }
-
-        // Starts the voice immediately inside the tap (phones block delayed speech)
-        function previewVoice() {
-            if (!('speechSynthesis' in window)) {
-                setSampleStatus('This browser cannot speak. Try Chrome or Safari.');
-                return;
-            }
-            ensureAudio();
-            safeCancel();
-            playChirp();
-            setSampleStatus('Starting voice...');
-            speakText('Hello Priya! Welcome to Gen AI Robot City!');
-        }
-
-        // ================= ROBOT MIRROR =================
-        // Live camera view only. No photo is captured, saved, or sent anywhere.
-        async function openMirrorCamera() {
-            if (mirrorStream) return true;
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return false;
-            try {
-                mirrorStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 640 } },
-                    audio: false
-                });
-                const v = document.getElementById('mirrorVideo');
-                v.srcObject = mirrorStream;
-                await v.play();
-                return true;
-            } catch (e) {
-                showDiag('Robot Mirror camera unavailable: ' + e.message);
-                return false;
-            }
-        }
-
-        function closeMirror() {
-            clearTimeout(mirrorTimer);
-            if (mirrorStream) {
-                mirrorStream.getTracks().forEach(t => t.stop());
-                mirrorStream = null;
-            }
-            document.getElementById('mirrorCard').classList.add('hidden');
-        }
-
-        async function showMirror(name) {
-            if (!mirrorEnabled) return;
-            document.getElementById('mirrorName').textContent = `Hello ${name}! 👋`;
-            const ok = await openMirrorCamera();
-            if (!ok) return;
-            document.getElementById('mirrorCard').classList.remove('hidden');
-            window.scrollTo(0, 0);
-            clearTimeout(mirrorTimer);
-            mirrorTimer = setTimeout(closeMirror, MIRROR_MS);
-        }
-
-        // ================= START / PAUSE =================
-        function startStation() {
-            // Verify config.js loaded
-            if (typeof VISITOR_API === 'undefined' || typeof VOICE_SETTINGS === 'undefined') {
-                document.getElementById('startError').textContent = '❌ config.js not loaded. Make sure config.js is in the same folder.';
-                showDiag('ERROR: config.js missing or not loaded');
-                return;
-            }
-
-            const canSpeak = 'speechSynthesis' in window;
-
-            // Tapping Start unlocks sound and voice for the rest of the session
-            ensureAudio();
-            safeCancel();
-            speakText('Tom station is ready.');
-
-            // Ask for camera permission once now, then switch the camera off until a visitor arrives
-            mirrorEnabled = document.getElementById('mirrorToggle').checked;
-            if (mirrorEnabled) {
-                openMirrorCamera().then(() => closeMirror());
-            }
-
-            lastCount = null;   // only greet visitors who arrive from now on
-            started = true;
-            document.getElementById('startCard').classList.add('hidden');
-            document.getElementById('stationPanel').classList.remove('hidden');
-            keepAwake();
-            poll();
-
-            // Warn (but keep running) if this browser has no voice
-            if (!canSpeak) {
-                const li = document.createElement('li');
-                li.style.color = '#ff6b6b';
-                li.textContent = '⚠️ This browser cannot speak. Open this page directly in Chrome or Safari for voice.';
-                document.getElementById('log').appendChild(li);
-            }
-
-            // Background music starts after the ready message
-            setTimeout(() => { if (started) startMusic(); }, 2500);
-        }
-
-        function pauseStation() {
-            started = false;
-            clearTimeout(pollTimer);
-            closeMirror();
-            stopMusic();
-            safeCancel();
-            queue.length = 0;
-            document.getElementById('stationPanel').classList.add('hidden');
-            document.getElementById('startCard').classList.remove('hidden');
-            document.getElementById('startBtn').textContent = '▶ Resume Station';
-            showDiag('Paused for settings.');
-            window.scrollTo(0, 0);
-        }
-
-        // Keep the screen on so the station never sleeps
-        async function keepAwake() {
-            try {
-                if ('wakeLock' in navigator) {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                }
-            } catch (e) {
-                // Silently fail - wake lock requires page focus and user interaction
-            }
-        }
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible' && started) {
-                keepAwake();
-                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-                if (!polling) { clearTimeout(pollTimer); poll(); }  // catch up right away
-            }
-        });
-
-        // ================= WATCH FOR NEW VISITORS =================
-        function schedulePoll(delay) {
-            clearTimeout(pollTimer);
-            pollTimer = setTimeout(poll, delay);
         }
 
         async function poll() {
             if (!started || polling) return;
             polling = true;
-            lastPollAt = Date.now();
-            const status = document.getElementById('status');
-
+            
             try {
-                const data = await readVisitors();
-                if (!started) return;   // paused while waiting for the reply
-                const count = data.count;
-                const recent = data.recent;   // newest first
-
-                showDiag(`OK (${data.source}) • ${count} visitors • newest: ${recent.join(', ') || 'none yet'}`);
-                document.getElementById('visitorTotal').textContent = `Total visitors: ${count}`;
+                const data = await loadJsonp(VISITOR_API, REPLY_TIMEOUT || 15000);
+                if (!data) throw new Error('Empty response');
+                
+                const count = data.count || 0;
+                const recent = data.recent || [];
+                
+                document.getElementById('visitorCount').textContent = `Total visitors: ${count}`;
+                document.getElementById('status').textContent = '🟢 Listening...';
 
                 if (lastCount === null || count < lastCount) {
                     lastCount = count;
@@ -1157,81 +400,38 @@
                     recent.slice(0, newOnes).reverse().forEach(name => greet(name));
                     lastCount = count;
                 }
-
-                status.textContent = '🟢 Watching for new visitors...';
-                document.getElementById('lastChecked').textContent =
-                    `Last checked: ${new Date().toLocaleTimeString()}`;
             } catch (e) {
-                status.textContent = '🟠 Connection problem, retrying...';
-                showDiag('Error: ' + e.message);
+                document.getElementById('status').textContent = '🟠 Error: ' + e.message;
             } finally {
                 polling = false;
-                if (started) schedulePoll(POLL_MS);
+                if (started) {
+                    pollTimer = setTimeout(poll, POLL_MS || 4000);
+                }
             }
         }
 
-        // Watchdog: restart checking if it ever stops
-        setInterval(() => {
-            if (started && !polling && Date.now() - lastPollAt > POLL_MS * 4) {
-                clearTimeout(pollTimer);
-                poll();
-            }
-        }, 5000);
-
-        // ================= GREETING QUEUE =================
-        function greet(name) {
-            queue.push(String(name).substring(0, 30));
-            processQueue();
+        // ================= START/PAUSE =================
+        function startStation() {
+            ensureAudio();
+            speakText('Tom station is ready.');
+            lastCount = null;
+            started = true;
+            document.getElementById('setupCard').classList.add('hidden');
+            document.getElementById('runningCard').classList.remove('hidden');
+            poll();
+            setTimeout(() => { if (started) startMusic(); }, 2500);
         }
 
-        function processQueue() {
-            if (busy || queue.length === 0) return;
-            busy = true;
-            const name = queue.shift();
-
-            const nameEl = document.getElementById('currentName');
-            nameEl.textContent = name;
-            nameEl.classList.remove('pulse');
-            void nameEl.offsetWidth;
-            nameEl.classList.add('pulse');
-            addLog(name);
-            showMirror(name);
-
-            // Silence the music, play the robot chirp, then speak
-            duckMusic(true);
-
-            const done = () => {
-                // Keep quiet while Tom repeats, then bring the music back
-                setTimeout(() => {
-                    duckMusic(false);
-                    busy = false;
-                    processQueue();
-                }, TOM_REPEAT_GAP);
-            };
-
-            setTimeout(() => {
-                playChirp();
-                setTimeout(() => speakText(`Hello ${name}! Welcome to Gen AI Robot City!`, done), 400);
-            }, 300);
+        function pauseStation() {
+            started = false;
+            clearTimeout(pollTimer);
+            stopMusic();
+            document.getElementById('runningCard').classList.add('hidden');
+            document.getElementById('setupCard').classList.remove('hidden');
         }
 
-        function addLog(name) {
-            const li = document.createElement('li');
-            const time = document.createElement('span');
-            time.className = 'time';
-            time.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            li.appendChild(time);
-            li.appendChild(document.createTextNode(`Greeted ${name}`));
-            const log = document.getElementById('log');
-            log.insertBefore(li, log.firstChild);
-        }
-
-        // Final force: populate voices right now
-        console.log('🎤 Forcing voice dropdown population...');
-        setTimeout(() => {
-            fillVoiceList();
-            console.log('🎤 Voice dropdown populated');
-        }, 100);
+        // ================= STARTUP =================
+        console.log('🚀 Station initialized');
     </script>
 </body>
 </html>
