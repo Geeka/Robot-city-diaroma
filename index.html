@@ -632,7 +632,7 @@
             <div id="avatarGrid" class="avatar-grid"></div>
 
             <button class="submit-name-btn" onclick="submitName()">Continue →</button>
-            <p style="color: #718096; font-size: 11px; margin-top: 12px;">Your first name will appear on the city's visitor board.</p>
+            <p style="color: #718096; font-size: 11px; margin-top: 12px;">Your first name and avatar choice are saved on the city's visitor board.</p>
         </div>
 
         <!-- MAIN -->
@@ -844,13 +844,13 @@
                     <div class="agent-grid">
                         <button class="agent-card" style="border-left-color: #00ff88;" onclick="agentSpeak('memory')">
                             <span class="agent-name">🗂️ Memory Agent</span>
-                            Saved your name on the city's visitor board so the city remembers you.
+                            Saved your name and avatar on the city's visitor board so the city remembers you.
                             <span class="agent-tag">Tool: Google Sheet</span>
                         </button>
                         <button class="agent-card" style="border-left-color: #00ff88;" onclick="agentSpeak('voice')">
                             <span class="agent-name">🗣️ Voice Agent</span>
-                            Speaks to you in the robot voice and tells the Tom Station to greet you.
-                            <span class="agent-tag">Tools: speaker + Tom Station</span>
+                            Speaks to you in the robot voice and tells the greeter robot to welcome you.
+                            <span class="agent-tag">Tools: speaker + greeter phone</span>
                         </button>
                     </div>
 
@@ -1224,6 +1224,7 @@
         }
 
         // ================= AVATARS =================
+        // The avatar names here must match AVATAR_NAMES in the Apps Script.
         const AVATARS = [
             { emoji: '🤖', name: 'Robo',      color: '#00ff88' },
             { emoji: '🧑', name: 'Human',     color: '#f6ad55' },
@@ -1271,12 +1272,13 @@
             return text.replace(/\bGen\s*AI\b/gi, MACHINE_WORD_BY_WORD ? 'Jen Ay Eye' : 'Jen A I');
         }
 
-        // Prefer a robotic-sounding voice if the phone has one installed
+        // Prefer a robotic voice, then a bright female voice, if the phone has one
         function pickVoice() {
             if (!('speechSynthesis' in window)) return null;
             const voices = speechSynthesis.getVoices()
                 .filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
             return voices.find(v => ROBOTIC_VOICE_NAMES.test(v.name)) ||
+                   voices.find(v => FEMALE_VOICE_NAMES.test(v.name)) ||
                    voices.find(v => v.lang === 'en-IN') ||
                    voices[0] || null;
         }
@@ -1308,15 +1310,16 @@
             }
         }
 
-        // Speaks in short, punchy phrases for a strong robot rhythm
+        // Speaks word. by. word. in a flat machine rhythm (or in short phrases)
         function speak(text) {
             if (!('speechSynthesis' in window)) return;
             const voice = pickVoice();
-            const phrases = (forSpeech(text).match(/[^.!?,]+[.!?,]*/g) || [text])
-                .map(s => s.trim())
-                .filter(Boolean);
-            phrases.forEach(phrase => {
-                const u = new SpeechSynthesisUtterance(phrase);
+            const spoken = forSpeech(text);
+            const parts = MACHINE_WORD_BY_WORD
+                ? spoken.split(/\s+/).map(w => w.replace(/[^\w']/g, '')).filter(Boolean)
+                : (spoken.match(/[^.!?,]+[.!?,]*/g) || [spoken]).map(s => s.trim()).filter(Boolean);
+            parts.forEach(part => {
+                const u = new SpeechSynthesisUtterance(part);
                 if (voice) u.voice = voice;
                 u.pitch = ROBOT_PITCH;
                 u.rate = ROBOT_RATE;
@@ -1471,8 +1474,8 @@
                 safety: 'I am the Safety Agent. I check that everything is kind, safe, and honest, and I ask a human before big decisions.',
                 vision: 'I am the Vision Agent. I use cameras to see and understand the world around me.',
                 maintenance: 'I am the Maintenance Agent. I keep the circuit boards, wires, and lights of the Neural Core working smoothly.',
-                memory: `I am the Memory Agent. I saved your name, ${visitorName}, on the visitor board, so the city remembers you.`,
-                voice: 'I am the Voice Agent. I speak to you in this robot voice, and I tell the Tom Station to greet you.'
+                memory: `I am the Memory Agent. I saved your name, ${visitorName}, and your avatar on the visitor board, so the city remembers you.`,
+                voice: 'I am the Voice Agent. I speak to you in this robot voice, and I tell the greeter robot to welcome you.'
             };
             sayNow(lines[agent] || '');
         }
@@ -1494,8 +1497,8 @@
             if (e.key === 'Enter') submitName();
         });
 
-        // ================= VISITOR BOARD (shown on the Tom Station) =================
-        // Only the first name is sent. The visitor number is used on the awards.
+        // ================= VISITOR BOARD =================
+        // The first name and the chosen avatar name are saved in the sheet.
         // Uses a script-tag request (JSONP), which works on every phone browser.
         function logVisit() {
             if (!VISITOR_API) return;
@@ -1523,7 +1526,8 @@
                 done();
                 console.log('Visitor board offline');
             };
-            s.src = `${VISITOR_API}?action=visit&name=${encodeURIComponent(visitorName)}&callback=${cb}&t=${Date.now()}`;
+            s.src = `${VISITOR_API}?action=visit&name=${encodeURIComponent(visitorName)}` +
+                    `&avatar=${encodeURIComponent(selectedAvatar.name)}&callback=${cb}&t=${Date.now()}`;
             document.body.appendChild(s);
         }
 
