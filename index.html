@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to Gen AI Robot City</title>
+    <!-- Load shared configuration -->
+    <script src="config.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -948,14 +950,12 @@
 
     <script>
         // ================= CONFIG =================
-        const VISITOR_API = 'https://script.google.com/macros/s/AKfycbzpu0Co2yrL6g73tj4aMMKGyaJL5Ef1s-9NtqIeCvFsJoPGCJtt26_KX9-PwfmPIQWA/exec';
-        // Photos load from the "images" folder next to this page, so they work in any repo name
+        // Config.js is loaded at the top: VISITOR_API, VOICE_SETTINGS, etc.
+        // Photos load from the "images" folder next to this page
         const IMG = 'images/';
         const TOTAL_ZONES = 7;
 
         // ================= ZONES + MAP PINS =================
-        // Pin positions are percentages across (x) and down (y) the city-overview photo.
-        // If a pin doesn't sit on the right spot of your photo, just adjust its x / y numbers.
         const ZONES = [
             { n: 1, icon: '🏙️', name: 'Entrance',     pin: { x: 50, y: 57 } },
             { n: 2, icon: '🌴', name: 'Data Valley',  pin: { x: 50, y: 42 } },
@@ -967,9 +967,6 @@
         ];
 
         // ================= AI CLOUD COTTAGES =================
-        // Each cottage in the AI Cloud is home to a different AI.
-        // These are examples. The real names are set in the Tom Station settings
-        // (or the "Cottages" tab of your sheet) and loaded automatically.
         let AI_COTTAGES = [
             { emoji: '💬', name: 'Chat AI',          job: 'Talks with people and answers their questions.',     color: '#00ff88' },
             { emoji: '🌐', name: 'Translator AI',    job: 'Turns one language into another.',                    color: '#4ecdc4' },
@@ -983,8 +980,6 @@
         const litCottages = new Set();
         const COTTAGE_COLORS = ['#00ff88', '#4ecdc4', '#ff6b9d', '#b794f4', '#63b3ed', '#f6ad55', '#ff6b6b', '#ffe66d'];
 
-        // Loads the cottage list saved from the Tom Station settings.
-        // If nothing is saved yet (or the internet is slow), the examples above stay.
         function loadCottagesFromSheet() {
             if (!VISITOR_API) return;
             const cb = 'cottages_' + Date.now();
@@ -1013,7 +1008,6 @@
         }
 
         // ================= DEVA ICON (original Indra-style drawing) =================
-        // Drawn with code: golden crown, halo, tilak, earrings, necklace and vajra.
         function drawDevaIcon(ctx, x, y, size) {
             ctx.save();
             ctx.translate(x, y);
@@ -1043,14 +1037,12 @@
                 if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = width || 2; ctx.stroke(); }
             };
 
-            // Heavenly golden background
             const sky = ctx.createRadialGradient(100, 80, 10, 100, 100, 110);
             sky.addColorStop(0, '#fff6c2');
             sky.addColorStop(0.55, '#f6c945');
             sky.addColorStop(1, '#b7791f');
             dot(100, 100, 100, sky);
 
-            // Glowing halo
             ctx.save();
             ctx.shadowColor = '#fff59d';
             ctx.shadowBlur = 20;
@@ -1063,27 +1055,22 @@
             const skin = '#f2c98a';
             const hair = '#2d1b0e';
 
-            // Shoulders, neck and necklace
             shape('M30 200 Q40 150 100 145 Q160 150 170 200 Z', skin);
             shape('M88 126 H112 V152 H88 Z', skin);
             shape('M62 158 Q100 186 138 158', null, gold, 7);
             dot(100, 176, 6, '#e53e3e', '#d69e2e', 2);
 
-            // Long hair behind the face
             shape('M60 90 Q56 140 72 152 L82 118 Z', hair);
             shape('M140 90 Q144 140 128 152 L118 118 Z', hair);
 
-            // Face, ears and earrings
             oval(100, 102, 34, 40, skin);
             oval(66, 104, 5, 9, '#e9b870');
             oval(134, 104, 5, 9, '#e9b870');
             dot(66, 121, 6, null, gold, 3);
             dot(134, 121, 6, null, gold, 3);
 
-            // Hairline
             shape('M66 92 Q100 68 134 92 Q128 78 100 74 Q72 78 66 92 Z', hair);
 
-            // Golden crown with jewels
             shape('M68 80 L132 80 L126 60 L116 64 L110 40 L100 22 L90 40 L84 64 L74 60 Z', gold, '#b7791f', 2);
             shape('M66 76 H134 V86 H66 Z', gold, '#b7791f', 2);
             dot(100, 58, 6, '#e53e3e', '#fff3a0', 2);
@@ -1092,7 +1079,6 @@
             dot(116, 81, 3, '#38a169');
             dot(100, 19, 4, '#fff3a0');
 
-            // Eyebrows, eyes, tilak, nose and gentle smile
             shape('M80 96 Q88 91 95 95', null, hair, 2.5);
             shape('M105 95 Q112 91 120 96', null, hair, 2.5);
             shape('M81 104 Q88 99 95 104 Q88 107 81 104 Z', '#ffffff');
@@ -1103,7 +1089,6 @@
             shape('M100 106 Q98 116 101 118', null, '#c98a45', 2);
             shape('M91 126 Q100 132 109 126', null, '#b83232', 2.5);
 
-            // Vajra (thunderbolt) with sparks
             ctx.save();
             ctx.translate(34, 150);
             ctx.rotate(-Math.PI / 6);
@@ -1117,13 +1102,11 @@
         }
 
         // ================= CELESTIAL ICON (spiral galaxy drawing) =================
-        // Bold glowing spiral arms, bright core and stars, so it stays clear at small sizes.
         function drawCelestialIcon(ctx, x, y, size) {
             ctx.save();
             ctx.translate(x, y);
             ctx.scale(size / 200, size / 200);
 
-            // Deep space background
             const space = ctx.createRadialGradient(100, 100, 10, 100, 100, 100);
             space.addColorStop(0, '#2a1b5c');
             space.addColorStop(1, '#07051a');
@@ -1137,7 +1120,6 @@
             ctx.arc(100, 100, 100, 0, Math.PI * 2);
             ctx.clip();
 
-            // Background stars
             const stars = [[30, 40, 1.8], [160, 30, 2.2], [178, 120, 1.6], [25, 150, 2.2], [140, 178, 1.6],
                            [60, 20, 1.2], [185, 80, 1.2], [15, 95, 1.4], [110, 14, 1.4], [80, 186, 1.8]];
             ctx.fillStyle = '#ffffff';
@@ -1147,12 +1129,10 @@
                 ctx.fill();
             });
 
-            // Tilt the galaxy slightly, like the Milky Way seen from space
             ctx.translate(100, 100);
             ctx.rotate(-0.5);
             ctx.scale(1, 0.75);
 
-            // Two glowing spiral arms (thick color glow + bright white center line)
             const armColors = ['#b794f4', '#63b3ed'];
             const tMax = 10, step = 0.12;
             ctx.lineCap = 'round';
@@ -1181,7 +1161,6 @@
                 }
             }
 
-            // Brilliant galactic core
             const core = ctx.createRadialGradient(0, 0, 0, 0, 0, 34);
             core.addColorStop(0, '#ffffff');
             core.addColorStop(0.35, '#fff3b0');
@@ -1191,9 +1170,8 @@
             ctx.arc(0, 0, 34, 0, Math.PI * 2);
             ctx.fill();
 
-            ctx.restore();   // end clip + tilt
+            ctx.restore();
 
-            // Sparkle star in the corner
             ctx.save();
             ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = 3;
@@ -1209,7 +1187,6 @@
             ctx.restore();
         }
 
-        // Turns a drawn avatar into a picture for buttons and the greeting
         const iconCache = {};
         function avatarIconURL(avatar, size) {
             const key = avatar.name + size;
@@ -1224,7 +1201,6 @@
         }
 
         // ================= AVATARS =================
-        // The avatar names here must match AVATAR_NAMES in the Apps Script.
         const AVATARS = [
             { emoji: '🤖', name: 'Robo',      color: '#00ff88' },
             { emoji: '🧑', name: 'Human',     color: '#f6ad55' },
@@ -1259,20 +1235,16 @@
         let gbReturnTo = 'welcome';
         let gbSigned = false;
 
-        // ================= ROBOT VOICE (energetic machine tone) =================
-        // A bright female base voice, spoken word. by. word. in a flat machine rhythm.
-        const ROBOT_PITCH = 1.15;  // brightness (range 0.1 - 2)
-        const ROBOT_RATE = 1.15;   // speed / energy (range 0.5 - 2)
-        const MACHINE_WORD_BY_WORD = true;   // false = speak in short phrases instead
-        const FEMALE_VOICE_NAMES = /female|zira|heera|veena|samantha|karen|moira|tessa|fiona|victoria|allison|ava|susan|zoe|nicky|serena|kate|google us english/i;
-        const ROBOTIC_VOICE_NAMES = /zarvox|trinoids|robot|espeak/i;
+        // ================= ROBOT VOICE (from config.js) =================
+        // Use VOICE_SETTINGS from config.js for consistency across all pages
+        const machineWordByWord = VOICE_SETTINGS.machineWordByWord !== false;
+        const robotPitch = VOICE_SETTINGS.pitch || 1.15;
+        const robotRate = VOICE_SETTINGS.rate || 1.15;
 
-        // Say "Gen AI" clearly (some voices read "Gen" as "General")
         function forSpeech(text) {
-            return text.replace(/\bGen\s*AI\b/gi, MACHINE_WORD_BY_WORD ? 'Jen Ay Eye' : 'Jen A I');
+            return text.replace(/\bGen\s*AI\b/gi, machineWordByWord ? 'Jen Ay Eye' : 'Jen A I');
         }
 
-        // Prefer a robotic voice, then a bright female voice, if the phone has one
         function pickVoice() {
             if (!('speechSynthesis' in window)) return null;
             const voices = speechSynthesis.getVoices()
@@ -1283,7 +1255,6 @@
                    voices[0] || null;
         }
 
-        // Short electronic "bleep-bloop" before the robot talks
         let beepCtx = null;
         function robotBeep() {
             try {
@@ -1310,19 +1281,18 @@
             }
         }
 
-        // Speaks word. by. word. in a flat machine rhythm (or in short phrases)
         function speak(text) {
             if (!('speechSynthesis' in window)) return;
             const voice = pickVoice();
             const spoken = forSpeech(text);
-            const parts = MACHINE_WORD_BY_WORD
+            const parts = machineWordByWord
                 ? spoken.split(/\s+/).map(w => w.replace(/[^\w']/g, '')).filter(Boolean)
                 : (spoken.match(/[^.!?,]+[.!?,]*/g) || [spoken]).map(s => s.trim()).filter(Boolean);
             parts.forEach(part => {
                 const u = new SpeechSynthesisUtterance(part);
                 if (voice) u.voice = voice;
-                u.pitch = ROBOT_PITCH;
-                u.rate = ROBOT_RATE;
+                u.pitch = robotPitch;
+                u.rate = robotRate;
                 u.volume = 1;
                 speechSynthesis.speak(u);
             });
@@ -1490,7 +1460,7 @@
             visitorName = name;
             document.getElementById('nameModal').classList.add('hidden');
             logVisit();
-            enterCity();   // straight to the welcome screen (inside the tap, so the voice can play)
+            enterCity();
         }
 
         document.getElementById('visitorName').addEventListener('keypress', e => {
@@ -1498,15 +1468,13 @@
         });
 
         // ================= VISITOR BOARD =================
-        // The first name and the chosen avatar name are saved in the sheet.
-        // Uses a script-tag request (JSONP), which works on every phone browser.
         function logVisit() {
             if (!VISITOR_API) return;
             const cb = 'visit_' + Date.now();
             const s = document.createElement('script');
             const done = () => {
                 clearTimeout(timer);
-                window[cb] = function () {};   // ignore any late reply
+                window[cb] = function () {};
                 s.remove();
             };
             const timer = setTimeout(() => {
@@ -1517,7 +1485,6 @@
             window[cb] = data => {
                 done();
                 if (data && data.count) visitorCount = data.count;
-                // add the visitor number to any award already shown
                 if (participationReady) drawAward('participation');
                 if (completionReady) drawAward('completion');
             };
@@ -1561,7 +1528,6 @@
             document.getElementById('zoneProgress').textContent =
                 `🧭 ${visitedZones.size} of ${TOTAL_ZONES} zones explored`;
 
-            // Keep the current zone chip visible in the bar
             const current = nav.querySelector('.current');
             if (current) nav.scrollLeft = current.offsetLeft - nav.clientWidth / 2 + current.clientWidth / 2;
         }
@@ -1574,7 +1540,6 @@
             toastTimer = setTimeout(() => toast.classList.add('hidden'), 4000);
         }
 
-        // Jump to any zone; the Finale stays locked until zones 1-6 are visited
         function goToZone(n) {
             if (n === TOTAL_ZONES && finaleLocked()) {
                 const list = missingZones().map(z => `${z.n} ${z.name}`).join(', ');
@@ -1608,7 +1573,6 @@
             if (zoneIntros[n]) sayNow(zoneIntros[n]);
 
             if (n === TOTAL_ZONES) {
-                // All zones explored: unlock the Award of Completion
                 completionReady = true;
                 drawAward('completion');
                 sayNow(`Congratulations ${visitorName}! You explored all ${TOTAL_ZONES} zones of Gen AI Robot City and earned your Award of Completion!`);
@@ -1771,7 +1735,6 @@
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.clearRect(0, 0, W, H);
 
-            // Background
             const bg = ctx.createLinearGradient(0, 0, W, H);
             bg.addColorStop(0, '#0f0f23');
             bg.addColorStop(0.5, '#1a1a2e');
@@ -1779,7 +1742,6 @@
             ctx.fillStyle = bg;
             ctx.fillRect(0, 0, W, H);
 
-            // Neon border
             ctx.save();
             ctx.shadowColor = cfg.border;
             ctx.shadowBlur = 20;
@@ -1792,7 +1754,6 @@
             ctx.textAlign = 'center';
             ctx.textBaseline = 'alphabetic';
 
-            // Title
             ctx.fillStyle = '#00ff88';
             ctx.font = "bold 40px 'Courier New', monospace";
             ctx.fillText('GEN AI ROBOT CITY', W / 2, 95);
@@ -1800,7 +1761,6 @@
             fitText(ctx, cfg.title, 540, 30);
             ctx.fillText(cfg.title, W / 2, 145);
 
-            // Avatar circle
             const cx = W / 2, cy = 355, r = 150;
             ctx.save();
             ctx.shadowColor = avatar.color;
@@ -1831,7 +1791,6 @@
             }
             ctx.restore();
 
-            // Name
             ctx.fillStyle = '#ffffff';
             fitText(ctx, visitorName, 520, 48);
             ctx.fillText(visitorName, W / 2, 580);
@@ -1841,7 +1800,6 @@
             ctx.fillText(cfg.line1, W / 2, 620);
             ctx.fillText(cfg.line2, W / 2, 650);
 
-            // Details
             const details = [];
             if (visitorCount) details.push(`Visitor #${visitorCount}`);
             details.push(new Date().toLocaleDateString());
@@ -1869,7 +1827,7 @@
             a.remove();
         }
 
-        // ================= WELCOME SCREEN (greeting + participation award) =================
+        // ================= WELCOME SCREEN =================
         function enterCity() {
             document.getElementById('mainContent').classList.remove('hidden');
             document.getElementById('welcomeBlock').classList.remove('hidden');
@@ -1879,7 +1837,6 @@
                 `Welcome, ${visitorName}! Prepare for an extraordinary journey.`;
             updateNamePlaceholders();
 
-            // Robot greets the visitor by name, with their avatar
             const greeterAvatar = document.getElementById('greeterAvatar');
             if (selectedAvatar.draw) {
                 greeterAvatar.textContent = '';
@@ -1898,7 +1855,6 @@
             document.getElementById('robotGreeting').textContent =
                 `Hello, ${visitorName}! Love your ${selectedAvatar.name} avatar! Here is your Participation Award. Tap "Enter the City" when you're ready! 🎖️`;
 
-            // Participation award
             participationReady = true;
             drawAward('participation');
 
@@ -1955,7 +1911,6 @@
             window.scrollTo(0, 0);
         }
 
-        // Hide any photo that fails to load
         document.querySelectorAll('.diorama-photo').forEach(img => {
             if (img.tagName === 'IMG') {
                 img.addEventListener('error', function () { this.style.display = 'none'; });
