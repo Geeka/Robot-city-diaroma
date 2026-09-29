@@ -85,6 +85,8 @@
     </style>
 </head>
 <body>
+    <!-- Load shared configuration -->
+    <script src="config.js"></script>
 
     <!-- START -->
     <div id="startCard" class="card">
@@ -109,17 +111,9 @@
 
     <script>
         // ================= CONFIG =================
-        // Same Apps Script link used by the story page and the Tom Station
-        const VISITOR_API = 'https://script.google.com/macros/s/AKfycbzpu0Co2yrL6g73tj4aMMKGyaJL5Ef1s-9NtqIeCvFsJoPGCJtt26_KX9-PwfmPIQWA/exec';
-
-        const POLL_MS = 4000;              // check for new visitors every 4 seconds
-        const REPLY_TIMEOUT = 15000;       // wait up to 15 seconds for Google to reply
-        const SETTINGS_REFRESH_MS = 60000; // pick up changes from the station every minute
-        const DEFAULT_GREETING = 'Welcome {name}!';
-
-        // Voices that sound robotic, then bright female voices (used automatically when available)
-        const ROBOTIC_VOICE_NAMES = /zarvox|trinoids|robot|espeak/i;
-        const FEMALE_VOICE_NAMES = /female|zira|heera|veena|samantha|karen|moira|tessa|fiona|victoria|allison|ava|susan|zoe|nicky|serena|kate|google us english/i;
+        // All configuration is now loaded from config.js
+        // This includes: VISITOR_API, POLL_MS, REPLY_TIMEOUT, 
+        // SETTINGS_REFRESH_MS, DEFAULT_GREETING, voice settings, etc.
 
         // ================= STATE =================
         let settings = {};                 // saved from the Tom Station (Settings sheet)
@@ -141,14 +135,23 @@
                 const n = parseFloat(v);
                 return isNaN(n) ? d : Math.min(hi, Math.max(lo, n));
             };
+            
+            // Start with defaults from config.js
+            const voiceStyle = VOICE_SETTINGS.style || 'machine';
+            const voiceFemale = VOICE_SETTINGS.female !== false;
+            const voicePitch = VOICE_SETTINGS.pitch || 1.15;
+            const voiceRate = VOICE_SETTINGS.rate || 1.15;
+            const voiceChirp = VOICE_SETTINGS.chirp !== false;
+            
+            // Override with spreadsheet settings if available
             return {
-                style: ['machine', 'energetic', 'natural'].includes(settings.style) ? settings.style : 'machine',
-                female: String(settings.female) !== 'false',
-                pitch: num(settings.pitch, 1.15, 0.1, 2),
-                rate: num(settings.rate, 1.15, 0.5, 2),
+                style: ['machine', 'energetic', 'natural'].includes(settings.style) ? settings.style : voiceStyle,
+                female: String(settings.female) !== 'false' ? voiceFemale : String(settings.female) === 'true',
+                pitch: num(settings.pitch, voicePitch, 0.1, 2),
+                rate: num(settings.rate, voiceRate, 0.5, 2),
                 gap: num(settings.gap, 6, 2, 20) * 1000,
                 greeting: String(settings.greeting || DEFAULT_GREETING).substring(0, 120),
-                chirp: String(settings.chirp) !== 'false'
+                chirp: String(settings.chirp) !== 'false' ? voiceChirp : String(settings.chirp) === 'true'
             };
         }
 
