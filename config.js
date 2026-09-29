@@ -12,9 +12,10 @@ const VISITOR_API = 'https://script.google.com/macros/s/AKfycbwLHMAkVKMJX4UYJcTz
 const VOICE_SETTINGS = {
   style: 'machine',        // 'machine' (word by word), 'energetic' (phrases), 'natural' (smooth)
   female: true,            // true = prefer female voices, false = default voice
-  pitch: 1.15,             // 0.1 to 2.0
-  rate: 1.15,              // 0.5 to 2.0
-  chirp: true              // true = robot chirp sound before greeting
+  pitch: 1.15,             // 0.1 to 2.0 (brightness)
+  rate: 1.15,              // 0.5 to 2.0 (speed/energy)
+  chirp: true,             // true = robot chirp sound before greeting
+  machineWordByWord: true  // For index/story: speak word. by. word. (vs phrases)
 };
 
 // ============================================
