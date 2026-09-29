@@ -334,9 +334,20 @@
 
     <div class="card" style="font-size: 11px; color: #718096; text-align: left;">
         <p><strong>Diagnostics</strong> (station v15 • cottage settings)</p>
-        <p id="diagLink"></p>
-        <p id="diag" style="word-break: break-all;">Waiting to start...</p>
+        <p id="diagLink">Loading config...</p>
+        <p id="diag" style="word-break: break-all;">Checking for config.js...</p>
     </div>
+
+    <script>
+        // Immediate check - before anything else
+        if (typeof VISITOR_API === 'undefined') {
+            document.getElementById('diag').innerHTML = '❌ <strong>ERROR: config.js not loaded!</strong><br>Make sure config.js is in the SAME folder as station.html';
+            document.getElementById('diagLink').innerHTML = '❌ config.js missing or not found';
+        } else {
+            document.getElementById('diag').textContent = 'Config loaded ✓ • Initializing...';
+            document.getElementById('diagLink').textContent = `API: ...${VISITOR_API.slice(-20)}`;
+        }
+    </script>
 
     <script>
         // ================= CONFIG =================
@@ -382,8 +393,14 @@
             document.getElementById('sampleStatus').textContent = msg;
         }
 
-        document.getElementById('diagLink').textContent =
-            `Script ends with: ...${VISITOR_API.slice(-15)} • Sheet backup: ...${SHEET_ID.slice(-6)}`;
+        // Check if config.js loaded
+        if (typeof VISITOR_API === 'undefined') {
+            document.getElementById('diagLink').innerHTML = '❌ <strong>ERROR: config.js not found!</strong> Make sure config.js is in the same folder.';
+            document.getElementById('startError').textContent = '❌ config.js missing. Put config.js in the same folder as this file.';
+        } else {
+            document.getElementById('diagLink').textContent =
+                `Script: ...${VISITOR_API.slice(-15)} • Sheet: ...${SHEET_ID.slice(-6)}`;
+        }
 
         // ================= LOADING DATA FROM GOOGLE =================
         // Loads data like a script file, so browser security rules don't block it
@@ -594,7 +611,12 @@
             }
         }
 
-        loadCottages();
+        // Load cottages only if config.js is available
+        if (typeof VISITOR_API !== 'undefined') {
+            loadCottages();
+        } else {
+            document.getElementById('cottageStatus').textContent = '❌ config.js not loaded';
+        }
 
         // ================= ROBOT BACKGROUND MUSIC (generated live, no files) =================
         let audioCtx = null;
@@ -932,6 +954,13 @@
 
         // ================= START / PAUSE =================
         function startStation() {
+            // Verify config.js loaded
+            if (typeof VISITOR_API === 'undefined' || typeof VOICE_SETTINGS === 'undefined') {
+                document.getElementById('startError').textContent = '❌ config.js not loaded. Make sure config.js is in the same folder.';
+                showDiag('ERROR: config.js missing or not loaded');
+                return;
+            }
+
             const canSpeak = 'speechSynthesis' in window;
 
             // Tapping Start unlocks sound and voice for the rest of the session
