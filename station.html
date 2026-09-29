@@ -162,15 +162,34 @@
         let musicOn = false;
 
         // ================= CONFIG CHECK =================
-        window.addEventListener('load', function() {
-            if (typeof VISITOR_API !== 'undefined') {
-                document.getElementById('configStatus').textContent = '✅ Config loaded';
-                document.getElementById('diag').textContent = 'API: ...' + VISITOR_API.slice(-20);
-            } else {
-                document.getElementById('configStatus').textContent = '❌ config.js not found';
-                document.getElementById('setupError').textContent = '❌ config.js missing from folder';
+        function updateDiagnostics() {
+            const configEl = document.getElementById('configStatus');
+            const diagEl = document.getElementById('diag');
+            
+            if (!configEl || !diagEl) {
+                console.warn('⚠️ Diagnostic elements not found');
+                return;
             }
-        });
+            
+            if (typeof VISITOR_API !== 'undefined') {
+                configEl.textContent = '✅ Config loaded';
+                const voiceCount = englishVoices().length;
+                diagEl.innerHTML = `<strong>API:</strong> ...${VISITOR_API.slice(-15)}<br><strong>Voices:</strong> ${voiceCount}`;
+                console.log('✅ Config loaded, API ready, voices available:', voiceCount);
+            } else {
+                configEl.textContent = '❌ config.js missing';
+                diagEl.textContent = 'Fallback config active';
+                console.warn('⚠️ Config.js not found, using fallbacks');
+            }
+        }
+        
+        // Update diagnostics immediately and after voices load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', updateDiagnostics);
+        } else {
+            updateDiagnostics();
+        }
+        setTimeout(updateDiagnostics, 500);
 
         // ================= VOICE LIST =================
         function englishVoices() {
