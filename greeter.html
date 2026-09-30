@@ -143,6 +143,23 @@
             .bot-face, .bot-face * { animation: none !important; }
         }
 
+        /* ===== Landscape: character beside the text ===== */
+        @media (orientation: landscape) {
+            #runPanel { display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+                        gap: 28px; max-width: 860px; }
+            #runPanel .bot-face { flex: 0 0 auto; margin: 0; }
+            #runPanel .run-info { flex: 1 1 260px; min-width: 220px; text-align: center; }
+            .run-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        }
+        /* Short landscape screens (phones): shrink so nothing is cut off */
+        @media (orientation: landscape) and (max-height: 520px) {
+            body { padding: 10px; }
+            .bot-face { width: 155px; height: 210px; }
+            h1 { font-size: 18px; }
+            #currentName { font-size: 36px; min-height: 42px; }
+            .card { padding: 14px; margin: 8px auto; }
+        }
+
         .label { color: #718096; font-size: 12px; margin-top: 8px; }
 
         #currentName {
@@ -173,13 +190,17 @@
     <!-- RUNNING SCREEN -->
     <div id="runPanel" class="card hidden">
         <div id="robotIcon" class="bot-face idle"></div>
-        <p class="label">LAST GREETED</p>
-        <div id="currentName">—</div>
-        <p id="status">Connecting...</p>
-        <p id="diag"></p>
-        <p id="warning" class="error hidden"></p>
-        <button class="btn small" onclick="testGreeting()">🔊 Test greeting</button>
-        <button class="btn small" onclick="goFullscreen()">⛶ Full screen</button>
+        <div class="run-info">
+            <p class="label">LAST GREETED</p>
+            <div id="currentName">—</div>
+            <p id="status">Connecting...</p>
+            <p id="diag"></p>
+            <p id="warning" class="error hidden"></p>
+            <div class="run-buttons">
+                <button class="btn small" onclick="testGreeting()">🔊 Test greeting</button>
+                <button class="btn small" onclick="goFullscreen()">⛶ Full screen</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -312,7 +333,17 @@
             <path class="wave wave-r" d="M146 90 q12 12 0 24" fill="none" stroke="#38e1ff" stroke-width="2.5" stroke-linecap="round"/>
             <path class="wave wave-r2" d="M154 86 q16 16 0 32" fill="none" stroke="#38e1ff" stroke-width="2.5" stroke-linecap="round"/>
         </svg>`;
-        document.querySelectorAll('.bot-face').forEach(el => { el.innerHTML = BOT_SVG; });
+        // Each copy gets unique gradient ids, so hiding the start screen never
+        // breaks the running character's colors (duplicate ids resolve to the first
+        // one in the DOM, which disappears when that screen is hidden).
+        document.querySelectorAll('.bot-face').forEach((el, i) => {
+            let svg = BOT_SVG;
+            ['cr', 'crd', 'vs'].forEach(id => {
+                svg = svg.split('id="' + id + '"').join('id="' + id + i + '"')
+                         .split('url(#' + id + ')').join('url(#' + id + i + ')');
+            });
+            el.innerHTML = svg;
+        });
 
         // ================= STATE =================
         let settings = {};
@@ -555,12 +586,20 @@
             speakText(greeting);
         }
 
-        // ================= FULL SCREEN =================
+        // ================= FULL SCREEN + LANDSCAPE =================
         function goFullscreen() {
             const el = document.documentElement;
             const req = el.requestFullscreen || el.webkitRequestFullscreen ||
                         el.mozRequestFullScreen || el.msRequestFullscreen;
             if (req) { try { req.call(el); } catch (e) {} }
+        }
+        function lockLandscape() {
+            // Only works once full-screen / installed (Android). Silently ignored elsewhere.
+            try {
+                if (screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock('landscape').catch(() => {});
+                }
+            } catch (e) {}
         }
 
         // ================= START =================
@@ -571,6 +610,7 @@
             busy = false;
             queue.length = 0;   // clear any leftover names so nothing stale is greeted
             goFullscreen();     // request full screen from within the Start tap
+            lockLandscape();    // best-effort landscape (works in installed/full-screen mode)
             const startCard = document.getElementById('startCard');
             const runPanel = document.getElementById('runPanel');
             if (startCard) startCard.classList.add('hidden');
