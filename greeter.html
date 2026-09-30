@@ -371,7 +371,12 @@
 
         function testGreeting() {
             ensureAudio();
-            greet('Test Visitor');
+            // Speak directly — do NOT use the visitor queue. This guarantees a test can
+            // never leave "Test Visitor" queued or interfere with real visitor greetings.
+            document.getElementById('currentName').textContent = 'Test Visitor';
+            const greeting = (settings.greeting || DEFAULT_GREETING).replace(/\{name\}/gi, 'Test Visitor');
+            if (VOICE_SETTINGS && VOICE_SETTINGS.chirp) { try { playChirp(); } catch (e) {} }
+            speakText(greeting);
         }
 
         // ================= START =================
@@ -379,6 +384,8 @@
             // Switch screen + start work FIRST so nothing can leave the button stuck.
             started = true;
             lastCount = null;
+            busy = false;
+            queue.length = 0;   // clear any leftover names so nothing stale is greeted
             const startCard = document.getElementById('startCard');
             const runPanel = document.getElementById('runPanel');
             if (startCard) startCard.classList.add('hidden');
