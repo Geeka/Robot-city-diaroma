@@ -359,13 +359,14 @@
                 }, gap);
             };
 
-            // Chirp is decorative and must never block the greeting.
+            // Chirp is decorative and must never block or delay the greeting.
+            // IMPORTANT: speak SYNCHRONOUSLY (no setTimeout) so mobile browsers, which
+            // only allow speech started directly from a tap, don't block it. The chirp
+            // plays concurrently via Web Audio.
             if (VOICE_SETTINGS && VOICE_SETTINGS.chirp) {
                 try { playChirp(); } catch (e) { console.error('chirp:', e); }
-                setTimeout(() => speakText(greeting, finish), 400);
-            } else {
-                speakText(greeting, finish);
             }
+            speakText(greeting, finish);
         }
 
         function testGreeting() {
