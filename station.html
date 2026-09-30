@@ -114,11 +114,12 @@
 
     <script>
         // ================= CONFIG FALLBACKS =================
+        // These are fallbacks if config.js fails to load
         if (typeof VISITOR_API === 'undefined') {
             var VISITOR_API = 'https://script.google.com/macros/s/AKfycbwLHMAkVKMJX4UYJcTzS0oX1Z2plHMYtv9WA-drsIKhx0WHO6J2bt6N_OI9lDWXPMlJ/exec';
         }
         if (typeof VOICE_SETTINGS === 'undefined') {
-            var VOICE_SETTINGS = { style: 'machine', female: true, pitch: 1.15, rate: 1.15, chirp: true };
+            var VOICE_SETTINGS = { style: 'machine', female: true, pitch: 1.15, rate: 1.15, chirp: true, machineWordByWord: true };
         }
         if (typeof POLL_MS === 'undefined') {
             var POLL_MS = 4000;
@@ -130,7 +131,10 @@
             var DEFAULT_GREETING = 'Welcome {name}!';
         }
         if (typeof ROBOTIC_VOICE_NAMES === 'undefined') {
-            var ROBOTIC_VOICE_NAMES = /zarvox|trinoids|robot|espeak|fred|ralph|junior|albert/i;
+            var ROBOTIC_VOICE_NAMES = /zarvox|trinoids|robot|espeak/i;
+        }
+        if (typeof FEMALE_VOICE_NAMES === 'undefined') {
+            var FEMALE_VOICE_NAMES = /female|zira|heera|veena|samantha|karen|moira|tessa|fiona|victoria|allison|ava|susan|zoe|nicky|serena|kate|google us english/i;
         }
 
         // ================= VOICE FALLBACK LIST =================
@@ -270,26 +274,48 @@
             return voices.find(v => ROBOTIC_VOICE_NAMES.test(v.name)) || voices[0] || null;
         }
 
+        // onDone(true) = finished speaking; onDone(false) = error/no sound
         function speakText(text, onDone) {
             if (!('speechSynthesis' in window)) {
-                if (onDone) onDone();
+                if (onDone) onDone(false);
                 return;
             }
+            // Clear any stuck utterance (common on Android Chrome)
+            if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
+
             const style = currentStyle();
             const u = new SpeechSynthesisUtterance(text);
             const voice = pickVoice();
             if (voice) u.voice = voice;
             u.pitch = style.pitch;
             u.rate = style.rate;
-            u.onend = () => { if (onDone) onDone(); };
-            u.onerror = () => { if (onDone) onDone(); };
+            u.volume = 1;
+            let finished = false;
+            u.onend = () => { if (!finished) { finished = true; if (onDone) onDone(true); } };
+            u.onerror = () => { if (!finished) { finished = true; if (onDone) onDone(false); } };
             speechSynthesis.speak(u);
         }
 
         function previewVoice() {
-            document.getElementById('sampleStatus').textContent = '🔊 Speaking...';
-            speakText('Hello! Tom Station is ready.', () => {
-                document.getElementById('sampleStatus').textContent = '✅ Voice works';
+            const status = document.getElementById('sampleStatus');
+            // If voices haven't loaded yet, load them and retry once
+            if (englishVoices().length === 0) {
+                fillVoiceList();
+                status.textContent = '⏳ Loading voices…';
+                setTimeout(() => {
+                    if (englishVoices().length === 0) {
+                        status.textContent = '⚠️ No voices on this device. Open in Chrome/Safari, and install a Text-to-Speech voice in device settings.';
+                    } else {
+                        previewVoice();
+                    }
+                }, 600);
+                return;
+            }
+            status.textContent = '🔊 Speaking…';
+            speakText('Hello! Tom Station is ready.', ok => {
+                status.textContent = ok
+                    ? '✅ Voice works'
+                    : '⚠️ No sound. Check the silent switch / volume, and open this page in Chrome or Safari (not inside another app).';
             });
         }
 
@@ -368,33 +394,43 @@
         }
 
         // ================= POLLING =================
+        // JSONP (script tag) — required for cross-origin reads from Google Apps Script.
+        // Apps Script ContentService cannot send CORS headers, so fetch() is blocked;
+        // loading the response as a <script> with ?callback= is the only way that works.
         function loadJsonp(url, timeout) {
             return new Promise((resolve, reject) => {
-                const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-                const script = document.createElement('script');
-                
-                window[cb] = data => {
-                    clearTimeout(timer);
-                    script.remove();
-                    delete window[cb];
-                    resolve(data);
-                };
+                const cb = 'cb_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
+                const s = document.createElement('script');
+                let done = false;
 
-                script.onerror = () => {
+                const cleanup = () => {
+                    done = true;
                     clearTimeout(timer);
-                    script.remove();
-                    delete window[cb];
-                    reject(new Error('Network error'));
+                    try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+                    if (s.parentNode) s.parentNode.removeChild(s);
                 };
 
                 const timer = setTimeout(() => {
-                    script.remove();
-                    delete window[cb];
-                    reject(new Error('Timeout'));
+                    if (done) return;
+                    cleanup();
+                    reject(new Error('No reply (timeout). Is the Apps Script deployed with "Anyone" access and JSONP callback support?'));
                 }, timeout);
 
-                script.src = url + '?callback=' + cb + '&t=' + Date.now();
-                document.body.appendChild(script);
+                window[cb] = data => {
+                    if (done) return;
+                    cleanup();
+                    resolve(data);
+                };
+
+                s.onerror = () => {
+                    if (done) return;
+                    cleanup();
+                    reject(new Error('Network error loading data'));
+                };
+
+                const sep = url.indexOf('?') === -1 ? '?' : '&';
+                s.src = url + sep + 'callback=' + cb + '&t=' + Date.now();
+                document.body.appendChild(s);
             });
         }
 
