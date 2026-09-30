@@ -221,18 +221,25 @@
             }
         }
 
-        // For the DROPDOWN display only. Uses real voices if present, otherwise the
-        // hardcoded fallback names so the menu isn't empty. NEVER used for speaking.
+        // For the DROPDOWN display only. Shows every REAL installed voice, then adds
+        // common named voices (Zira, Samantha, Zarvox...) that aren't installed here,
+        // so they're always selectable. Each entry is tagged real:true/false.
+        // NEVER used for speaking — pickVoice() only ever returns a real voice.
         function displayVoices() {
-            const real = realVoices();
-            return real.length ? real : FALLBACK_VOICES;
+            const real = realVoices().map(v => ({ name: v.name, lang: v.lang, real: true }));
+            const haveName = name => real.some(r => r.name.toLowerCase().includes(name.toLowerCase())
+                                                 || name.toLowerCase().includes(r.name.toLowerCase()));
+            const extras = FALLBACK_VOICES
+                .filter(f => !haveName(f.name))
+                .map(f => ({ name: f.name, lang: f.lang, real: false }));
+            return real.concat(extras);
         }
 
         function fillVoiceList() {
             const select = document.getElementById('voiceSelect');
             if (!select) return;
 
-            const voices = displayVoices().slice().sort((a, b) => {
+            const voices = displayVoices().sort((a, b) => {
                 const aRobotic = ROBOTIC_VOICE_NAMES.test(a.name) ? 1 : 0;
                 const bRobotic = ROBOTIC_VOICE_NAMES.test(b.name) ? 1 : 0;
                 return bRobotic - aRobotic;
@@ -241,7 +248,8 @@
             select.innerHTML = '<option value="">🎤 Auto (most robotic available)</option>';
             voices.forEach(v => {
                 const isRobotic = ROBOTIC_VOICE_NAMES.test(v.name) ? '🤖 ' : '';
-                select.innerHTML += `<option value="${v.name}">${isRobotic}${v.name}</option>`;
+                const tag = v.real ? '' : ' (if installed)';
+                select.innerHTML += `<option value="${v.name}">${isRobotic}${v.name}${tag}</option>`;
             });
             console.log('🎤 Voices in menu:', voices.length, '| real voices:', realVoices().length);
         }
@@ -287,8 +295,14 @@
             const sel = document.getElementById('voiceSelect');
             const chosen = sel ? sel.value : '';
             if (chosen) {
-                const v = voices.find(x => x.name === chosen);
-                if (v) return v;   // if the chosen name is a fallback-only name, fall through
+                // exact match first, then partial (e.g. "Zira" -> "Microsoft Zira - English")
+                const exact = voices.find(x => x.name === chosen);
+                if (exact) return exact;
+                const partial = voices.find(x =>
+                    x.name.toLowerCase().includes(chosen.toLowerCase()) ||
+                    chosen.toLowerCase().includes(x.name.toLowerCase()));
+                if (partial) return partial;
+                // chosen isn't installed on this device -> fall through to best available
             }
             return voices.find(v => ROBOTIC_VOICE_NAMES.test(v.name)) || voices[0] || null;
         }
