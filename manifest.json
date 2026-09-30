@@ -1,0 +1,14 @@
+{
+  "name": "Gen AI Robot City - Greeter",
+  "short_name": "Greeter",
+  "description": "Greets new visitors to Gen AI Robot City.",
+  "start_url": "greeter.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#0f0f23",
+  "theme_color": "#0f0f23",
+  "icons": [
+    { "src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
