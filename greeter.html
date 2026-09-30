@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Greeter Phone - Gen AI Robot City</title>
+    <title>Greeter - Gen AI Robot City</title>
+    <!-- Load shared configuration -->
+    <script src="config.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -79,39 +81,47 @@
         }
 
         #status { color: #4ecdc4; font-size: 14px; margin-top: 8px; }
-        .tiny { font-size: 11px; color: #718096; margin-top: 8px; }
+        #diag { font-size: 11px; color: #718096; margin-top: 8px; }
         .error { color: #ff6b6b; font-size: 13px; margin-top: 10px; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <!-- Load shared configuration -->
-    <script src="config.js"></script>
-
-    <!-- START -->
+    <!-- START SCREEN -->
     <div id="startCard" class="card">
         <div class="big-robot">🤖</div>
-        <h1>GREETER PHONE</h1>
-        <p style="font-size: 13px; margin-top: 8px;">Keep this phone next to the mimicking robot. It only says hello to new visitors. All settings are managed from the Tom Station.</p>
+        <h1>GREETER</h1>
+        <p style="font-size: 13px; margin-top: 8px;">Keep this phone next to the robot. It announces hello to new visitors.</p>
         <button class="btn" onclick="startGreeter()">▶ Start Greeter</button>
         <p id="startError" class="error"></p>
-        <p class="tiny">Turn the volume up, plug in the charger, and open this page in Chrome or Safari.</p>
+        <p style="font-size: 11px; color: #718096; margin-top: 12px;">Turn volume up, plug in charger. Use Chrome or Safari.</p>
     </div>
 
-    <!-- RUNNING -->
+    <!-- RUNNING SCREEN -->
     <div id="runPanel" class="card hidden">
         <div id="robotIcon" class="big-robot idle">🤖</div>
         <p class="label">LAST GREETED</p>
         <div id="currentName">—</div>
         <p id="status">Connecting...</p>
+        <p id="diag"></p>
         <p id="warning" class="error hidden"></p>
         <button class="btn small" onclick="testGreeting()">🔊 Test greeting</button>
-        <p class="tiny" id="diag">greeter v2</p>
     </div>
 
     <script>
-        // ================= CONFIG FALLBACKS =================
-        // Assign to window.X (assignment, not declaration) so these never clash with
+        // ================= GLOBAL ERROR REPORTER =================
+        // Surfaces any script error on the page (mobile has no easy console).
+        window.addEventListener('error', function (ev) {
+            var box = document.getElementById('startError');
+            if (box) {
+                box.textContent = '⚠️ Script error: ' + (ev.message || ev.error || 'unknown')
+                    + (ev.lineno ? ' (line ' + ev.lineno + ')' : '');
+            }
+        });
+
+        // ================= CONFIG =================
+        // All configuration loaded from config.js. The fallbacks below assign to
+        // window.X (assignment, not declaration) so they can never clash with
         // config.js whether it uses const or var, or fails to load at all.
         if (typeof VISITOR_API === 'undefined') {
             window.VISITOR_API = 'https://script.google.com/macros/s/AKfycbwLHMAkVKMJX4UYJcTzS0oX1Z2plHMYtv9WA-drsIKhx0WHO6J2bt6N_OI9lDWXPMlJ/exec';
@@ -137,15 +147,9 @@
         if (typeof FEMALE_VOICE_NAMES === 'undefined') {
             window.FEMALE_VOICE_NAMES = /female|zira|heera|veena|samantha|karen|moira|tessa|fiona|victoria|allison|ava|susan|zoe|nicky|serena|kate|google us english/i;
         }
-    </script>
-
-    <script>
-        // ================= CONFIG =================
-        // All configuration loaded from config.js
-        // VISITOR_API, VOICE_SETTINGS, POLL_MS, REPLY_TIMEOUT, SETTINGS_REFRESH_MS, etc.
 
         // ================= STATE =================
-        let settings = {};                 // saved from the Tom Station (Settings sheet)
+        let settings = {};
         let settingsNote = 'defaults';
         let started = false;
         let polling = false;
@@ -158,70 +162,41 @@
         const queue = [];
         let audioCtx = null;
 
-        // ================= SETTINGS (managed on the Tom Station) =================
-        function cfg() {
-            const num = (v, d, lo, hi) => {
-                const n = parseFloat(v);
-                return isNaN(n) ? d : Math.min(hi, Math.max(lo, n));
-            };
-            
-            // Start with defaults from config.js
-            const voiceStyle = VOICE_SETTINGS.style || 'machine';
-            const voiceFemale = VOICE_SETTINGS.female !== false;
-            const voicePitch = VOICE_SETTINGS.pitch || 1.15;
-            const voiceRate = VOICE_SETTINGS.rate || 1.15;
-            const voiceChirp = VOICE_SETTINGS.chirp !== false;
-            
-            // Override with spreadsheet settings if available
-            return {
-                style: ['machine', 'energetic', 'natural'].includes(settings.style) ? settings.style : voiceStyle,
-                female: String(settings.female) !== 'false' ? voiceFemale : String(settings.female) === 'true',
-                pitch: num(settings.pitch, voicePitch, 0.1, 2),
-                rate: num(settings.rate, voiceRate, 0.5, 2),
-                gap: num(settings.gap, 6, 2, 20) * 1000,
-                greeting: String(settings.greeting || DEFAULT_GREETING).substring(0, 120),
-                chirp: String(settings.chirp) !== 'false' ? voiceChirp : String(settings.chirp) === 'true'
-            };
-        }
-
+        // ================= DIAGNOSTICS =================
         function updateDiag() {
-            const url = typeof VISITOR_API !== 'undefined' ? VISITOR_API.slice(-20) : 'NOT LOADED';
-            document.getElementById('diag').textContent =
-                `greeter v2 • API: ...${url} • settings: ${settingsNote}` + (lastChecked ? ` • checked ${lastChecked}` : '');
+            const msg = `greeter v2 • settings: ${settingsNote}` + 
+                        (lastChecked ? ` • checked ${lastChecked}` : '');
+            document.getElementById('diag').textContent = msg;
         }
 
         // ================= LOADING DATA FROM GOOGLE =================
-        // Loads data like a script file, so browser security rules don't block it
-        // JSONP (script tag) — required for cross-origin reads from Google Apps Script.
-        // makeSrc(cb) builds a URL containing ?callback=<cb>; the Apps Script must wrap
-        // its JSON reply as <cb>({...}) for this to fire.
         function loadJsonp(makeSrc, parse, timeoutMsg) {
             return new Promise((resolve, reject) => {
-                const cb = 'cb_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
+                const cb = 'cb_' + Date.now() + '_' + Math.floor(Math.random() * 1000000);
                 const s = document.createElement('script');
-                let done = false;
+                let settled = false;
 
                 const cleanup = () => {
-                    done = true;
+                    settled = true;
                     clearTimeout(timer);
-                    try { delete window[cb]; } catch (e) { window[cb] = undefined; }
-                    if (s.parentNode) s.parentNode.removeChild(s);
+                    window[cb] = function () {};
+                    s.remove();
                 };
 
                 const timer = setTimeout(() => {
-                    if (done) return;
+                    if (settled) return;
                     cleanup();
-                    reject(new Error(timeoutMsg || 'no reply (timeout)'));
-                }, REPLY_TIMEOUT || 15000);
+                    reject(new Error(timeoutMsg));
+                }, REPLY_TIMEOUT);
 
                 window[cb] = data => {
-                    if (done) return;
+                    if (settled) return;
                     cleanup();
                     try { resolve(parse(data)); } catch (e) { reject(e); }
                 };
 
                 s.onerror = () => {
-                    if (done) return;
+                    if (settled) return;
                     cleanup();
                     reject(new Error('network problem'));
                 };
@@ -263,7 +238,7 @@
             updateDiag();
         }
 
-        // ================= SOUND =================
+        // ================= AUDIO =================
         function ensureAudio() {
             try {
                 if (!audioCtx) {
@@ -278,28 +253,27 @@
             }
         }
 
-        // Short robot "boot chirp" before each greeting
         function playChirp() {
             if (!ensureAudio()) return;
             const t = audioCtx.currentTime + 0.02;
+            const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+            
             [880, 1320, 1760].forEach((f, i) => {
                 const o = audioCtx.createOscillator();
                 const g = audioCtx.createGain();
                 o.type = 'square';
                 o.frequency.value = f;
                 g.gain.setValueAtTime(0.0001, t + i * 0.09);
-                g.gain.exponentialRampToValueAtTime(0.09, t + i * 0.09 + 0.01);
+                g.gain.exponentialRampToValueAtTime(0.08, t + i * 0.09 + 0.01);
                 g.gain.exponentialRampToValueAtTime(0.0001, t + i * 0.09 + 0.08);
                 o.connect(g);
                 g.connect(audioCtx.destination);
                 o.start(t + i * 0.09);
-                o.stop(t + i * 0.09 + 0.1);
+                o.stop(t + i * 0.09 + 0.13);
             });
         }
 
-        // ================= VOICE =================
-        // Phones only allow speech that starts from a tap. The first tap anywhere
-        // "unlocks" speech so later automatic greetings are allowed too.
+        // ================= SPEECH =================
         let speechUnlocked = false;
         function unlockSpeech() {
             if (speechUnlocked || !('speechSynthesis' in window)) return;
@@ -311,121 +285,87 @@
         document.addEventListener('touchend', unlockSpeech, { once: true });
         document.addEventListener('click', unlockSpeech, { once: true });
 
+        // Warm up the voice list so the first greeting isn't silent on mobile
+        if ('speechSynthesis' in window) {
+            try { speechSynthesis.getVoices(); } catch (e) {}
+            speechSynthesis.onvoiceschanged = function () { try { speechSynthesis.getVoices(); } catch (e) {} };
+            setTimeout(function () { try { speechSynthesis.getVoices(); } catch (e) {} }, 100);
+        }
+
         function safeCancel() {
             if (!('speechSynthesis' in window)) return;
             if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
         }
 
-        function englishVoices() {
-            if (!('speechSynthesis' in window)) return [];
-            return speechSynthesis.getVoices()
-                .filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
-        }
-
-        function pickVoice(c) {
-            const voices = englishVoices();
-            const prefer_female = c.female !== false;
-            return voices.find(v => ROBOTIC_VOICE_NAMES.test(v.name)) ||
-                   (prefer_female ? voices.find(v => FEMALE_VOICE_NAMES.test(v.name)) : null) ||
-                   voices.find(v => v.lang === 'en-IN') ||
-                   voices[0] || null;
-        }
-
-        // Say "Gen AI" clearly (some voices read "Gen" as "General")
-        function forSpeech(text, wordByWord) {
-            return text.replace(/\bGen\s*AI\b/gi, wordByWord ? 'Jen Ay Eye' : 'Jen A I');
-        }
-
-        // Speaks a line. "machine" = word. by. word. in a flat rhythm,
-        // "energetic" = short punchy phrases, "natural" = one smooth sentence.
-        // If the chosen voice fails, it retries once with the phone's default voice.
-        function speakLine(text, onDone, useDefaultVoice) {
-            let finished = false;
-            const finish = () => {
-                if (finished) return;
-                finished = true;
+        function speakText(text, onDone) {
+            if (!('speechSynthesis' in window)) {
                 if (onDone) onDone();
-            };
-            if (!('speechSynthesis' in window)) { finish(); return; }
-
-            const c = cfg();
-            const spoken = forSpeech(text, c.style === 'machine');
-            let parts;
-            if (c.style === 'machine') {
-                parts = spoken.split(/\s+/).map(w => w.replace(/[^\w']/g, '')).filter(Boolean);
-            } else if (c.style === 'energetic') {
-                parts = (spoken.match(/[^.!?,]+[.!?,]*/g) || [spoken]).map(s => s.trim()).filter(Boolean);
-            } else {
-                parts = [spoken];
+                return;
             }
+            try {
+                // Clear any stuck utterance (common on Android Chrome)
+                if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
 
-            const voice = useDefaultVoice ? null : pickVoice(c);
-            let retried = false;
+                const u = new SpeechSynthesisUtterance(text);
 
-            parts.forEach((part, i) => {
-                const u = new SpeechSynthesisUtterance(part);
-                if (voice) u.voice = voice;
-                u.pitch = c.pitch;
-                u.rate = c.rate;
+                // Use VOICE_SETTINGS from config.js
+                u.pitch = (VOICE_SETTINGS && VOICE_SETTINGS.pitch) || 1.15;
+                u.rate = (VOICE_SETTINGS && VOICE_SETTINGS.rate) || 1.15;
                 u.volume = 1;
 
-                u.onerror = e => {
-                    const err = (e && e.error) ? e.error : 'unknown';
-                    if (err === 'interrupted' || err === 'canceled') {
-                        if (i === parts.length - 1) finish();
-                        return;
-                    }
-                    if (!useDefaultVoice && !retried) {
-                        retried = true;
-                        finished = true;   // the retry takes over from here
-                        safeCancel();
-                        speakLine(text, onDone, true);
-                        return;
-                    }
-                    document.getElementById('diag').textContent = `Voice error: ${err}`;
-                    if (i === parts.length - 1) finish();
+                // Use a robotic voice if the device has one; otherwise leave the device
+                // default voice (this matches how it sounded before). Never force another.
+                const voices = speechSynthesis.getVoices();
+                const roboticVoice = voices.find(v => ROBOTIC_VOICE_NAMES.test(v.name));
+                if (roboticVoice) { try { u.voice = roboticVoice; } catch (e) { /* keep default */ } }
+
+                let finished = false;
+                u.onend = () => { if (!finished) { finished = true; if (onDone) onDone(); } };
+                u.onerror = (e) => {
+                    if (!finished) { finished = true; console.error('Speech error:', e && e.error); if (onDone) onDone(); }
                 };
 
-                if (i === parts.length - 1) u.onend = finish;
                 speechSynthesis.speak(u);
-            });
-            setTimeout(finish, 3000 + parts.length * 1200);   // safety net
+            } catch (e) {
+                console.error('speakText error:', e);
+                if (onDone) onDone();
+            }
         }
 
-        // ================= GREETING QUEUE =================
-        function setTalking(on) {
-            const icon = document.getElementById('robotIcon');
-            icon.classList.toggle('talking', on);
-            icon.classList.toggle('idle', !on);
-        }
-
+        // ================= GREETING =================
         function greet(name) {
-            queue.push(String(name).substring(0, 30));
-            processQueue();
-        }
-
-        function processQueue() {
-            if (busy || queue.length === 0) return;
+            if (busy) {
+                queue.push(name);
+                return;
+            }
             busy = true;
-            const name = queue.shift();
-            const c = cfg();
 
             document.getElementById('currentName').textContent = name;
-            setTalking(true);
+            document.getElementById('robotIcon').classList.remove('idle');
+            document.getElementById('robotIcon').classList.add('talking');
 
+            const greeting = (settings.greeting || DEFAULT_GREETING).replace(/\{name\}/gi, name);
+            
             const finish = () => {
-                setTalking(false);
-                // Stay quiet while the mimicking robot repeats, then take the next visitor
+                document.getElementById('robotIcon').classList.remove('talking');
+                document.getElementById('robotIcon').classList.add('idle');
+                
+                const gap = (settings.gap || 6) * 1000;
                 setTimeout(() => {
                     busy = false;
-                    processQueue();
-                }, c.gap);
+                    if (queue.length) {
+                        greet(queue.shift());
+                    }
+                }, gap);
             };
 
-            if (c.chirp) playChirp();
-            setTimeout(() => {
-                speakLine(c.greeting.replace(/\{name\}/gi, name), finish);
-            }, c.chirp ? 400 : 50);
+            // Chirp is decorative and must never block the greeting.
+            if (VOICE_SETTINGS && VOICE_SETTINGS.chirp) {
+                try { playChirp(); } catch (e) { console.error('chirp:', e); }
+                setTimeout(() => speakText(greeting, finish), 400);
+            } else {
+                speakText(greeting, finish);
+            }
         }
 
         function testGreeting() {
@@ -435,38 +375,33 @@
 
         // ================= START =================
         function startGreeter() {
-            // Verify config.js loaded
-            if (typeof VISITOR_API === 'undefined') {
-                document.getElementById('startError').textContent = '❌ config.js not loaded. Make sure config.js is in the same folder as this file.';
-                return;
-            }
-            
-            ensureAudio();
-            const canSpeak = 'speechSynthesis' in window;
-
-            if (canSpeak) {
-                safeCancel();
-                speakLine('Greeter ready.');
-            }
-
+            // Switch screen + start work FIRST so nothing can leave the button stuck.
             started = true;
-            lastCount = null;   // only greet visitors who arrive from now on
-            document.getElementById('startCard').classList.add('hidden');
-            document.getElementById('runPanel').classList.remove('hidden');
+            lastCount = null;
+            const startCard = document.getElementById('startCard');
+            const runPanel = document.getElementById('runPanel');
+            if (startCard) startCard.classList.add('hidden');
+            if (runPanel) runPanel.classList.remove('hidden');
 
+            const canSpeak = 'speechSynthesis' in window;
             if (!canSpeak) {
                 const w = document.getElementById('warning');
-                w.textContent = '⚠️ This browser cannot speak. Open this page directly in Chrome or Safari.';
-                w.classList.remove('hidden');
+                if (w) {
+                    w.textContent = '⚠️ This browser cannot speak. Open the page in Chrome or Safari (not inside another app).';
+                    w.classList.remove('hidden');
+                }
             }
 
-            keepAwake();
+            // Audio + speech are best-effort; failures must never block startup.
+            try { ensureAudio(); } catch (e) { console.error('audio init:', e); }
+            if (canSpeak) { try { safeCancel(); speakText('Greeter ready.'); } catch (e) { console.error('greet:', e); } }
+
+            try { keepAwake(); } catch (e) {}
             loadSettings();
             poll();
             setInterval(() => { if (started) loadSettings(); }, SETTINGS_REFRESH_MS);
         }
 
-        // Keep the screen on so the greeter never sleeps
         let wakeLockBlocked = false;
         async function keepAwake() {
             if (!('wakeLock' in navigator) || wakeLockBlocked) return;
@@ -475,7 +410,7 @@
                 wakeLock.addEventListener('release', () => { wakeLock = null; });
             } catch (e) {
                 // NotAllowedError = blocked by permissions policy (in-app browser / iframe)
-                // or the tab isn't visible. Not fatal — the greeter still runs.
+                // or tab not visible. Not fatal — the greeter still runs.
                 wakeLockBlocked = (e && e.name === 'NotAllowedError');
                 if (wakeLockBlocked) {
                     const w = document.getElementById('warning');
@@ -487,16 +422,15 @@
             }
         }
 
-        // Re-acquire the wake lock + resume audio/polling when the page returns to foreground
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible' && started) {
                 if (!wakeLock && !wakeLockBlocked) keepAwake();
                 if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-                if (!polling) { clearTimeout(pollTimer); poll(); }   // catch up right away
+                if (!polling) { clearTimeout(pollTimer); poll(); }
             }
         });
 
-        // ================= WATCH FOR NEW VISITORS =================
+        // ================= POLLING =================
         async function poll() {
             if (!started || polling) return;
             polling = true;
@@ -506,7 +440,7 @@
             try {
                 const data = await readVisitors();
                 const count = data.count;
-                const recent = data.recent;   // newest first
+                const recent = data.recent;
 
                 if (lastCount === null || count < lastCount) {
                     lastCount = count;
@@ -520,9 +454,8 @@
                 lastChecked = new Date().toLocaleTimeString();
                 updateDiag();
             } catch (e) {
-                const errorMsg = e.message || 'unknown error';
-                status.textContent = '🟠 Connection problem, retrying...';
-                document.getElementById('diag').textContent = `Error: ${errorMsg} • API: ...${VISITOR_API.slice(-20)}`;
+                status.textContent = '🟠 Connection problem: ' + e.message;
+                document.getElementById('diag').textContent = 'Error: ' + e.message;
             } finally {
                 polling = false;
                 if (started) {
@@ -532,7 +465,7 @@
             }
         }
 
-        // Watchdog: restart checking if it ever stops
+        // Watchdog
         setInterval(() => {
             if (started && !polling && Date.now() - lastPollAt > POLL_MS * 4) {
                 clearTimeout(pollTimer);
@@ -540,7 +473,6 @@
             }
         }, 5000);
 
-        // Show config on page load
         updateDiag();
     </script>
 </body>
