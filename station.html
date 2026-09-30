@@ -113,6 +113,16 @@
     </div>
 
     <script>
+        // ================= GLOBAL ERROR REPORTER =================
+        // Surfaces any script error on the page (mobile has no easy console).
+        window.addEventListener('error', function (ev) {
+            var box = document.getElementById('setupError');
+            if (box) {
+                box.textContent = '⚠️ Script error: ' + (ev.message || ev.error || 'unknown')
+                    + (ev.lineno ? ' (line ' + ev.lineno + ')' : '');
+            }
+        });
+
         // ================= CONFIG FALLBACKS =================
         // These are fallbacks if config.js fails to load
         if (typeof VISITOR_API === 'undefined') {
@@ -177,9 +187,9 @@
             
             if (typeof VISITOR_API !== 'undefined') {
                 configEl.textContent = '✅ Config loaded';
-                const voiceCount = englishVoices().length;
-                diagEl.innerHTML = `<strong>API:</strong> ...${VISITOR_API.slice(-15)}<br><strong>Voices:</strong> ${voiceCount}`;
-                console.log('✅ Config loaded, API ready, voices available:', voiceCount);
+                const voiceCount = realVoices().length;
+                diagEl.innerHTML = `<strong>API:</strong> ...${VISITOR_API.slice(-15)}<br><strong>Voices:</strong> ${voiceCount} real`;
+                console.log('✅ Config loaded, API ready, real voices:', voiceCount);
             } else {
                 configEl.textContent = '❌ config.js missing';
                 diagEl.textContent = 'Fallback config active';
@@ -196,38 +206,42 @@
         setTimeout(updateDiagnostics, 500);
 
         // ================= VOICE LIST =================
-        function englishVoices() {
-            if ('speechSynthesis' in window) {
-                try {
-                    const allVoices = speechSynthesis.getVoices();
-                    const english = allVoices.filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
-                    if (english.length > 0) return english;
-                } catch (e) {
-                    console.error('Voice error:', e);
-                }
+        // REAL voices only — these are actual SpeechSynthesisVoice objects safe to
+        // assign to utterance.voice. May be empty (especially on mobile before load).
+        function realVoices() {
+            if (!('speechSynthesis' in window)) return [];
+            try {
+                return speechSynthesis.getVoices()
+                    .filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
+            } catch (e) {
+                console.error('Voice error:', e);
+                return [];
             }
-            return FALLBACK_VOICES;
+        }
+
+        // For the DROPDOWN display only. Uses real voices if present, otherwise the
+        // hardcoded fallback names so the menu isn't empty. NEVER used for speaking.
+        function displayVoices() {
+            const real = realVoices();
+            return real.length ? real : FALLBACK_VOICES;
         }
 
         function fillVoiceList() {
             const select = document.getElementById('voiceSelect');
             if (!select) return;
-            
-            const voices = englishVoices();
-            select.innerHTML = '<option value="">🎤 Auto (most robotic available)</option>';
-            
-            voices.sort((a, b) => {
+
+            const voices = displayVoices().slice().sort((a, b) => {
                 const aRobotic = ROBOTIC_VOICE_NAMES.test(a.name) ? 1 : 0;
                 const bRobotic = ROBOTIC_VOICE_NAMES.test(b.name) ? 1 : 0;
                 return bRobotic - aRobotic;
             });
-            
+
+            select.innerHTML = '<option value="">🎤 Auto (most robotic available)</option>';
             voices.forEach(v => {
                 const isRobotic = ROBOTIC_VOICE_NAMES.test(v.name) ? '🤖 ' : '';
                 select.innerHTML += `<option value="${v.name}">${isRobotic}${v.name}</option>`;
             });
-            
-            console.log('🎤 Voices loaded:', voices.length);
+            console.log('🎤 Voices in menu:', voices.length, '| real voices:', realVoices().length);
         }
 
         // Populate voices when page loads
@@ -264,12 +278,15 @@
             return VOICE_STYLES[document.getElementById('voiceStyle').value] || VOICE_STYLES.machine;
         }
 
+        // Returns a REAL SpeechSynthesisVoice or null. Never a fallback dummy object.
         function pickVoice() {
-            const chosen = document.getElementById('voiceSelect').value;
-            const voices = englishVoices();
+            const voices = realVoices();
+            if (!voices.length) return null;
+            const sel = document.getElementById('voiceSelect');
+            const chosen = sel ? sel.value : '';
             if (chosen) {
                 const v = voices.find(x => x.name === chosen);
-                if (v) return v;
+                if (v) return v;   // if the chosen name is a fallback-only name, fall through
             }
             return voices.find(v => ROBOTIC_VOICE_NAMES.test(v.name)) || voices[0] || null;
         }
@@ -280,42 +297,51 @@
                 if (onDone) onDone(false);
                 return;
             }
-            // Clear any stuck utterance (common on Android Chrome)
-            if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
+            try {
+                // Clear any stuck utterance (common on Android Chrome)
+                if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
 
-            const style = currentStyle();
-            const u = new SpeechSynthesisUtterance(text);
-            const voice = pickVoice();
-            if (voice) u.voice = voice;
-            u.pitch = style.pitch;
-            u.rate = style.rate;
-            u.volume = 1;
-            let finished = false;
-            u.onend = () => { if (!finished) { finished = true; if (onDone) onDone(true); } };
-            u.onerror = () => { if (!finished) { finished = true; if (onDone) onDone(false); } };
-            speechSynthesis.speak(u);
+                const style = currentStyle();
+                const u = new SpeechSynthesisUtterance(text);
+                const voice = pickVoice();
+                // Only assign a REAL voice; assigning a plain object throws a TypeError.
+                if (voice) { try { u.voice = voice; } catch (e) { /* keep default voice */ } }
+                u.pitch = style.pitch;
+                u.rate = style.rate;
+                u.volume = 1;
+                let finished = false;
+                u.onend = () => { if (!finished) { finished = true; if (onDone) onDone(true); } };
+                u.onerror = () => { if (!finished) { finished = true; if (onDone) onDone(false); } };
+                speechSynthesis.speak(u);
+            } catch (e) {
+                console.error('speakText error:', e);
+                if (onDone) onDone(false);
+            }
         }
 
         function previewVoice() {
             const status = document.getElementById('sampleStatus');
-            // If voices haven't loaded yet, load them and retry once
-            if (englishVoices().length === 0) {
-                fillVoiceList();
-                status.textContent = '⏳ Loading voices…';
-                setTimeout(() => {
-                    if (englishVoices().length === 0) {
-                        status.textContent = '⚠️ No voices on this device. Open in Chrome/Safari, and install a Text-to-Speech voice in device settings.';
-                    } else {
-                        previewVoice();
-                    }
-                }, 600);
+            if (!('speechSynthesis' in window)) {
+                status.textContent = '⚠️ This browser cannot speak. Open the page in Chrome or Safari (not inside another app).';
                 return;
             }
+            // If real voices haven't loaded yet, nudge them and retry once — but still
+            // try to speak with the device default even if the list stays empty.
+            if (realVoices().length === 0) {
+                fillVoiceList();
+                status.textContent = '⏳ Loading voices…';
+                setTimeout(() => { speakSample(status); }, 600);
+                return;
+            }
+            speakSample(status);
+        }
+
+        function speakSample(status) {
             status.textContent = '🔊 Speaking…';
             speakText('Hello! Tom Station is ready.', ok => {
                 status.textContent = ok
                     ? '✅ Voice works'
-                    : '⚠️ No sound. Check the silent switch / volume, and open this page in Chrome or Safari (not inside another app).';
+                    : '⚠️ No sound. Check the silent switch / volume, and open this page in Chrome or Safari (not inside another app). On Android, install a Text-to-Speech voice in Settings → Accessibility.';
             });
         }
 
@@ -467,14 +493,20 @@
 
         // ================= START/PAUSE =================
         function startStation() {
-            ensureAudio();
-            speakText('Tom station is ready.');
-            lastCount = null;
+            // Switch cards + start polling FIRST so nothing can leave the button stuck.
             started = true;
-            document.getElementById('setupCard').classList.add('hidden');
-            document.getElementById('runningCard').classList.remove('hidden');
+            lastCount = null;
+            const setup = document.getElementById('setupCard');
+            const running = document.getElementById('runningCard');
+            if (setup) setup.classList.add('hidden');
+            if (running) running.classList.remove('hidden');
+
+            // Audio + speech are best-effort; failures must never block startup.
+            try { ensureAudio(); } catch (e) { console.error('audio init:', e); }
+            try { speakText('Tom station is ready.'); } catch (e) { console.error('greet:', e); }
+
             poll();
-            setTimeout(() => { if (started) startMusic(); }, 2500);
+            setTimeout(() => { if (started) { try { startMusic(); } catch (e) {} } }, 2500);
         }
 
         function pauseStation() {
