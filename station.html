@@ -124,27 +124,29 @@
         });
 
         // ================= CONFIG FALLBACKS =================
-        // These are fallbacks if config.js fails to load
+        // Assign to window.X (an assignment, NOT a declaration) so these can never
+        // clash with config.js whether it declares these with const or var. Works
+        // three ways: config.js with const, config.js with var, or no config.js.
         if (typeof VISITOR_API === 'undefined') {
-            var VISITOR_API = 'https://script.google.com/macros/s/AKfycbwLHMAkVKMJX4UYJcTzS0oX1Z2plHMYtv9WA-drsIKhx0WHO6J2bt6N_OI9lDWXPMlJ/exec';
+            window.VISITOR_API = 'https://script.google.com/macros/s/AKfycbwLHMAkVKMJX4UYJcTzS0oX1Z2plHMYtv9WA-drsIKhx0WHO6J2bt6N_OI9lDWXPMlJ/exec';
         }
         if (typeof VOICE_SETTINGS === 'undefined') {
-            var VOICE_SETTINGS = { style: 'machine', female: true, pitch: 1.15, rate: 1.15, chirp: true, machineWordByWord: true };
+            window.VOICE_SETTINGS = { style: 'machine', female: true, pitch: 1.15, rate: 1.15, chirp: true, machineWordByWord: true };
         }
         if (typeof POLL_MS === 'undefined') {
-            var POLL_MS = 4000;
+            window.POLL_MS = 4000;
         }
         if (typeof REPLY_TIMEOUT === 'undefined') {
-            var REPLY_TIMEOUT = 15000;
+            window.REPLY_TIMEOUT = 15000;
         }
         if (typeof DEFAULT_GREETING === 'undefined') {
-            var DEFAULT_GREETING = 'Welcome {name}!';
+            window.DEFAULT_GREETING = 'Welcome {name}!';
         }
         if (typeof ROBOTIC_VOICE_NAMES === 'undefined') {
-            var ROBOTIC_VOICE_NAMES = /zarvox|trinoids|robot|espeak/i;
+            window.ROBOTIC_VOICE_NAMES = /zarvox|trinoids|robot|espeak/i;
         }
         if (typeof FEMALE_VOICE_NAMES === 'undefined') {
-            var FEMALE_VOICE_NAMES = /female|zira|heera|veena|samantha|karen|moira|tessa|fiona|victoria|allison|ava|susan|zoe|nicky|serena|kate|google us english/i;
+            window.FEMALE_VOICE_NAMES = /female|zira|heera|veena|samantha|karen|moira|tessa|fiona|victoria|allison|ava|susan|zoe|nicky|serena|kate|google us english/i;
         }
 
         // ================= VOICE FALLBACK LIST =================
