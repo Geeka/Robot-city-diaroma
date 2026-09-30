@@ -18,6 +18,7 @@
     <script src="config.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background: #0f0f23; min-height: 100%; }
 
         body {
             font-family: 'Courier New', monospace;
@@ -76,14 +77,15 @@
         @keyframes bounce { from { transform: translateY(2px) scale(1); }
                             to   { transform: translateY(-7px) scale(1.04); } }
 
-        /* Mouth flaps */
-        .bot-face .mouth { transform-box: fill-box; transform-origin: center; }
-        .bot-face.talking .mouth { animation: chomp 0.17s ease-in-out infinite alternate; }
-        @keyframes chomp { from { transform: scaleY(0.22); } to { transform: scaleY(1); } }
+        /* Mouth flaps (explicit view-box origin works on all mobile browsers) */
+        .bot-face .mouth { transform-box: view-box; transform-origin: 110px 131px; }
+        .bot-face.talking .mouth { animation: chomp 0.15s ease-in-out infinite alternate; }
+        @keyframes chomp { from { transform: scaleY(0.12); } to { transform: scaleY(1.25); } }
 
         /* Blink */
-        .bot-face .lid { transform-box: fill-box; transform-origin: center; transform: scaleY(0);
-                         animation: blink 4.8s infinite; }
+        .bot-face .lid { transform-box: view-box; transform: scaleY(0); animation: blink 4.8s infinite; }
+        .bot-face .lid-l { transform-origin: 94px 102px; }
+        .bot-face .lid-r { transform-origin: 126px 102px; }
         @keyframes blink { 0%,93%,100% { transform: scaleY(0); } 96% { transform: scaleY(1); } }
 
         /* Lights pulse (gentle always, faster while talking) */
@@ -120,7 +122,12 @@
         @keyframes stepR { 0%,100% { transform: translateY(-6px) rotate(7deg); } 50% { transform: translateY(0) rotate(0); } }
 
         /* Chest equalizer bars bounce while talking */
-        .bot-face .eq { transform-box: fill-box; transform-origin: center bottom; }
+        .bot-face .eq { transform-box: view-box; }
+        .bot-face .eq1 { transform-origin: 94.5px 210px; }
+        .bot-face .eq2 { transform-origin: 102.5px 210px; }
+        .bot-face .eq3 { transform-origin: 110.5px 210px; }
+        .bot-face .eq4 { transform-origin: 118.5px 210px; }
+        .bot-face .eq5 { transform-origin: 126.5px 210px; }
         .bot-face.talking .eq1 { animation: eqA 0.42s ease-in-out infinite alternate; }
         .bot-face.talking .eq2 { animation: eqB 0.38s ease-in-out infinite alternate; }
         .bot-face.talking .eq3 { animation: eqC 0.30s ease-in-out infinite alternate; }
@@ -143,21 +150,17 @@
             .bot-face, .bot-face * { animation: none !important; }
         }
 
-        /* ===== Landscape: character beside the text ===== */
+        /* ===== Landscape: character beside the text, filling the screen ===== */
         @media (orientation: landscape) {
-            #runPanel { display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
-                        gap: 28px; max-width: 860px; }
-            #runPanel .bot-face { flex: 0 0 auto; margin: 0; }
-            #runPanel .run-info { flex: 1 1 260px; min-width: 220px; text-align: center; }
+            body { padding: 10px; justify-content: center; }
+            #runPanel { display: flex; flex-wrap: nowrap; align-items: center; justify-content: center;
+                        gap: 5vw; width: 96vw; max-width: 96vw; padding: 14px; }
+            #runPanel .bot-face { flex: 0 0 auto; margin: 0;
+                                  height: 76vh; width: 55.7vh; max-height: 430px; max-width: 315px; }
+            #runPanel .run-info { flex: 0 1 auto; text-align: center; }
             .run-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-        }
-        /* Short landscape screens (phones): shrink so nothing is cut off */
-        @media (orientation: landscape) and (max-height: 520px) {
-            body { padding: 10px; }
-            .bot-face { width: 155px; height: 210px; }
-            h1 { font-size: 18px; }
-            #currentName { font-size: 36px; min-height: 42px; }
-            .card { padding: 14px; margin: 8px auto; }
+            #currentName { font-size: clamp(36px, 9.5vh, 72px); }
+            h1 { font-size: clamp(16px, 3.6vh, 26px); }
         }
 
         .label { color: #718096; font-size: 12px; margin-top: 8px; }
@@ -233,7 +236,7 @@
             };
         }
         if (typeof POLL_MS === 'undefined') {
-            window.POLL_MS = 4000;
+            window.POLL_MS = 2000;
         }
         if (typeof REPLY_TIMEOUT === 'undefined') {
             window.REPLY_TIMEOUT = 15000;
@@ -321,8 +324,8 @@
             <circle cx="126" cy="102" r="7" fill="#38e1ff"/>
             <circle cx="91" cy="99" r="2.5" fill="#eaffff"/>
             <circle cx="123" cy="99" r="2.5" fill="#eaffff"/>
-            <rect class="lid" x="81" y="89" width="26" height="26" rx="8" fill="#10151c"/>
-            <rect class="lid" x="113" y="89" width="26" height="26" rx="8" fill="#10151c"/>
+            <rect class="lid lid-l" x="81" y="89" width="26" height="26" rx="8" fill="#10151c"/>
+            <rect class="lid lid-r" x="113" y="89" width="26" height="26" rx="8" fill="#10151c"/>
             <!-- cheeks + mouth -->
             <circle class="cheek" cx="78" cy="128" r="3.5" fill="#38e1ff"/>
             <circle class="cheek" cx="142" cy="128" r="3.5" fill="#38e1ff"/>
@@ -693,7 +696,9 @@
                 polling = false;
                 if (started) {
                     clearTimeout(pollTimer);
-                    pollTimer = setTimeout(poll, POLL_MS);
+                    // Aim for a steady POLL_MS cadence: subtract how long this check took.
+                    const wait = Math.max(300, POLL_MS - (Date.now() - lastPollAt));
+                    pollTimer = setTimeout(poll, wait);
                 }
             }
         }
