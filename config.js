@@ -40,7 +40,7 @@ var DEFAULT_GREETING = 'Welcome {name}!';
 // ============================================
 // TIMING SETTINGS (milliseconds)
 // ============================================
-var POLL_MS = 4000;              // Check for new visitors every 4 seconds
+var POLL_MS = 2000;              // Check for new visitors every 2 seconds (faster greeting)
 var REPLY_TIMEOUT = 15000;       // Wait up to 15 seconds for Google Apps Script to reply
 var SETTINGS_REFRESH_MS = 60000; // Refresh settings from spreadsheet every 60 seconds
 
