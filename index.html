@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!--
+  © 2026 Gen AI Robot City — All rights reserved. Unauthorized copying, reproduction, or distribution of this code is prohibited.
+-->
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1337,13 +1341,11 @@
         let gbSigned = false;
 
         // ================= ROBOT VOICE (from config.js) =================
-        // Pitch/rate + voice come from the SAME config values the Station and Greeter
-        // use, so all three pages sound identical.
-        const machineWordByWord = VOICE_SETTINGS.machineWordByWord !== false;
-        const _style = (VOICE_STYLES && VOICE_STYLES[VOICE_SETTINGS && VOICE_SETTINGS.style]) ||
-                       (VOICE_STYLES && VOICE_STYLES.machine) || { pitch: 0.3, rate: 0.8 };
-        const robotPitch = _style.pitch;
-        const robotRate = _style.rate;
+        // Story-page voice: robotic TONE but spoken smoothly — NOT word-by-word and
+        // NOT slow. (The greeter/station keep their own config voice.)
+        const machineWordByWord = false;   // speak whole phrases, no word-by-word pauses
+        const robotPitch = 0.5;            // low pitch = robot tone
+        const robotRate = 1.05;            // normal speed (not slow)
 
         function forSpeech(text) {
             return text.replace(/\bGen\s*AI\b/gi, machineWordByWord ? 'Jen Ay Eye' : 'Jen A I');
@@ -1365,9 +1367,8 @@
             return voices.find(v => ROBOTIC_VOICE_NAMES.test(v.name)) || null;
         }
 
-        // The story page is SILENT — the Tom Station (on the computer) handles all audio.
-        // Flip this to false if you ever want the story page to speak on its own.
-        const MUTED = true;
+        // Story page voice is ON (robot tone, smooth). Set to true to silence it.
+        const MUTED = false;
 
         let beepCtx = null;
         function robotBeep() {
