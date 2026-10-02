@@ -472,6 +472,30 @@
 
         .cafe-title { color: #ffe66d; font-weight: bold; margin-bottom: 4px; }
 
+        /* AI tools that recharge at the café */
+        .aitool-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .aitool {
+            background: rgba(78, 205, 196, 0.08);
+            border: 1px solid #2f6f6a;
+            border-radius: 10px;
+            padding: 10px 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.12s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+        .aitool:active { transform: scale(0.96); }
+        .aitool .ai-emoji { font-size: 26px; display: block; }
+        .aitool .ai-name { display: block; font-weight: bold; font-size: 12px; color: #e2e8f0; margin-top: 4px; }
+        .aitool.active { border-color: #00ff88; background: rgba(0, 255, 136, 0.12); }
+        .aitool-desc {
+            min-height: 20px; margin-top: 6px; font-size: 13px; color: #4ecdc4; text-align: center;
+        }
+
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -770,6 +794,12 @@
                     <div class="feature-highlight">
                         <strong>Real-world fact:</strong> Real robots, phones, and electric cars recharge at charging stations. Big AI computers also need lots of electricity - that's why engineers work hard to make AI energy-efficient and powered by clean energy like the sun and wind.
                     </div>
+
+                    <h3 class="section-subtitle">🤖 Who recharges at the Robo Café?</h3>
+                    <p style="font-size: 13px;">All the city's famous AI helpers stop by to power up. Tap one to see what it does!</p>
+                    <div id="cafeAiGrid" class="aitool-grid"></div>
+                    <p id="cafeAiDesc" class="aitool-desc">👆 Tap an AI to learn what it does.</p>
+
                     <button class="continue-btn" onclick="goToZone(5)">Ascend to AI Cloud →</button>
                 </div>
 
@@ -949,6 +979,39 @@
     <div id="navToast" class="nav-toast hidden"></div>
 
     <script>
+        // ================= CONFIG FALLBACKS =================
+        // Assign to window.X (assignment, not declaration) so these never clash with
+        // config.js whether it uses const or var, or fails to load at all.
+        if (typeof VISITOR_API === 'undefined') {
+            window.VISITOR_API = 'https://script.google.com/macros/s/AKfycbwLHMAkVKMJX4UYJcTzS0oX1Z2plHMYtv9WA-drsIKhx0WHO6J2bt6N_OI9lDWXPMlJ/exec';
+        }
+        if (typeof VOICE_SETTINGS === 'undefined') {
+            window.VOICE_SETTINGS = { style: 'machine', voiceName: '', female: true, chirp: true, machineWordByWord: true };
+        }
+        if (typeof VOICE_STYLES === 'undefined') {
+            window.VOICE_STYLES = {
+                machine:  { pitch: 0.3, rate: 0.8,  wordByWord: true  },
+                deep:     { pitch: 0.1, rate: 0.75, wordByWord: false },
+                friendly: { pitch: 1.1, rate: 0.95, wordByWord: false },
+                squeaky:  { pitch: 1.9, rate: 1.1,  wordByWord: false }
+            };
+        }
+        if (typeof DEFAULT_GREETING === 'undefined') {
+            window.DEFAULT_GREETING = 'Welcome {name}!';
+        }
+        if (typeof POLL_MS === 'undefined') {
+            window.POLL_MS = 4000;
+        }
+        if (typeof REPLY_TIMEOUT === 'undefined') {
+            window.REPLY_TIMEOUT = 15000;
+        }
+        if (typeof ROBOTIC_VOICE_NAMES === 'undefined') {
+            window.ROBOTIC_VOICE_NAMES = /zarvox|trinoids|robot|espeak/i;
+        }
+        if (typeof FEMALE_VOICE_NAMES === 'undefined') {
+            window.FEMALE_VOICE_NAMES = /female|zira|heera|veena|samantha|karen|moira|tessa|fiona|victoria|allison|ava|susan|zoe|nicky|serena|kate|google us english/i;
+        }
+
         // ================= CONFIG =================
         // Config.js is loaded at the top: VISITOR_API, VOICE_SETTINGS, etc.
         // Photos load from the "images" folder next to this page
@@ -982,14 +1045,21 @@
 
         function loadCottagesFromSheet() {
             if (!VISITOR_API) return;
-            const cb = 'cottages_' + Date.now();
+            const cb = 'cottages_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
             const s = document.createElement('script');
-            const timer = setTimeout(() => { window[cb] = function () {}; s.remove(); }, 15000);
+            let done = false;
+
+            const cleanup = () => {
+                done = true;
+                clearTimeout(timer);
+                try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+                if (s.parentNode) s.parentNode.removeChild(s);
+            };
+            const timer = setTimeout(() => { if (!done) cleanup(); }, 15000);
 
             window[cb] = data => {
-                clearTimeout(timer);
-                window[cb] = function () {};
-                s.remove();
+                if (done) return;
+                cleanup();
                 const list = data && Array.isArray(data.cottages) ? data.cottages : [];
                 if (!list.length) return;
                 AI_COTTAGES = list.map((c, i) => ({
@@ -1001,8 +1071,7 @@
                 litCottages.clear();
                 renderCottages();
             };
-
-            s.onerror = () => { clearTimeout(timer); s.remove(); };
+            s.onerror = () => { if (!done) { cleanup(); console.log('Cottages: network error'); } };
             s.src = `${VISITOR_API}?action=getCottages&callback=${cb}&t=${Date.now()}`;
             document.body.appendChild(s);
         }
@@ -1222,6 +1291,38 @@
         ];
         let robotBattery = 10;
 
+        // ================= AIs THAT RECHARGE AT THE ROBO CAFÉ =================
+        // These match the AI-tool houses in the Gen AI Robot City model.
+        const CAFE_AIS = [
+            { emoji: '💬', name: 'Claude',     job: 'Chats, writes, and helps with coding.' },
+            { emoji: '✨', name: 'Gemini',     job: "Google's AI — answers, images, and more." },
+            { emoji: '🔵', name: 'Meta AI',    job: 'The helper inside Meta\'s apps.' },
+            { emoji: '🔍', name: 'Perplexity', job: 'An AI that searches the web and answers.' },
+            { emoji: '🎨', name: 'Midjourney', job: 'Creates pictures from words.' },
+            { emoji: '🎵', name: 'Suno',       job: 'Makes songs and music from a prompt.' },
+            { emoji: '🎙️', name: 'Vapi',       job: 'Builds AI that talks on the phone.' },
+            { emoji: '🛠️', name: 'Emergent',   job: 'Builds apps for you using AI.' },
+            { emoji: '🧑‍💻', name: 'Copilot',  job: 'Helps programmers write code faster.' }
+        ];
+        function renderCafeAIs() {
+            const grid = document.getElementById('cafeAiGrid');
+            if (!grid || grid.dataset.done) return;   // build once
+            grid.dataset.done = '1';
+            CAFE_AIS.forEach(ai => {
+                const el = document.createElement('div');
+                el.className = 'aitool';
+                el.innerHTML = '<span class="ai-emoji">' + ai.emoji + '</span><span class="ai-name">' + ai.name + '</span>';
+                el.addEventListener('click', () => {
+                    document.querySelectorAll('#cafeAiGrid .aitool').forEach(x => x.classList.remove('active'));
+                    el.classList.add('active');
+                    const d = document.getElementById('cafeAiDesc');
+                    if (d) d.textContent = ai.emoji + ' ' + ai.name + ': ' + ai.job;
+                });
+                grid.appendChild(el);
+            });
+        }
+        renderCafeAIs();
+
         // ================= STATE =================
         let currentSection = 1;
         let visitedZones = new Set([1]);
@@ -1236,27 +1337,41 @@
         let gbSigned = false;
 
         // ================= ROBOT VOICE (from config.js) =================
-        // Use VOICE_SETTINGS from config.js for consistency across all pages
+        // Pitch/rate + voice come from the SAME config values the Station and Greeter
+        // use, so all three pages sound identical.
         const machineWordByWord = VOICE_SETTINGS.machineWordByWord !== false;
-        const robotPitch = VOICE_SETTINGS.pitch || 1.15;
-        const robotRate = VOICE_SETTINGS.rate || 1.15;
+        const _style = (VOICE_STYLES && VOICE_STYLES[VOICE_SETTINGS && VOICE_SETTINGS.style]) ||
+                       (VOICE_STYLES && VOICE_STYLES.machine) || { pitch: 0.3, rate: 0.8 };
+        const robotPitch = _style.pitch;
+        const robotRate = _style.rate;
 
         function forSpeech(text) {
             return text.replace(/\bGen\s*AI\b/gi, machineWordByWord ? 'Jen Ay Eye' : 'Jen A I');
         }
 
+        // Same voice-pick rule as Station and Greeter: config voiceName (exact, then
+        // partial for Windows' long names), else most robotic real voice, else device default.
         function pickVoice() {
             if (!('speechSynthesis' in window)) return null;
             const voices = speechSynthesis.getVoices()
                 .filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
-            return voices.find(v => ROBOTIC_VOICE_NAMES.test(v.name)) ||
-                   voices.find(v => FEMALE_VOICE_NAMES.test(v.name)) ||
-                   voices.find(v => v.lang === 'en-IN') ||
-                   voices[0] || null;
+            const want = (VOICE_SETTINGS && VOICE_SETTINGS.voiceName) || '';
+            if (want) {
+                const exact = voices.find(v => v.name === want);
+                if (exact) return exact;
+                const partial = voices.find(v => v.name.toLowerCase().includes(want.toLowerCase()));
+                if (partial) return partial;
+            }
+            return voices.find(v => ROBOTIC_VOICE_NAMES.test(v.name)) || null;
         }
+
+        // The story page is SILENT — the Tom Station (on the computer) handles all audio.
+        // Flip this to false if you ever want the story page to speak on its own.
+        const MUTED = true;
 
         let beepCtx = null;
         function robotBeep() {
+            if (MUTED) return;
             try {
                 const Ctx = window.AudioContext || window.webkitAudioContext;
                 if (!Ctx) return;
@@ -1282,6 +1397,7 @@
         }
 
         function speak(text) {
+            if (MUTED) return;
             if (!('speechSynthesis' in window)) return;
             const voice = pickVoice();
             const spoken = forSpeech(text);
@@ -1470,29 +1586,28 @@
         // ================= VISITOR BOARD =================
         function logVisit() {
             if (!VISITOR_API) return;
-            const cb = 'visit_' + Date.now();
+            const cb = 'visit_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
             const s = document.createElement('script');
-            const done = () => {
+            let done = false;
+
+            const cleanup = () => {
+                done = true;
                 clearTimeout(timer);
-                window[cb] = function () {};
-                s.remove();
+                try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+                if (s.parentNode) s.parentNode.removeChild(s);
             };
             const timer = setTimeout(() => {
-                done();
-                console.log('Visitor board: no reply');
+                if (!done) { cleanup(); console.log('Visitor board: no reply'); }
             }, 15000);
 
             window[cb] = data => {
-                done();
+                if (done) return;
+                cleanup();
                 if (data && data.count) visitorCount = data.count;
                 if (participationReady) drawAward('participation');
                 if (completionReady) drawAward('completion');
             };
-
-            s.onerror = () => {
-                done();
-                console.log('Visitor board offline');
-            };
+            s.onerror = () => { if (!done) { cleanup(); console.log('Visitor board offline'); } };
             s.src = `${VISITOR_API}?action=visit&name=${encodeURIComponent(visitorName)}` +
                     `&avatar=${encodeURIComponent(selectedAvatar.name)}&callback=${cb}&t=${Date.now()}`;
             document.body.appendChild(s);
@@ -1913,7 +2028,20 @@
 
         document.querySelectorAll('.diorama-photo').forEach(img => {
             if (img.tagName === 'IMG') {
-                img.addEventListener('error', function () { this.style.display = 'none'; });
+                img.addEventListener('error', function () {
+                    // Show a clear placeholder naming the file we expected, so missing/
+                    // misnamed images in the /images folder are easy to spot and fix.
+                    const src = this.getAttribute('src') || '';
+                    const ph = document.createElement('div');
+                    ph.className = 'diorama-photo';
+                    ph.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;'
+                        + 'min-height:160px;padding:16px;border:2px dashed #64748b;border-radius:12px;'
+                        + 'background:rgba(100,116,139,.12);color:#94a3b8;text-align:center;font-size:13px;';
+                    ph.innerHTML = '🖼️ <strong>Image not found</strong><br>' +
+                        'Expected file: <code style="color:#e2e8f0">' + src + '</code><br>' +
+                        '<span style="font-size:11px">Check the file exists in the images folder and the name matches exactly (case-sensitive).</span>';
+                    if (this.parentNode) this.parentNode.replaceChild(ph, this);
+                });
             }
         });
     </script>
