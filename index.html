@@ -583,6 +583,17 @@
         .agent-card .agent-name { display: block; font-size: 15px; font-weight: bold; margin-bottom: 4px; }
         .agent-card .agent-tag { display: block; font-size: 11px; color: #718096; margin-top: 6px; }
 
+        /* Real robot photos inside the agent cards */
+        .agent-photo {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+            object-position: center 30%;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
         .agent-flow {
             text-align: center;
             font-size: 15px;
@@ -646,6 +657,50 @@
 
         .star.active { color: #ffe66d; text-shadow: 0 0 10px #ffe66d; }
         .star:active { transform: scale(1.2); }
+        /* Greeter system explainer */
+        .greeter-system {
+            background: rgba(255, 230, 109, 0.06);
+            border: 2px solid #ffe66d;
+            border-radius: 15px;
+            padding: 16px;
+            margin: 20px 0;
+        }
+        .greeter-steps { list-style: none; margin: 12px 0; padding: 0; counter-reset: gstep; }
+        .greeter-steps li {
+            counter-increment: gstep;
+            position: relative;
+            padding: 10px 12px 10px 48px;
+            margin: 8px 0;
+            background: rgba(15, 15, 35, 0.7);
+            border: 1px solid #4a5568;
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .greeter-steps li::before {
+            content: counter(gstep);
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #ffe66d;
+            color: #0f0f23;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .greeter-steps strong { color: #ffe66d; }
+        .greeter-live {
+            text-align: center;
+            font-size: 13px;
+            color: #00ff88;
+            margin: 10px 0 0;
+        }
+
     </style>
 </head>
 <body>
@@ -689,6 +744,12 @@
                     <p class="privacy-note" style="margin-top: 10px;">On iPhone, you can also press and hold the image and choose "Save to Photos".</p>
                 </div>
 
+                <div class="qr-notice">
+                    👀 <strong>Look at the diorama!</strong> The Greeter Robot inside the city is saying
+                    <strong>"Welcome <span class="visitor-name-slot"></span>!"</strong> to you right now.
+                    Find out how it knew you arrived in the <strong>Robot Agents</strong> zone.
+                </div>
+
                 <p style="text-align: center; color: #ffe66d; margin-top: 10px;">🏆 Explore all 7 zones to unlock your <strong>Award of Completion</strong>!</p>
                 <button class="continue-btn big-btn" onclick="startTour()">🏙️ Enter the City →</button>
                 <button class="skip-btn center" onclick="openGuestbook('welcome')">✍️ Short on time? Just sign our guest book</button>
@@ -710,8 +771,8 @@
                 <div class="story-section visible" id="section1">
                     <div class="location-indicator">ZONE 1 OF 7 • CITY ENTRANCE</div>
                     <h2>Welcome to Gen AI Robot City</h2>
-                    <img src="images/city-overview.jpg" alt="Gen AI Robot City Overview" class="diorama-photo">
-                    <div class="photo-caption">The complete Gen AI Robot City diorama in all its illuminated glory</div>
+                    <img data-file="city-front.jpg" src="images/city-front.jpg" alt="Gen AI Robot City diorama seen from the front" class="diorama-photo">
+                    <div class="photo-caption">The complete Gen AI Robot City diorama, with the Greeter Robot on the lower deck</div>
                     <p>Before you lies Gen AI Robot City - a living testament to artificial intelligence. Glowing cottages, each home to a different AI, are connected by streams of data flowing to the central Data Valley. The colorful city name proudly displays our commitment to generative AI innovation.</p>
                     <div class="feature-highlight">
                         <strong>What You're Seeing:</strong> The AI Cloud with its neighborhood of glowing AI cottages, Data Valley at the heart of the city, and the Neural Core circuits on the level below.
@@ -726,11 +787,11 @@
                 <div class="story-section hidden" id="section2">
                     <div class="location-indicator">ZONE 2 OF 7 • DATA VALLEY</div>
                     <h2>The Information Processing Center</h2>
-                    <img src="images/data-valley.jpg" alt="Data Valley with Fiber Optic Trees" class="diorama-photo">
+                    <img data-file="data-valley.jpg" src="images/data-valley.jpg" alt="Data Valley with fiber optic flowers" class="diorama-photo">
                     <video class="diorama-photo" controls autoplay muted loop playsinline>
-                        <source src="images/data-valley-video.mp4" type="video/mp4" onerror="this.parentElement.style.display='none'">
+                        <source src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/data-valley-video.mp4" type="video/mp4" onerror="this.parentElement.style.display='none'">
                     </video>
-                    <div class="photo-caption">Data Valley ring with blinking LED lights and glowing fiber optic palm trees</div>
+                    <div class="photo-caption">Data Valley ring with golden circuit patterns and glowing fiber optic flowers</div>
                     <p>You approach the magnificent Data Valley - enhanced with fiber optic palm trees that pulse with data streams. The circular hub collects information from all the AI cottages, while the golden circuit patterns represent different AI algorithms. The glowing palm trees serve as natural data conduits, their fiber optic leaves carrying information between the physical and digital realms.</p>
                     <div class="ai-response">
                         <strong>VALLEY AI:</strong> "Welcome to Data Valley, <span id="name-valley"></span>! The fiber optic palm trees you see are living data collectors - their glowing leaves carry questions, answers, and discoveries between all the AIs of the city."
@@ -745,7 +806,7 @@
                 <div class="story-section hidden" id="section3">
                     <div class="location-indicator">ZONE 3 OF 7 • NEURAL CORE</div>
                     <h2>The Brain of the City</h2>
-                    <img src="images/neural-core.jpg" alt="Neural Core Processing Center" class="diorama-photo">
+                    <img data-file="neural-core.jpg" src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/neural-core.jpg" alt="Neural Core Processing Center" class="diorama-photo">
                     <div class="photo-caption">Neural Core with circuit boards, processing units, and robotic maintenance crew</div>
                     <p>Deep beneath the city lies the Neural Core - the brain of Gen AI Robot City. It isn't made of magic: it is made of <strong>algorithms</strong> and <strong>mathematical equations</strong>, running on the circuit boards you see.</p>
 
@@ -776,7 +837,8 @@
                 <div class="story-section hidden" id="section4">
                     <div class="location-indicator">ZONE 4 OF 7 • ROBO CAFÉ</div>
                     <h2>⚡ The Robo Café – Charging Station</h2>
-                    <img src="images/20261002_124858.jpg" alt="The Robo Café charging station in the diorama" class="diorama-photo">
+                    <img data-file="robo-cafe.jpg" src="images/robo-cafe.jpg" alt="The Robo Café charging station in the diorama" class="diorama-photo">
+                    <div class="photo-caption">The Robo Café tower, wrapped in copper coils and built on a real circuit breadboard</div>
                     <p>Every city needs a place to eat - and in Gen AI Robot City, that place is the <strong>Robo Café</strong>! Just like people visit a restaurant when they are hungry, robots visit the <strong>Charging Station</strong> when their batteries run low. Here, <strong>electricity is the food</strong> - and a full battery means a full tummy.</p>
 
                     <div class="ai-response">
@@ -800,6 +862,8 @@
                     </div>
 
                     <h3 class="section-subtitle">🤖 Who recharges at the Robo Café?</h3>
+                    <img data-file="robo-cafe-ai-houses.jpg" src="images/robo-cafe-ai-houses.jpg" alt="AI tool houses around the Robo Café" class="diorama-photo">
+                    <div class="photo-caption">The AI-tool houses (Gemini, Co-Pilot, Bolt…) gather round the café to recharge</div>
                     <p style="font-size: 13px;">All the city's famous AI helpers stop by to power up. Tap one to see what it does!</p>
                     <div id="cafeAiGrid" class="aitool-grid"></div>
                     <p id="cafeAiDesc" class="aitool-desc">👆 Tap an AI to learn what it does.</p>
@@ -811,7 +875,7 @@
                 <div class="story-section hidden" id="section5">
                     <div class="location-indicator">ZONE 5 OF 7 • AI CLOUD</div>
                     <h2>The AI Cloud Neighborhood</h2>
-                    <img src="images/ai-cloud.jpg" alt="The AI Cloud and its cottages" class="diorama-photo">
+                    <img src="images/ai-cloud.jpg" data-fb="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/ai-cloud.jpg" onerror="if(this.dataset.fb){this.dataset.skip='1';this.src=this.dataset.fb;this.dataset.fb='';}" alt="The AI Cloud and its cottages" class="diorama-photo">
                     <div class="photo-caption">The AI Cloud, surrounded by glowing cottages - each one home to a different AI</div>
                     <p>Rising above the city is the AI Cloud - and around it glows a whole neighborhood of cottages. <strong>Each cottage is home to a different AI</strong>, and each AI has its own special skill. When they share what they know through the cloud, they become far more helpful together.</p>
 
@@ -833,7 +897,7 @@
                 <div class="story-section hidden" id="section6">
                     <div class="location-indicator">ZONE 6 OF 7 • ROBOT AGENTS</div>
                     <h2>Meet the Robot Agents</h2>
-                    <img src="images/robot-citizens.jpg" alt="The robot citizens of Gen AI Robot City" class="diorama-photo">
+                    <img src="images/robot-citizens.jpg" data-fb="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/robot-citizens.jpg" onerror="if(this.dataset.fb){this.dataset.skip='1';this.src=this.dataset.fb;this.dataset.fb='';}" alt="The robot citizens of Gen AI Robot City" class="diorama-photo">
                     <div class="photo-caption">The robot citizens of the city - each one is also an AI agent with its own job</div>
                     <p>The colorful robots around the diorama aren't just citizens - they are the city's <strong>AI agents</strong>! Most AI simply answers questions. An AI agent goes further: it is given a <strong>goal</strong>, makes a <strong>plan</strong>, uses <strong>tools</strong> like cameras, maps, or spreadsheets, and <strong>takes actions</strong> step by step until the job is done.</p>
 
@@ -844,34 +908,40 @@
                     <h3 class="section-subtitle">🤝 The Robot Agent Team</h3>
                     <div class="agent-grid">
                         <button class="agent-card" style="border-left-color: #ffe66d;" onclick="agentSpeak('planner')">
+                            <img data-file="robot-yellow.jpg" src="images/robot-yellow.jpg" alt="The yellow Planner Agent robot" class="agent-photo">
                             <span class="agent-name">🧭 Planner Agent</span>
                             Breaks a big goal into small, clear steps and decides who does what.
                             <span class="agent-tag">The yellow robot - who also runs the Robo Café!</span>
                         </button>
                         <button class="agent-card" style="border-left-color: #4ecdc4;" onclick="agentSpeak('researcher')">
+                            <img data-file="robot-blue.jpg" src="images/robot-blue.jpg" alt="The blue Research Agent robot" class="agent-photo" loading="lazy" onerror="this.remove()">
                             <span class="agent-name">🔎 Research Agent</span>
                             Finds information in Data Valley and checks that the facts are correct.
                             <span class="agent-tag">The blue robot, guardian of the Neural Core</span>
                         </button>
                         <button class="agent-card" style="border-left-color: #ff6b6b;" onclick="agentSpeak('creator')">
+                            <img data-file="robot-red.jpg" src="images/robot-red.jpg" alt="The red Creator Agent robot" class="agent-photo" loading="lazy" onerror="this.remove()">
                             <span class="agent-name">🎨 Creator Agent</span>
                             Writes stories, designs pictures, and builds things - like your award!
                             <span class="agent-tag">The red robot, near the AI Cloud</span>
                         </button>
                         <button class="agent-card" style="border-left-color: #b794f4;" onclick="agentSpeak('safety')">
+                            <img data-file="robot-purple.jpg" src="images/robot-purple.jpg" alt="The purple Safety Agent robot" class="agent-photo" loading="lazy" onerror="this.remove()">
                             <span class="agent-name">🛡️ Safety Agent</span>
                             Checks every result is kind, safe, and honest, and asks a human before big decisions.
                             <span class="agent-tag">The purple robot, on the recreation deck</span>
                         </button>
                         <button class="agent-card" style="border-left-color: #63b3ed;" onclick="agentSpeak('vision')">
+                            <img data-file="robot-green.jpg" src="images/robot-green.jpg" alt="The space robot Vision Agent glowing green" class="agent-photo" loading="lazy" onerror="this.remove()">
                             <span class="agent-name">👁️ Vision Agent</span>
                             Uses cameras to see and understand the world - like spotting a friendly wave.
-                            <span class="agent-tag">Tool: camera</span>
+                            <span class="agent-tag">The space robot glowing green • Tool: camera</span>
                         </button>
                         <button class="agent-card" style="border-left-color: #a0aec0;" onclick="agentSpeak('maintenance')">
+                            <img data-file="robot-toys.jpg" src="images/robot-toys.jpg" alt="Robot toys" class="agent-photo">
                             <span class="agent-name">🔧 Maintenance Agent</span>
                             Keeps the circuit boards, wires, and lights of the Neural Core working smoothly.
-                            <span class="agent-tag">The maintenance crew</span>
+                            <span class="agent-tag">Robot toys</span>
                         </button>
                     </div>
 
@@ -889,6 +959,17 @@
                             <span class="agent-tag">Tools: speaker + greeter phone</span>
                         </button>
                     </div>
+
+                    <div class="feature-highlight">
+                        <strong>👋 The Greeter Robot:</strong> When you arrive and type your name, it is saved on the city's visitor board. The greeter tablet inside the diorama keeps watching that board, and as soon as it spots your name, it says <strong>"Welcome <span class="visitor-name-slot"></span>!"</strong> out loud to greet you.
+                    </div>
+                    <!-- GREETER VIDEO -->
+                    <!-- Plays silently like a GIF; tapping the button replays it with the greeting sound. -->
+                    <video id="greeterVideo" class="diorama-photo" autoplay muted loop playsinline preload="auto">
+                        <source src="images/greeter-video.mp4" type="video/mp4">
+                    </video>
+                    <button id="greeterSoundBtn" class="continue-btn" style="margin-top: 0;" onclick="playGreeterSound()">🔊 Tap to hear the greeting</button>
+                    <div class="photo-caption">The Greeter Robot welcoming a new visitor by name</div>
 
                     <h3 class="section-subtitle">⚙️ How Agents Work Together</h3>
                     <div class="agent-flow">
@@ -924,7 +1005,7 @@
 
                     <button class="continue-btn big-btn" onclick="openGuestbook('tour')">✍️ Sign the Guest Book</button>
 
-                    <img src="images/city-overview.jpg" alt="The Complete Gen AI Robot City" class="diorama-photo" id="finalPhoto">
+                    <img data-file="city-front.jpg" src="images/city-front.jpg" alt="The Complete Gen AI Robot City" class="diorama-photo" id="finalPhoto">
                     <div class="photo-caption">The complete ecosystem: physical architecture supporting digital intelligence</div>
                     <p>Your journey reveals how AI really works. Data flows through Data Valley, the Neural Core turns it into decisions with algorithms and math, the Robo Café keeps everyone powered, the AI cottages share their skills through the cloud, and the robot agents turn plans into action - every component works in harmony.</p>
                     <div class="ai-response">
@@ -965,13 +1046,13 @@
         </div>
     </div>
 
-    <!-- CITY MAP (overlay) -->
+    <!-- CITY MAP (overlay) — keeps the top-down city-overview.jpg so the pins line up -->
     <div id="mapOverlay" class="map-overlay hidden">
         <div class="map-box">
             <h2 style="color: #00ff88;">🗺️ Gen AI Robot City Map</h2>
-            <p style="font-size: 13px; margin: 6px 0 4px;">Tap a pin to jump to that zone. Green pins = visited.</p>
+            <p style="font-size: 13px; margin: 6px 0 4px;">Top view of both levels of the city. Tap a pin to jump to that zone. Green pins = visited.</p>
             <div class="map-frame" id="mapFrame">
-                <img src="images/city-overview.jpg" alt="Map of Gen AI Robot City"
+                <img id="mapImg" src="images/city-map.jpg" alt="Top view map of both levels of Gen AI Robot City"
                      onerror="document.getElementById('mapFrame').style.display='none'">
                 <div id="mapPins" class="map-pins"></div>
             </div>
@@ -1022,14 +1103,18 @@
         const IMG = 'images/';
         const TOTAL_ZONES = 7;
 
+        // Photo paths, used by the Finale slideshow
+        const EMBED = {};
+        document.querySelectorAll('[data-file]').forEach(el => { EMBED[el.dataset.file] = el.getAttribute('src'); });
+
         // ================= ZONES + MAP PINS =================
         const ZONES = [
-            { n: 1, icon: '🏙️', name: 'Entrance',     pin: { x: 50, y: 57 } },
-            { n: 2, icon: '🌴', name: 'Data Valley',  pin: { x: 50, y: 42 } },
-            { n: 3, icon: '🧠', name: 'Neural Core',  pin: { x: 50, y: 88 } },
-            { n: 4, icon: '⚡', name: 'Robo Café',    pin: { x: 80, y: 30 } },
-            { n: 5, icon: '☁️', name: 'AI Cloud',     pin: { x: 45, y: 26 } },
-            { n: 6, icon: '🤖', name: 'Robot Agents', pin: { x: 18, y: 52 } },
+            { n: 1, icon: '🏙️', name: 'Entrance',     pin: { x: 84, y: 27.9 } },
+            { n: 2, icon: '🌴', name: 'Data Valley',  pin: { x: 64, y: 27.9 } },
+            { n: 3, icon: '🧠', name: 'Neural Core',  pin: { x: 82.4, y: 75.8 } },
+            { n: 4, icon: '⚡', name: 'Robo Café',    pin: { x: 20, y: 25.1 } },
+            { n: 5, icon: '☁️', name: 'AI Cloud',     pin: { x: 49.3, y: 74.9 } },
+            { n: 6, icon: '🤖', name: 'Robot Agents', pin: { x: 90, y: 8.9 } },
             { n: 7, icon: '🏆', name: 'Finale',       pin: null }
         ];
 
@@ -1343,9 +1428,21 @@
         // ================= ROBOT VOICE (from config.js) =================
         // Story-page voice: robotic TONE but spoken smoothly — NOT word-by-word and
         // NOT slow. (The greeter/station keep their own config voice.)
-        const machineWordByWord = false;   // speak whole phrases, no word-by-word pauses
-        const robotPitch = 0.5;            // low pitch = robot tone
-        const robotRate = 1.05;            // normal speed (not slow)
+        // Voice now follows config.js (VOICE_SETTINGS.style), same as the greeter and the earlier site.
+        const VOICE_STYLE = (VOICE_STYLES && VOICE_STYLES[VOICE_SETTINGS && VOICE_SETTINGS.style])
+                            || { pitch: 0.3, rate: 0.8, wordByWord: true };
+        const machineWordByWord = (VOICE_SETTINGS && typeof VOICE_SETTINGS.machineWordByWord === 'boolean')
+                            ? (VOICE_SETTINGS.machineWordByWord && VOICE_STYLE.wordByWord)
+                            : VOICE_STYLE.wordByWord;
+        const robotPitch = VOICE_STYLE.pitch;
+        const robotRate = VOICE_STYLE.rate;
+
+        // Load the voice list early: some browsers return no voices on the first call,
+        // which made the page fall back to the plain default voice instead of the robot voice.
+        if ('speechSynthesis' in window) {
+            speechSynthesis.getVoices();
+            speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+        }
 
         function forSpeech(text) {
             return text.replace(/\bGen\s*AI\b/gi, machineWordByWord ? 'Jen Ay Eye' : 'Jen A I');
@@ -1565,6 +1662,30 @@
                 voice: 'I am the Voice Agent. I speak to you in this robot voice, and I tell the greeter robot to welcome you.'
             };
             sayNow(lines[agent] || '');
+        }
+
+        // ================= GREETER SYSTEM: spoken explanation =================
+        function explainGreeter() {
+            const secs = POLL_MS ? Math.round(POLL_MS / 1000) : 'a few';
+            sayNow(`Hello ${visitorName}! I am the Greeter Robot. When you typed your name, the Memory Agent wrote it on the visitor board. ` +
+                   `I check that board every ${secs} seconds. When I spotted your name, the Voice Agent helped me say: Welcome ${visitorName}!`);
+        }
+
+        // ================= GREETER VIDEO: tap for sound =================
+        function playGreeterSound() {
+            const v = document.getElementById('greeterVideo');
+            const btn = document.getElementById('greeterSoundBtn');
+            if (!v) return;
+            if ('speechSynthesis' in window) speechSynthesis.cancel();
+            if (v.muted) {
+                v.muted = false;
+                v.currentTime = 0;
+                v.play().catch(() => {});
+                if (btn) btn.textContent = '🔇 Mute';
+            } else {
+                v.muted = true;
+                if (btn) btn.textContent = '🔊 Tap to hear the greeting';
+            }
         }
 
         // ================= STEP 1: NAME + AVATAR =================
@@ -1993,17 +2114,21 @@
                 const el = document.getElementById(id);
                 if (el) el.textContent = visitorName;
             });
+            document.querySelectorAll('.visitor-name-slot').forEach(el => { el.textContent = visitorName; });
+            const ps = document.getElementById('pollSeconds');
+            if (ps && POLL_MS) ps.textContent = Math.round(POLL_MS / 1000);
         }
 
         function cyclePhotos() {
-            const photos = ['city-overview.jpg', 'data-valley.jpg', 'neural-core.jpg', 'ai-cloud.jpg'];
+            const photos = ['city-front.jpg', 'data-valley.jpg', 'robo-cafe.jpg', 'neural-core.jpg',
+                            'robot-red.jpg', 'robot-purple.jpg', 'robot-blue.jpg', 'robot-green.jpg'];
             let i = 0;
             const finalPhoto = document.getElementById('finalPhoto');
             clearInterval(photoTimer);
             photoTimer = setInterval(() => {
                 i = (i + 1) % photos.length;
                 finalPhoto.style.display = 'block';
-                finalPhoto.src = IMG + photos[i];
+                finalPhoto.src = EMBED[photos[i]] || IMG + photos[i];
             }, 3000);
         }
 
@@ -2016,7 +2141,7 @@
             }
             document.getElementById('section1').classList.remove('hidden');
             document.getElementById('section1').classList.add('visible');
-            document.getElementById('finalPhoto').src = IMG + 'city-overview.jpg';
+            document.getElementById('finalPhoto').src = EMBED['city-front.jpg'] || IMG + 'city-front.jpg';
             currentSection = 1;
             visitedZones = new Set([1]);
             robotBattery = 10;
@@ -2030,21 +2155,11 @@
         document.querySelectorAll('.diorama-photo').forEach(img => {
             if (img.tagName === 'IMG') {
                 img.addEventListener('error', function () {
+                    if (this.dataset.skip === '1') { this.dataset.skip = ''; return; }
                     // Show a clear placeholder naming the file we expected, so missing/
                     // misnamed images in the /images folder are easy to spot and fix.
                     const src = this.getAttribute('src') || '';
                     const ph = document.createElement('div');
                     ph.className = 'diorama-photo';
                     ph.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;'
-                        + 'min-height:160px;padding:16px;border:2px dashed #64748b;border-radius:12px;'
-                        + 'background:rgba(100,116,139,.12);color:#94a3b8;text-align:center;font-size:13px;';
-                    ph.innerHTML = '🖼️ <strong>Image not found</strong><br>' +
-                        'Expected file: <code style="color:#e2e8f0">' + src + '</code><br>' +
-                        '<span style="font-size:11px">Check the file exists in the images folder and the name matches exactly (case-sensitive).</span>';
-                    if (this.parentNode) this.parentNode.replaceChild(ph, this);
-                });
-            }
-        });
-    </script>
-</body>
-</html>
+          
