@@ -8,6 +8,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to Gen AI Robot City</title>
+    <!-- Shows any script error on screen, so problems are easy to report -->
+    <script>
+        window.addEventListener('error', function (e) {
+            if (!e.message) return;   // ignore missing images/videos
+            var d = document.getElementById('rcErrorBanner');
+            if (!d) {
+                d = document.createElement('div');
+                d.id = 'rcErrorBanner';
+                d.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#7f1d1d;color:#fff;' +
+                                  'font:13px monospace;padding:10px;white-space:pre-wrap;';
+                (document.body || document.documentElement).appendChild(d);
+            }
+            d.textContent += '⚠️ Page error: ' + e.message + ' (line ' + e.lineno + ')\n';
+        }, true);
+    </script>
     <!-- Load shared configuration -->
     <script src="config.js"></script>
     <style>
@@ -1104,8 +1119,8 @@
         const TOTAL_ZONES = 7;
 
         // Photo paths, used by the Finale slideshow
-        const EMBED = {};
-        document.querySelectorAll('[data-file]').forEach(el => { EMBED[el.dataset.file] = el.getAttribute('src'); });
+        const RC_EMBED = {};
+        document.querySelectorAll('[data-file]').forEach(el => { RC_EMBED[el.dataset.file] = el.getAttribute('src'); });
 
         // ================= ZONES + MAP PINS =================
         const ZONES = [
@@ -1429,13 +1444,13 @@
         // Story-page voice: robotic TONE but spoken smoothly — NOT word-by-word and
         // NOT slow. (The greeter/station keep their own config voice.)
         // Voice now follows config.js (VOICE_SETTINGS.style), same as the greeter and the earlier site.
-        const VOICE_STYLE = (VOICE_STYLES && VOICE_STYLES[VOICE_SETTINGS && VOICE_SETTINGS.style])
+        const RC_VOICE_STYLE = (VOICE_STYLES && VOICE_STYLES[VOICE_SETTINGS && VOICE_SETTINGS.style])
                             || { pitch: 0.3, rate: 0.8, wordByWord: true };
         const machineWordByWord = (VOICE_SETTINGS && typeof VOICE_SETTINGS.machineWordByWord === 'boolean')
-                            ? (VOICE_SETTINGS.machineWordByWord && VOICE_STYLE.wordByWord)
-                            : VOICE_STYLE.wordByWord;
-        const robotPitch = VOICE_STYLE.pitch;
-        const robotRate = VOICE_STYLE.rate;
+                            ? (VOICE_SETTINGS.machineWordByWord && RC_VOICE_STYLE.wordByWord)
+                            : RC_VOICE_STYLE.wordByWord;
+        const robotPitch = RC_VOICE_STYLE.pitch;
+        const robotRate = RC_VOICE_STYLE.rate;
 
         // Load the voice list early: some browsers return no voices on the first call,
         // which made the page fall back to the plain default voice instead of the robot voice.
@@ -2128,7 +2143,7 @@
             photoTimer = setInterval(() => {
                 i = (i + 1) % photos.length;
                 finalPhoto.style.display = 'block';
-                finalPhoto.src = EMBED[photos[i]] || IMG + photos[i];
+                finalPhoto.src = RC_EMBED[photos[i]] || IMG + photos[i];
             }, 3000);
         }
 
@@ -2141,25 +2156,9 @@
             }
             document.getElementById('section1').classList.remove('hidden');
             document.getElementById('section1').classList.add('visible');
-            document.getElementById('finalPhoto').src = EMBED['city-front.jpg'] || IMG + 'city-front.jpg';
+            document.getElementById('finalPhoto').src = RC_EMBED['city-front.jpg'] || IMG + 'city-front.jpg';
             currentSection = 1;
             visitedZones = new Set([1]);
             robotBattery = 10;
             updateBattery();
             litCottages.clear();
-            renderCottages();
-            renderZoneNav();
-            window.scrollTo(0, 0);
-        }
-
-        document.querySelectorAll('.diorama-photo').forEach(img => {
-            if (img.tagName === 'IMG') {
-                img.addEventListener('error', function () {
-                    if (this.dataset.skip === '1') { this.dataset.skip = ''; return; }
-                    // Show a clear placeholder naming the file we expected, so missing/
-                    // misnamed images in the /images folder are easy to spot and fix.
-                    const src = this.getAttribute('src') || '';
-                    const ph = document.createElement('div');
-                    ph.className = 'diorama-photo';
-                    ph.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;'
-          
