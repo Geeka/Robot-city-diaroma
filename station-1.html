@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tom Station - Gen AI Robot City</title>
+    <!-- Error reporter loads FIRST and on its own, so even a broken script below shows its error on screen -->
+    <script>
+        window.addEventListener('error', function (ev) {
+            if (!ev.message) return;   // ignore missing images etc.
+            var show = function () {
+                var box = document.getElementById('setupError');
+                if (box) box.textContent = '⚠️ Script error: ' + ev.message + (ev.lineno ? ' (line ' + ev.lineno + ')' : '');
+            };
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', show); else show();
+        });
+    </script>
+    <script src="config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0f0f23, #1a1a2e, #16213e);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 { color: #00ff88; margin: 10px 0 5px; text-shadow: 0 0 15px #00ff88; }
+        h2 { color: #00ff88; font-size: 18px; margin-bottom: 12px; }
+        .subtitle { color: #718096; font-size: 13px; margin-bottom: 20px; }
+        .card {
+            background: rgba(45, 55, 72, 0.8);
+            border: 2px solid #4a5568;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px auto;
+            max-width: 500px;
+        }
+        .btn {
+            background: linear-gradient(45deg, #00ff88, #4ecdc4);
+            border: none;
+            color: #0f0f23;
+            padding: 16px 30px;
+            border-radius: 30px;
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .btn.small { font-size: 13px; padding: 10px 18px; background: #4a5568; color: #e2e8f0; }
+        .setting { text-align: left; margin: 12px 0; font-size: 13px; }
+        .setting label { display: block; color: #4ecdc4; margin-bottom: 6px; }
+        .select, input { width: 100%; background: rgba(15, 15, 35, 0.8); border: 2px solid #4a5568; border-radius: 8px; padding: 10px; color: #e2e8f0; font-family: inherit; font-size: 15px; }
+        .note { font-size: 11px; color: #718096; text-align: left; margin-top: 4px; }
+        #sampleStatus { font-size: 12px; color: #ffe66d; min-height: 16px; margin-bottom: 6px; }
+        #status { color: #4ecdc4; font-size: 14px; margin-top: 10px; }
+        #currentName { font-size: 42px; color: #ffe66d; margin: 10px 0; word-break: break-word; min-height: 50px; }
+        #log { list-style: none; text-align: left; font-size: 13px; max-height: 200px; overflow-y: auto; }
+        #log li { padding: 6px 0; border-bottom: 1px solid #2d3748; }
+        .error { color: #ff6b6b; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <h1>🐱 TOM STATION</h1>
+    <p class="subtitle">Gen AI Robot City • Greeting relay for Talking Tom</p>
+
+    <div id="setupCard" class="card">
+        <h2>⚙️ Settings</h2>
+
+        <div class="setting">
+            <label for="voiceStyle">🔊 Voice style</label>
+            <select id="voiceStyle" class="select">
+                <option value="machine">🤖 Machine (word by word)</option>
+                <option value="deep">🦾 Deep robot</option>
+                <option value="friendly">🙂 Friendly</option>
+                <option value="squeaky">🐭 Squeaky</option>
+            </select>
+        </div>
+
+        <div class="setting">
+            <label for="voiceSelect">🗣️ Voice</label>
+            <select id="voiceSelect" class="select">
+                <option value="">🎤 Auto (most robotic available)</option>
+            </select>
+            <p class="note">Tip: robotic voices like "Zarvox" or "Trinoids" (iPhone) or "eSpeak" (Android) sound the most machine-like.</p>
+        </div>
+
+        <button class="btn small" data-action="previewVoice">▶ Hear a sample</button>
+        <p id="sampleStatus"></p>
+
+        <div class="setting">
+            <label for="musicLevel">🎵 Background music</label>
+            <select id="musicLevel" class="select">
+                <option value="low">Low (recommended)</option>
+                <option value="medium">Medium</option>
+                <option value="off">Off</option>
+            </select>
+            <p class="note">Music goes silent during each greeting so Tom repeats only the voice. On iPhone, turn off silent mode to hear music and chirps.</p>
+        </div>
+
+        <button class="btn small" id="musicPreviewBtn" data-action="toggleMusicPreview">🎵 Preview music</button>
+
+        <button class="btn" data-action="startStation">▶ START STATION</button>
+        <p id="setupError" class="error"></p>
+    </div>
+
+    <div id="runningCard" class="card hidden">
+        <h2>🟢 STATION RUNNING</h2>
+        <p style="font-size: 12px; color: #718096; margin-bottom: 12px;">Listening for new visitors...</p>
+        <p class="note">LAST GREETED</p>
+        <div id="currentName">—</div>
+        <p id="status">Connecting...</p>
+        <p id="visitorCount" style="color: #00ff88;"></p>
+        <button class="btn small" data-action="testGreet">🔊 Test Greeting</button>
+        <button class="btn small" data-action="pauseStation">⏸️ Pause</button>
+    </div>
+
+    <div class="card" style="font-size: 11px; color: #718096; text-align: left;">
+        <p><strong>Status:</strong> <span id="configStatus">Loading...</span></p>
+        <p id="diag"></p>
+    </div>
+
+    <script>
+    // Everything lives inside this function, so no name here can ever clash with
+    // anything declared in config.js (e.g. VOICE_STYLES). That clash was what stopped
+    // the whole page from running.
+    (function () {
+        'use strict';
+
+        // ================= CONFIG FALLBACKS =================
+        if (typeof window.VISITOR_API === 'undefined' && typeof VISITOR_API === 'undefined') {
+            window.VISITOR_API = 'https://script.google.com/macros/s/AKfycbw0gF29C6zbmZKDmzY-u0nCFAsp7zfj_u9VLRh-DGJR5X80DvdTyTskiUr5M9etZp5o/exec';
+        }
+        const CFG = {
+            api:      (typeof VISITOR_API !== 'undefined') ? VISITOR_API : window.VISITOR_API,
+            pollMs:   (typeof POLL_MS !== 'undefined') ? POLL_MS : 4000,
+            timeout:  (typeof REPLY_TIMEOUT !== 'undefined') ? REPLY_TIMEOUT : 15000,
+            robotic:  (typeof ROBOTIC_VOICE_NAMES !== 'undefined') ? ROBOTIC_VOICE_NAMES : /zarvox|trinoids|robot|espeak/i,
+            hasConfig: (typeof VISITOR_API !== 'undefined')
+        };
+
+        // ================= VOICE FALLBACK LIST =================
+        const FALLBACK_VOICES = [
+            { name: 'Zira', lang: 'en-US' },
+            { name: 'David', lang: 'en-US' },
+            { name: 'Mark', lang: 'en-US' },
+            { name: 'Google US English', lang: 'en-US' },
+            { name: 'Google US English Female', lang: 'en-US' },
+            { name: 'Samantha', lang: 'en-US' },
+            { name: 'Victoria', lang: 'en-US' },
+            { name: 'Karen', lang: 'en-AU' },
+            { name: 'Moira', lang: 'en-IE' },
+            { name: 'Fiona', lang: 'en-GB' },
+            { name: 'Daniel', lang: 'en-GB' },
+            { name: 'Zarvox', lang: 'en-US' },
+            { name: 'Trinoids', lang: 'en-US' },
+            { name: 'eSpeak', lang: 'en-US' },
+            { name: 'Alex', lang: 'en-US' }
+        ];
+
+        // ================= STATE =================
+        let started = false;
+        let polling = false;
+        let pollTimer = null;
+        let lastCount = null;
+        let audioCtx = null;
+        let musicGain = null;
+        let musicOn = false;
+
+        // ================= VOICE LIST =================
+        function realVoices() {
+            if (!('speechSynthesis' in window)) return [];
+            try {
+                return speechSynthesis.getVoices()
+                    .filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
+            } catch (e) {
+                console.error('Voice error:', e);
+                return [];
+            }
+        }
+
+        function displayVoices() {
+            const real = realVoices().map(v => ({ name: v.name, lang: v.lang, real: true }));
+            const haveName = name => real.some(r => r.name.toLowerCase().includes(name.toLowerCase())
+                                                 || name.toLowerCase().includes(r.name.toLowerCase()));
+            const extras = FALLBACK_VOICES
+                .filter(f => !haveName(f.name))
+                .map(f => ({ name: f.name, lang: f.lang, real: false }));
+            return real.concat(extras);
+        }
+
+        function fillVoiceList() {
+            const select = document.getElementById('voiceSelect');
+            if (!select) return;
+            const keep = select.value;
+            const voices = displayVoices().sort((a, b) =>
+                (CFG.robotic.test(b.name) ? 1 : 0) - (CFG.robotic.test(a.name) ? 1 : 0));
+            select.innerHTML = '<option value="">🎤 Auto (most robotic available)</option>';
+            voices.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.name;
+                opt.textContent = (CFG.robotic.test(v.name) ? '🤖 ' : '') + v.name + (v.real ? '' : ' (if installed)');
+                select.appendChild(opt);
+            });
+            if (keep) select.value = keep;
+        }
+
+        // ================= DIAGNOSTICS =================
+        function updateDiagnostics() {
+            const configEl = document.getElementById('configStatus');
+            const diagEl = document.getElementById('diag');
+            if (!configEl || !diagEl) return;
+            configEl.textContent = CFG.hasConfig ? '✅ Config loaded' : '⚠️ config.js not found - using built-in settings';
+            diagEl.innerHTML = '<strong>API:</strong> ...' + String(CFG.api).slice(-15) +
+                               '<br><strong>Voices:</strong> ' + realVoices().length + ' real';
+        }
+
+        // ================= VOICE STYLES (station's own, private) =================
+        const STATION_STYLES = {
+            machine:  { pitch: 0.3, rate: 0.8,  wordByWord: true  },
+            deep:     { pitch: 0.1, rate: 0.75, wordByWord: false },
+            friendly: { pitch: 1.1, rate: 0.95, wordByWord: false },
+            squeaky:  { pitch: 1.9, rate: 1.1,  wordByWord: false }
+        };
+
+        let speechUnlocked = false;
+        function unlockSpeech() {
+            if (speechUnlocked || !('speechSynthesis' in window)) return;
+            speechUnlocked = true;
+            const u = new SpeechSynthesisUtterance(' ');
+            u.volume = 0;
+            speechSynthesis.speak(u);
+        }
+
+        function currentStyle() {
+            return STATION_STYLES[document.getElementById('voiceStyle').value] || STATION_STYLES.machine;
+        }
+
+        function pickVoice() {
+            const voices = realVoices();
+            if (!voices.length) return null;
+            const sel = document.getElementById('voiceSelect');
+            const chosen = sel ? sel.value : '';
+            if (chosen) {
+                const exact = voices.find(x => x.name === chosen);
+                if (exact) return exact;
+                const partial = voices.find(x =>
+                    x.name.toLowerCase().includes(chosen.toLowerCase()) ||
+                    chosen.toLowerCase().includes(x.name.toLowerCase()));
+                if (partial) return partial;
+            }
+            return voices.find(v => CFG.robotic.test(v.name)) || voices[0] || null;
+        }
+
+        // onDone(true) = finished speaking; onDone(false) = error/no sound
+        function speakText(text, onDone) {
+            if (!('speechSynthesis' in window)) { if (onDone) onDone(false); return; }
+            try {
+                if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
+                const style = currentStyle();
+                const u = new SpeechSynthesisUtterance(text);
+                const voice = pickVoice();
+                if (voice) { try { u.voice = voice; } catch (e) { /* keep default voice */ } }
+                u.pitch = style.pitch;
+                u.rate = style.rate;
+                u.volume = 1;
+                let finished = false;
+                u.onend = () => { if (!finished) { finished = true; if (onDone) onDone(true); } };
+                u.onerror = () => { if (!finished) { finished = true; if (onDone) onDone(false); } };
+                // pause music while speaking so Tom repeats only the voice
+                duckMusic(true);
+                const origEnd = u.onend, origErr = u.onerror;
+                u.onend = e => { duckMusic(false); origEnd(e); };
+                u.onerror = e => { duckMusic(false); origErr(e); };
+                speechSynthesis.speak(u);
+            } catch (e) {
+                console.error('speakText error:', e);
+                if (onDone) onDone(false);
+            }
+        }
+
+        function previewVoice() {
+            const status = document.getElementById('sampleStatus');
+            if (!('speechSynthesis' in window)) {
+                status.textContent = '⚠️ This browser cannot speak. Open the page in Chrome or Safari (not inside another app).';
+                return;
+            }
+            if (realVoices().length === 0) {
+                fillVoiceList();
+                status.textContent = '⏳ Loading voices…';
+                setTimeout(() => speakSample(status), 600);
+                return;
+            }
+            speakSample(status);
+        }
+
+        function speakSample(status) {
+            status.textContent = '🔊 Speaking…';
+            speakText('Hello! Tom Station is ready.', ok => {
+                status.textContent = ok
+                    ? '✅ Voice works'
+                    : '⚠️ No sound. Check the silent switch / volume, and open this page in Chrome or Safari (not inside another app). On Android, install a Text-to-Speech voice in Settings → Accessibility.';
+            });
+        }
+
+        // ================= MUSIC =================
+        const MUSIC_LEVELS = { off: 0, low: 0.12, medium: 0.25 };
+        let musicLoop = null;
+
+        function ensureAudio() {
+            if (!audioCtx) {
+                const Ctx = window.AudioContext || window.webkitAudioContext;
+                if (!Ctx) return false;
+                audioCtx = new Ctx();
+                musicGain = audioCtx.createGain();
+                musicGain.gain.value = 0;
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 2200;
+                musicGain.connect(filter);
+                filter.connect(audioCtx.destination);
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return true;
+        }
+
+        function musicLevel() {
+            return MUSIC_LEVELS[document.getElementById('musicLevel').value] || 0;
+        }
+
+        function startMusic() {
+            if (!ensureAudio()) return;
+            musicOn = true;
+            musicGain.gain.setTargetAtTime(musicLevel(), audioCtx.currentTime, 0.6);
+            playSimpleMusic();
+            clearInterval(musicLoop);
+            musicLoop = setInterval(playSimpleMusic, 1200);   // keep the tune repeating
+            const b = document.getElementById('musicPreviewBtn');
+            if (b) b.textContent = '⏹ Stop music';
+        }
+
+        function stopMusic() {
+            musicOn = false;
+            clearInterval(musicLoop);
+            if (musicGain && audioCtx) musicGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
+            const b = document.getElementById('musicPreviewBtn');
+            if (b) b.textContent = '🎵 Preview music';
+        }
+
+        function duckMusic(down) {
+            if (!musicOn || !musicGain || !audioCtx) return;
+            musicGain.gain.setTargetAtTime(down ? 0 : musicLevel(), audioCtx.currentTime, 0.1);
+        }
+
+        function playSimpleMusic() {
+            if (!musicOn || !audioCtx) return;
+            const t = audioCtx.currentTime;
+            [440, 550, 660, 550].forEach((f, i) => {
+                const o = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                o.frequency.value = f;
+                o.type = 'square';
+                g.gain.setValueAtTime(0, t + i * 0.3);
+                g.gain.linearRampToValueAtTime(0.1, t + i * 0.3 + 0.05);
+                g.gain.linearRampToValueAtTime(0, t + i * 0.3 + 0.25);
+                o.connect(g);
+                g.connect(musicGain);
+                o.start(t + i * 0.3);
+                o.stop(t + i * 0.3 + 0.3);
+            });
+        }
+
+        function toggleMusicPreview() {
+            ensureAudio();
+            if (musicOn) stopMusic(); else startMusic();
+        }
+
+        function onMusicLevelChange() {
+            if (musicLevel() === 0) stopMusic();
+            else if (musicOn) startMusic();
+        }
+
+        // ================= GREETING =================
+        function greet(name) {
+            document.getElementById('currentName').textContent = name;
+            speakText('Hello ' + name + '! Welcome to Gen AI Robot City!');
+        }
+
+        function testGreet() {
+            ensureAudio();
+            greet('Test Visitor');
+        }
+
+        // ================= POLLING (JSONP, needed for Google Apps Script) =================
+        function loadJsonp(url, timeout) {
+            return new Promise((resolve, reject) => {
+                const cb = 'cb_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
+                const s = document.createElement('script');
+                let done = false;
+                const cleanup = () => {
+                    done = true;
+                    clearTimeout(timer);
+                    try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+                    if (s.parentNode) s.parentNode.removeChild(s);
+                };
+                const timer = setTimeout(() => {
+                    if (done) return;
+                    cleanup();
+                    reject(new Error('No reply (timeout). Is the Apps Script deployed with "Anyone" access and JSONP callback support?'));
+                }, timeout);
+                window[cb] = data => { if (done) return; cleanup(); resolve(data); };
+                s.onerror = () => { if (done) return; cleanup(); reject(new Error('Network error loading data')); };
+                const sep = url.indexOf('?') === -1 ? '?' : '&';
+                s.src = url + sep + 'callback=' + cb + '&t=' + Date.now();
+                document.body.appendChild(s);
+            });
+        }
+
+        async function poll() {
+            if (!started || polling) return;
+            polling = true;
+            try {
+                const data = await loadJsonp(CFG.api, CFG.timeout);
+                if (!data) throw new Error('Empty response');
+                const count = data.count || 0;
+                const recent = data.recent || [];
+                document.getElementById('visitorCount').textContent = 'Total visitors: ' + count;
+                document.getElementById('status').textContent = '🟢 Listening...';
+                if (lastCount === null || count < lastCount) {
+                    lastCount = count;
+                } else if (count > lastCount) {
+                    const newOnes = Math.min(count - lastCount, recent.length);
+                    recent.slice(0, newOnes).reverse().forEach(n => greet(typeof n === 'string' ? n : (n && n.name) || 'friend'));
+                    lastCount = count;
+                }
+            } catch (e) {
+                document.getElementById('status').textContent = '🟠 Error: ' + e.message;
+            } finally {
+                polling = false;
+                if (started) pollTimer = setTimeout(poll, CFG.pollMs);
+            }
+        }
+
+        // ================= START/PAUSE =================
+        function startStation() {
+            started = true;
+            lastCount = null;
+            document.getElementById('setupCard').classList.add('hidden');
+            document.getElementById('runningCard').classList.remove('hidden');
+            try { ensureAudio(); } catch (e) { console.error('audio init:', e); }
+            try { speakText('Tom station is ready.'); } catch (e) { console.error('greet:', e); }
+            poll();
+            setTimeout(() => { if (started && musicLevel() > 0) { try { startMusic(); } catch (e) {} } }, 2500);
+        }
+
+        function pauseStation() {
+            started = false;
+            clearTimeout(pollTimer);
+            stopMusic();
+            document.getElementById('runningCard').classList.add('hidden');
+            document.getElementById('setupCard').classList.remove('hidden');
+        }
+
+        // ================= WIRING (no inline onclick, works on strict hosts) =================
+        const ACTIONS = { previewVoice, toggleMusicPreview, startStation, testGreet, pauseStation };
+        document.addEventListener('click', e => {
+            unlockSpeech();
+            const el = e.target.closest('[data-action]');
+            if (el && ACTIONS[el.dataset.action]) ACTIONS[el.dataset.action]();
+        });
+        document.addEventListener('touchend', unlockSpeech, { once: true });
+        document.getElementById('musicLevel').addEventListener('change', onMusicLevelChange);
+
+        fillVoiceList();
+        updateDiagnostics();
+        if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => { fillVoiceList(); updateDiagnostics(); };
+        setTimeout(() => { fillVoiceList(); updateDiagnostics(); }, 500);
+    })();
+    </script>
+</body>
+</html>
