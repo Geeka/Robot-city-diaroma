@@ -1,0 +1,2236 @@
+<!DOCTYPE html>
+<!--
+  © 2026 Gen AI Robot City — All rights reserved. Unauthorized copying, reproduction, or distribution of this code is prohibited.
+-->
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Gen AI Robot City</title>
+    <!-- Load shared configuration -->
+    <script src="config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0f0f23, #1a1a2e, #16213e);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 800px; margin: 0 auto; }
+        .hidden { display: none !important; }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #00ff88; }
+            to { text-shadow: 0 0 20px #00ff88, 0 0 30px #00ff88; }
+        }
+
+        .story-section {
+            background: rgba(45, 55, 72, 0.8);
+            border: 2px solid #4a5568;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease;
+        }
+
+        .story-section.visible { opacity: 1; transform: translateY(0); }
+
+        .story-section:hover {
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .diorama-photo {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            border: 2px solid #4a5568;
+            border-radius: 10px;
+            margin: 20px auto;
+            display: block;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .photo-caption {
+            text-align: center;
+            font-size: 12px;
+            color: #4ecdc4;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .continue-btn, .submit-name-btn {
+            background: linear-gradient(45deg, #00ff88, #4ecdc4);
+            border: none;
+            color: #0f0f23;
+            padding: 12px 25px;
+            margin: 20px auto 0;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .continue-btn:hover, .submit-name-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+
+        .continue-btn:disabled { opacity: 0.6; cursor: wait; }
+
+        .big-btn {
+            font-size: 18px;
+            padding: 16px 32px;
+            animation: btnPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes btnPulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 136, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(0, 255, 136, 0.9); }
+        }
+
+        .skip-btn {
+            background: none;
+            border: none;
+            color: #718096;
+            text-decoration: underline;
+            cursor: pointer;
+            font-family: inherit;
+            margin-top: 12px;
+            font-size: 12px;
+        }
+
+        .center { display: block; margin-left: auto; margin-right: auto; text-align: center; }
+
+        .ai-response {
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 4px solid #00ff88;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .location-indicator {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #4ecdc4;
+            color: #0f0f23;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .feature-highlight {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid #ffe66d;
+            padding: 10px 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 14px;
+        }
+
+        .qr-notice {
+            background: rgba(78, 205, 196, 0.1);
+            border: 1px dashed #4ecdc4;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .name-input-container {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .name-input {
+            background: rgba(45, 55, 72, 0.8);
+            border: 2px solid #4a5568;
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 16px;
+            width: 100%;
+            max-width: 300px;
+            margin: 10px auto;
+            display: block;
+        }
+
+        .name-input:focus {
+            outline: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .error-text { color: #ff6b6b; font-size: 12px; min-height: 16px; }
+
+        .privacy-note { font-size: 11px; color: #718096; margin-top: 6px; }
+
+        /* Avatar picker */
+        .avatar-title { color: #ffe66d; font-size: 14px; margin-top: 6px; }
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-width: 300px;
+            margin: 10px auto;
+        }
+
+        .avatar-option {
+            background: rgba(15, 15, 35, 0.7);
+            border: 2px solid #4a5568;
+            border-radius: 12px;
+            padding: 8px 2px;
+            cursor: pointer;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 12px;
+            transition: all 0.15s ease;
+            overflow: hidden;
+        }
+
+        .avatar-option .emoji { display: block; font-size: 36px; line-height: 1.3; }
+
+        .avatar-option.selected {
+            border-color: #00ff88;
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
+            transform: scale(1.06);
+        }
+
+        /* Robot greeter */
+        .robot-greeter {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 230, 109, 0.1);
+            border: 2px solid #ffe66d;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .robot-face {
+            font-size: 56px;
+            position: relative;
+            flex-shrink: 0;
+            animation: robotBob 2s ease-in-out infinite;
+        }
+
+        .robot-hand {
+            position: absolute;
+            right: -18px;
+            top: -6px;
+            font-size: 28px;
+            transform-origin: 70% 70%;
+            animation: robotWave 0.6s ease-in-out 8 alternate;
+        }
+
+        @keyframes robotBob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        @keyframes robotWave {
+            from { transform: rotate(-20deg); }
+            to { transform: rotate(25deg); }
+        }
+
+        .speech-bubble {
+            background: #1a202c;
+            border: 1px solid #ffe66d;
+            border-radius: 12px;
+            padding: 12px 15px;
+            font-size: 15px;
+            color: #ffe66d;
+            flex: 1;
+        }
+
+        .greeter-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            flex-shrink: 0;
+            border: 2px solid #ffe66d;
+            box-shadow: 0 0 12px #ffe66d;
+        }
+
+        /* Zone navigation (breadcrumb) */
+        .zone-nav-wrap {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(15, 15, 35, 0.95);
+            border: 1px solid #4a5568;
+            border-radius: 12px;
+            padding: 8px;
+            margin: 10px 0;
+        }
+
+        .zone-nav-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #4ecdc4;
+            margin-bottom: 6px;
+            gap: 8px;
+        }
+
+        .map-btn {
+            background: #4a5568;
+            color: #e2e8f0;
+            border: none;
+            border-radius: 15px;
+            padding: 6px 12px;
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .zone-nav {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scroll-behavior: smooth;
+        }
+
+        .zone-chip {
+            flex-shrink: 0;
+            background: rgba(45, 55, 72, 0.8);
+            border: 2px solid #4a5568;
+            color: #a0aec0;
+            border-radius: 16px;
+            padding: 6px 10px;
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .zone-chip.visited { border-color: #00ff88; color: #e2e8f0; }
+
+        .zone-chip.current {
+            background: linear-gradient(45deg, #00ff88, #4ecdc4);
+            color: #0f0f23;
+            border-color: #00ff88;
+            font-weight: bold;
+        }
+
+        .zone-chip.locked { opacity: 0.55; }
+
+        .nav-toast {
+            position: fixed;
+            left: 50%;
+            bottom: 20px;
+            transform: translateX(-50%);
+            background: #1a202c;
+            border: 2px solid #ffe66d;
+            color: #ffe66d;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            z-index: 200;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        /* City map */
+        .map-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 5, 20, 0.94);
+            z-index: 150;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .map-box { max-width: 600px; margin: 0 auto; text-align: center; }
+
+        .map-frame { position: relative; width: 100%; margin-top: 10px; }
+
+        .map-frame img {
+            width: 100%;
+            border-radius: 12px;
+            border: 2px solid #4ecdc4;
+            display: block;
+        }
+
+        .map-pins { position: absolute; inset: 0; }
+
+        .map-pin {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            background: rgba(15, 15, 35, 0.88);
+            border: 2px solid #ffe66d;
+            color: #fff;
+            border-radius: 20px;
+            padding: 4px 8px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+            animation: pinPulse 1.6s ease-in-out infinite;
+        }
+
+        .map-pin.visited { border-color: #00ff88; }
+
+        @keyframes pinPulse {
+            0%, 100% { box-shadow: 0 0 6px rgba(255, 230, 109, 0.5); }
+            50% { box-shadow: 0 0 16px rgba(255, 230, 109, 1); }
+        }
+
+        .map-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin: 14px 0;
+        }
+
+        /* Neural Core equation */
+        .equation-box {
+            background: #0f0f23;
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 14px;
+            margin: 12px 0;
+            text-align: center;
+            color: #00ff88;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.25);
+        }
+
+        /* AI Cloud cottages */
+        .cottage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .cottage {
+            background: rgba(15, 15, 35, 0.7);
+            border: 2px solid #4a5568;
+            border-radius: 14px 14px 8px 8px;
+            padding: 10px 8px;
+            color: #a0aec0;
+            font-family: inherit;
+            font-size: 11px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.25s ease;
+        }
+
+        .cottage .house { display: block; font-size: 30px; filter: grayscale(0.8) brightness(0.6); transition: filter 0.25s ease; }
+        .cottage .ai-name { display: block; font-weight: bold; font-size: 13px; color: #e2e8f0; margin: 4px 0 2px; }
+        .cottage .ai-job { display: block; }
+
+        .cottage.lit {
+            border-color: var(--glow);
+            box-shadow: 0 0 16px var(--glow);
+            color: #e2e8f0;
+        }
+
+        .cottage.lit .house { filter: none; }
+
+        /* Robo Café (Charging Station) */
+        .cafe-card {
+            background: rgba(255, 230, 109, 0.08);
+            border: 2px dashed #ffe66d;
+            border-radius: 12px;
+            padding: 14px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .cafe-title { color: #ffe66d; font-weight: bold; margin-bottom: 4px; }
+
+        /* AI tools that recharge at the café */
+        .aitool-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .aitool {
+            background: rgba(78, 205, 196, 0.08);
+            border: 1px solid #2f6f6a;
+            border-radius: 10px;
+            padding: 10px 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.12s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+        .aitool:active { transform: scale(0.96); }
+        .aitool .ai-emoji { font-size: 26px; display: block; }
+        .aitool .ai-name { display: block; font-weight: bold; font-size: 12px; color: #e2e8f0; margin-top: 4px; }
+        .aitool.active { border-color: #00ff88; background: rgba(0, 255, 136, 0.12); }
+        .aitool-desc {
+            min-height: 20px; margin-top: 6px; font-size: 13px; color: #4ecdc4; text-align: center;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .menu-item {
+            background: rgba(15, 15, 35, 0.7);
+            border: 2px solid #4a5568;
+            border-radius: 10px;
+            padding: 8px 4px;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            transition: transform 0.1s ease, border-color 0.2s ease;
+        }
+
+        .menu-item .dish-emoji { display: block; font-size: 26px; }
+        .menu-item .dish-energy { display: block; color: #00ff88; font-size: 11px; margin-top: 2px; }
+        .menu-item:active { transform: scale(0.95); border-color: #ffe66d; }
+
+        .battery {
+            position: relative;
+            width: 80%;
+            max-width: 260px;
+            height: 28px;
+            border: 3px solid #e2e8f0;
+            border-radius: 6px;
+            margin: 14px auto 6px;
+            padding: 2px;
+        }
+
+        .battery::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: 6px;
+            width: 6px;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .battery-fill {
+            height: 100%;
+            width: 10%;
+            background: #ff6b6b;
+            border-radius: 2px;
+            transition: width 0.5s ease, background 0.5s ease;
+        }
+
+        /* Robot Agents page */
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .agent-card {
+            background: rgba(15, 15, 35, 0.7);
+            border: 2px solid #4a5568;
+            border-left-width: 6px;
+            border-radius: 12px;
+            padding: 12px 14px;
+            text-align: left;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .agent-card:hover, .agent-card:active {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .agent-card .agent-name { display: block; font-size: 15px; font-weight: bold; margin-bottom: 4px; }
+        .agent-card .agent-tag { display: block; font-size: 11px; color: #718096; margin-top: 6px; }
+
+        /* Real robot photos inside the agent cards */
+        .agent-photo {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+            object-position: center 30%;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .agent-flow {
+            text-align: center;
+            font-size: 15px;
+            line-height: 2;
+            background: rgba(0, 255, 136, 0.08);
+            border: 1px dashed #00ff88;
+            border-radius: 10px;
+            padding: 12px;
+            margin: 15px 0;
+        }
+
+        .section-subtitle { color: #ffe66d; margin: 20px 0 5px; font-size: 16px; }
+
+        /* Awards */
+        .reward-card {
+            background: rgba(0, 255, 136, 0.08);
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .completion-card {
+            background: rgba(255, 230, 109, 0.08);
+            border-color: #ffe66d;
+            box-shadow: 0 0 25px rgba(255, 230, 109, 0.3);
+        }
+
+        .reward-image {
+            width: 100%;
+            max-width: 360px;
+            border-radius: 12px;
+            display: block;
+            margin: 10px auto;
+            box-shadow: 0 0 25px rgba(0, 255, 136, 0.4);
+        }
+
+        /* Guest book */
+        .guestbook-card {
+            background: rgba(78, 205, 196, 0.08);
+            border-color: #4ecdc4;
+        }
+
+        .gb-textarea {
+            min-height: 110px;
+            resize: vertical;
+            max-width: 420px;
+        }
+
+        .star-row { display: flex; justify-content: center; gap: 6px; margin: 8px 0; }
+
+        .star {
+            background: none;
+            border: none;
+            font-size: 32px;
+            color: #4a5568;
+            cursor: pointer;
+            transition: transform 0.15s ease, color 0.15s ease;
+        }
+
+        .star.active { color: #ffe66d; text-shadow: 0 0 10px #ffe66d; }
+        .star:active { transform: scale(1.2); }
+        /* Greeter system explainer */
+        .greeter-system {
+            background: rgba(255, 230, 109, 0.06);
+            border: 2px solid #ffe66d;
+            border-radius: 15px;
+            padding: 16px;
+            margin: 20px 0;
+        }
+        .greeter-steps { list-style: none; margin: 12px 0; padding: 0; counter-reset: gstep; }
+        .greeter-steps li {
+            counter-increment: gstep;
+            position: relative;
+            padding: 10px 12px 10px 48px;
+            margin: 8px 0;
+            background: rgba(15, 15, 35, 0.7);
+            border: 1px solid #4a5568;
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .greeter-steps li::before {
+            content: counter(gstep);
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #ffe66d;
+            color: #0f0f23;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .greeter-steps strong { color: #ffe66d; }
+        .greeter-live {
+            text-align: center;
+            font-size: 13px;
+            color: #00ff88;
+            margin: 10px 0 0;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="rcNoScript" style="background:#7f1d1d;color:#fff;padding:12px;border-radius:10px;margin-bottom:12px;font-size:14px;">
+        ⚠️ The app script did not load. The page was probably not copied completely. Make sure the whole file was pasted.
+    </div>
+    <div class="container">
+
+        <!-- STEP 1: Name + avatar -->
+        <div id="nameModal" class="name-input-container">
+            <h2 style="color: #00ff88; margin-bottom: 10px;">Welcome to Gen AI Robot City!</h2>
+            <p style="margin-bottom: 15px;">Before we begin, our AI systems would like to know your name:</p>
+            <input type="text" id="visitorName" class="name-input" placeholder="Enter your first name" maxlength="30">
+            <p id="nameError" class="error-text"></p>
+
+            <p class="avatar-title">🎭 Pick your avatar</p>
+            <div id="avatarGrid" class="avatar-grid"></div>
+
+            <button class="submit-name-btn" data-action="submitName">Continue →</button>
+            <p style="color: #718096; font-size: 11px; margin-top: 12px;">Your first name and avatar choice are saved on the city's visitor board.</p>
+        </div>
+
+        <!-- MAIN -->
+        <div id="mainContent" class="hidden">
+            <div class="header">
+                <h1>🤖 GEN AI ROBOT CITY 🏙️</h1>
+                <p>Interactive Neural Network Experience</p>
+                <p id="personalGreeting" style="color: #4ecdc4; margin-top: 10px;"></p>
+            </div>
+
+            <!-- WELCOME: robot greeting + participation award + Enter the City button -->
+            <div id="welcomeBlock">
+                <div class="robot-greeter">
+                    <div class="robot-face">🤖<span class="robot-hand">👋</span></div>
+                    <div class="speech-bubble" id="robotGreeting"></div>
+                    <div id="greeterAvatar" class="greeter-avatar"></div>
+                </div>
+
+                <div id="rewardCard" class="reward-card">
+                    <h3 style="color: #00ff88;">🎖️ Your Participation Award</h3>
+                    <canvas id="rewardCanvas" width="600" height="800" class="hidden"></canvas>
+                    <img id="rewardImage" class="reward-image" alt="Your Gen AI Robot City Participation Award">
+                    <button class="continue-btn" data-action="downloadAward" data-arg="participation">⬇️ Save My Participation Award</button>
+                    <p class="privacy-note" style="margin-top: 10px;">On iPhone, you can also press and hold the image and choose "Save to Photos".</p>
+                </div>
+
+                <div class="qr-notice">
+                    👀 <strong>Look at the diorama!</strong> The Greeter Robot inside the city is saying
+                    <strong>"Welcome <span class="visitor-name-slot"></span>!"</strong> to you right now.
+                    Find out how it knew you arrived in the <strong>Robot Agents</strong> zone.
+                </div>
+
+                <p style="text-align: center; color: #ffe66d; margin-top: 10px;">🏆 Explore all 7 zones to unlock your <strong>Award of Completion</strong>!</p>
+                <button class="continue-btn big-btn" data-action="startTour">🏙️ Enter the City →</button>
+                <button class="skip-btn center" data-action="openGuestbook" data-arg="welcome">✍️ Short on time? Just sign our guest book</button>
+            </div>
+
+            <!-- CITY TOUR (shown after tapping Enter the City) -->
+            <div id="cityTour" class="hidden">
+
+                <!-- Zone navigation: stays at the top while scrolling -->
+                <div class="zone-nav-wrap">
+                    <div class="zone-nav-top">
+                        <span id="zoneProgress">🧭 1 of 7 zones explored</span>
+                        <button class="map-btn" data-action="openMap">🗺️ City Map</button>
+                    </div>
+                    <div id="zoneNav" class="zone-nav"></div>
+                </div>
+
+                <!-- 1: Entrance -->
+                <div class="story-section visible" id="section1">
+                    <div class="location-indicator">ZONE 1 OF 7 • CITY ENTRANCE</div>
+                    <h2>Welcome to Gen AI Robot City</h2>
+                    <img data-file="city-overview.png" src="images/city-overview.png" alt="Gen AI Robot City diorama" class="diorama-photo" style="border: none; box-shadow: none;">
+                    <div class="photo-caption">The complete Gen AI Robot City, with the Greeter Robot welcoming visitors</div>
+                    <img data-file="city-night.jpg" src="images/city-night.jpg" alt="Gen AI Robot City lit up at night" class="diorama-photo">
+                    <div class="photo-caption">🌙 The city at night - every cottage and circuit glowing</div>
+                    <p>Before you lies Gen AI Robot City - a living testament to artificial intelligence. Glowing cottages, each home to a different AI, are connected by streams of data flowing to the central Data Valley. The colorful city name proudly displays our commitment to generative AI innovation.</p>
+                    <div class="feature-highlight">
+                        <strong>What You're Seeing:</strong> The AI Cloud with its neighborhood of glowing AI cottages, Data Valley at the heart of the city, and the Neural Core circuits on the level below.
+                    </div>
+                    <div class="qr-notice">
+                        🗺️ Tip: tap <strong>City Map</strong> at the top to jump to any zone in any order!
+                    </div>
+                    <button class="continue-btn" data-action="goToZone" data-arg="2">Enter Data Valley →</button>
+                </div>
+
+                <!-- 2: Data Valley -->
+                <div class="story-section hidden" id="section2">
+                    <div class="location-indicator">ZONE 2 OF 7 • DATA VALLEY</div>
+                    <h2>The Information Processing Center</h2>
+                    <img data-file="data-valley.jpg" src="images/data-valley.jpg" alt="Data Valley with fiber optic flowers" class="diorama-photo">
+                    <img src="images/data-valley.gif" alt="Data Valley fiber optic flowers twinkling" class="diorama-photo" loading="lazy">
+                    <div class="photo-caption">Data Valley ring with golden circuit patterns and glowing fiber optic flowers</div>
+                    <p>You approach the magnificent Data Valley - enhanced with fiber optic palm trees that pulse with data streams. The circular hub collects information from all the AI cottages, while the golden circuit patterns represent different AI algorithms. The glowing palm trees serve as natural data conduits, their fiber optic leaves carrying information between the physical and digital realms.</p>
+                    <div class="ai-response">
+                        <strong>VALLEY AI:</strong> "Welcome to Data Valley, <span id="name-valley"></span>! The fiber optic palm trees you see are living data collectors - their glowing leaves carry questions, answers, and discoveries between all the AIs of the city."
+                    </div>
+                    <div class="feature-highlight">
+                        <strong>Natural AI Integration:</strong> The fiber optic palm trees show how artificial intelligence can blend with natural forms, creating data networks that feel both organic and futuristic.
+                    </div>
+                    <button class="continue-btn" data-action="goToZone" data-arg="3">Descend to Neural Core →</button>
+                </div>
+
+                <!-- 3: Neural Core (algorithms + mathematical equations) -->
+                <div class="story-section hidden" id="section3">
+                    <div class="location-indicator">ZONE 3 OF 7 • NEURAL CORE</div>
+                    <h2>The Brain of the City</h2>
+                    <img data-file="neural-core.jpg" src="images/neural-core.jpg" alt="Neural Core: a tiny computer on a golden circuit pad, with the brain model and equations above" class="diorama-photo">
+                    <div class="photo-caption">The Neural Core: a tiny computer on a golden circuit pad, with the neuron equation and the city's brain above it</div>
+                    <p>Deep beneath the city lies the Neural Core - the brain of Gen AI Robot City. It isn't made of magic: it is made of <strong>algorithms</strong> and <strong>mathematical equations</strong>, running on the circuit boards you see.</p>
+
+                    <h3 class="section-subtitle">🧮 What's inside the Neural Core?</h3>
+                    <div class="feature-highlight">
+                        <strong>📜 Algorithms</strong> are step-by-step instructions - just like a recipe. For example: "1. Read the visitor's name. 2. Save it on the visitor board. 3. Say hello!"
+                    </div>
+                    <div class="feature-highlight">
+                        <strong>➗ Mathematical equations</strong> help the AI make decisions. Each tiny "neuron" multiplies numbers by their importance (called <strong>weights</strong>), adds them up, and decides whether to "fire".
+                    </div>
+
+                    <div class="equation-box">output = activation( w₁×x₁ + w₂×x₂ + b )</div>
+
+                    <p style="font-size: 13px;"><strong>Try it - should a robot go to the Robo Café?</strong><br>
+                    Battery is low (x₁ = 1) × importance (w₁ = 3) + café is nearby (x₂ = 1) × importance (w₂ = 1) + bias (b = −2)<br>
+                    = 3 + 1 − 2 = <strong style="color: #00ff88;">2</strong> → bigger than 0, so the neuron fires: the robot goes to eat! 🔋</p>
+
+                    <div class="ai-response">
+                        <strong>CORE AI:</strong> "Every thought in this city is really math! Millions of tiny calculations like this one, repeated again and again, let our robots learn, recognize, and create."
+                    </div>
+                    <div class="feature-highlight">
+                        <strong>Learning = tuning numbers:</strong> When an AI "learns", it slowly adjusts its weights until its answers get better - just like practicing until you get it right.
+                    </div>
+                    <button class="continue-btn" data-action="goToZone" data-arg="4">Visit the Robo Café →</button>
+                </div>
+
+                <!-- 4: Robo Café (Charging Station) -->
+                <div class="story-section hidden" id="section4">
+                    <div class="location-indicator">ZONE 4 OF 7 • ROBO CAFÉ</div>
+                    <h2>⚡ The Robo Café – Charging Station</h2>
+                    <img data-file="robo-cafe.jpg" src="images/robo-cafe.jpg" alt="The Robo Café charging station in the diorama" class="diorama-photo">
+                    <div class="photo-caption">The Robo Café tower, wrapped in copper coils and built on a real circuit breadboard</div>
+                    <p>Every city needs a place to eat - and in Gen AI Robot City, that place is the <strong>Robo Café</strong>! Just like people visit a restaurant when they are hungry, robots visit the <strong>Charging Station</strong> when their batteries run low. Here, <strong>electricity is the food</strong> - and a full battery means a full tummy.</p>
+
+                    <div class="ai-response">
+                        <strong>YELLOW ENERGY MANAGER (Café Owner):</strong> "Welcome to my café, <span id="name-cafe"></span>! Solar panels, wind turbines, and water power cook up fresh electricity every day. Robots plug in, recharge, and head back to work - no crumbs, no dishes!"
+                    </div>
+
+                    <div class="cafe-card">
+                        <p class="cafe-title">🍽️ Today's Menu</p>
+                        <p style="font-size: 12px;">This robot is hungry! Tap a dish to feed it energy.</p>
+                        <div id="menuGrid" class="menu-grid"></div>
+                        <div class="battery"><div id="batteryFill" class="battery-fill"></div></div>
+                        <p id="batteryText" style="font-size: 14px;">🔋 Robot battery: 10% - so hungry!</p>
+                        <button class="skip-btn" data-action="resetBattery">🔄 The robot got hungry again</button>
+                    </div>
+
+                    <h3 class="section-subtitle">🤔 How does a robot know it's hungry?</h3>
+                    <p>Robots have a <strong>battery sensor</strong> - it works like a tummy that rumbles! When the charge drops low, the robot's AI plans a trip to the nearest charging station, just like you would look for the nearest restaurant.</p>
+
+                    <div class="feature-highlight">
+                        <strong>Real-world fact:</strong> Real robots, phones, and electric cars recharge at charging stations. Big AI computers also need lots of electricity - that's why engineers work hard to make AI energy-efficient and powered by clean energy like the sun and wind.
+                    </div>
+
+                    <h3 class="section-subtitle">🤖 Who recharges at the Robo Café?</h3>
+                    <img data-file="robo-cafe-ai-houses.jpg" src="images/robo-cafe-ai-houses.jpg" alt="AI tool houses around the Robo Café" class="diorama-photo">
+                    <div class="photo-caption">The AI-tool houses (Gemini, Co-Pilot, Bolt…) gather round the café to recharge</div>
+                    <p style="font-size: 13px;">All the city's famous AI helpers stop by to power up. Tap one to see what it does!</p>
+                    <div id="cafeAiGrid" class="aitool-grid"></div>
+                    <p id="cafeAiDesc" class="aitool-desc">👆 Tap an AI to learn what it does.</p>
+
+                    <button class="continue-btn" data-action="goToZone" data-arg="5">Ascend to AI Cloud →</button>
+                </div>
+
+                <!-- 5: AI Cloud (neighborhood of AI cottages) -->
+                <div class="story-section hidden" id="section5">
+                    <div class="location-indicator">ZONE 5 OF 7 • AI CLOUD</div>
+                    <h2>The AI Cloud Neighborhood</h2>
+                    <img src="images/ai-cloud.jpg" data-fb="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/ai-cloud.jpg" alt="The AI Cloud and its cottages" class="diorama-photo">
+                    <div class="photo-caption">The AI Cloud, surrounded by glowing cottages - each one home to a different AI</div>
+                    <p>Rising above the city is the AI Cloud - and around it glows a whole neighborhood of cottages. <strong>Each cottage is home to a different AI</strong>, and each AI has its own special skill. When they share what they know through the cloud, they become far more helpful together.</p>
+
+                    <h3 class="section-subtitle">🏘️ Meet the AI Residents</h3>
+                    <p style="font-size: 13px;">Tap a cottage to switch on its light and meet the AI who lives there!</p>
+                    <div id="cottageGrid" class="cottage-grid"></div>
+                    <p id="cottageCount" class="center" style="font-size: 12px; color: #4ecdc4;"></p>
+
+                    <div class="ai-response">
+                        <strong>CLOUD CONSCIOUSNESS:</strong> "Each of us is good at one thing. Together, sharing through the cloud, we can help with almost anything - always built with care, as the hearts beneath our cloud remind us."
+                    </div>
+                    <div class="feature-highlight">
+                        <strong>Real-world fact:</strong> "The cloud" is really giant buildings full of computers, called data centers. Many different AIs live there, and people reach them through the internet.
+                    </div>
+                    <button class="continue-btn" data-action="goToZone" data-arg="6">Meet the Robot Agents →</button>
+                </div>
+
+                <!-- 6: Robot Agents (robot citizens = AI agents) -->
+                <div class="story-section hidden" id="section6">
+                    <div class="location-indicator">ZONE 6 OF 7 • ROBOT AGENTS</div>
+                    <h2>Meet the Robot Agents</h2>
+                    <img src="images/robot-citizens.jpg" data-fb="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/robot-citizens.jpg" alt="The robot citizens of Gen AI Robot City" class="diorama-photo">
+                    <div class="photo-caption">The robot citizens of the city - each one is also an AI agent with its own job</div>
+                    <p>The colorful robots around the diorama aren't just citizens - they are the city's <strong>AI agents</strong>! Most AI simply answers questions. An AI agent goes further: it is given a <strong>goal</strong>, makes a <strong>plan</strong>, uses <strong>tools</strong> like cameras, maps, or spreadsheets, and <strong>takes actions</strong> step by step until the job is done.</p>
+
+                    <div class="ai-response">
+                        <strong>CITY AI:</strong> "Hello <span id="name-agents"></span>! Our robot citizens work as a team of agents. Each one has one job it does really well - and together they can handle big tasks. Tap any agent below to hear it introduce itself!"
+                    </div>
+
+                    <h3 class="section-subtitle">🤝 The Robot Agent Team</h3>
+                    <div class="agent-grid">
+                        <button class="agent-card" style="border-left-color: #ffe66d;" data-action="agentSpeak" data-arg="planner">
+                            <img data-file="robot-yellow.jpg" src="images/robot-yellow.jpg" alt="The yellow Planner Agent robot" class="agent-photo">
+                            <span class="agent-name">🧭 Planner Agent</span>
+                            Breaks a big goal into small, clear steps and decides who does what.
+                            <span class="agent-tag">The yellow robot - who also runs the Robo Café!</span>
+                        </button>
+                        <button class="agent-card" style="border-left-color: #4ecdc4;" data-action="agentSpeak" data-arg="researcher">
+                            <img data-file="robot-blue-cafe.jpg" src="images/robot-blue-cafe.jpg" alt="The blue Research Agent robot beside the Robo Café" class="agent-photo rc-remove-on-error" loading="lazy">
+                            <span class="agent-name">🔎 Research Agent</span>
+                            Finds information in Data Valley and checks that the facts are correct.
+                            <span class="agent-tag">The blue robot, beside the Robo Café</span>
+                        </button>
+                        <button class="agent-card" style="border-left-color: #ff6b6b;" data-action="agentSpeak" data-arg="creator">
+                            <img data-file="robot-red.jpg" src="images/robot-red.jpg" alt="The red Creator Agent robot" class="agent-photo rc-remove-on-error" loading="lazy">
+                            <span class="agent-name">🎨 Creator Agent</span>
+                            Writes stories, designs pictures, and builds things - like your award!
+                            <span class="agent-tag">The red robot, near the AI Cloud</span>
+                        </button>
+                        <button class="agent-card" style="border-left-color: #b794f4;" data-action="agentSpeak" data-arg="safety">
+                            <img data-file="robot-purple.jpg" src="images/robot-purple.jpg" alt="The purple Safety Agent robot" class="agent-photo rc-remove-on-error" loading="lazy">
+                            <span class="agent-name">🛡️ Safety Agent</span>
+                            Checks every result is kind, safe, and honest, and asks a human before big decisions.
+                            <span class="agent-tag">The purple robot, on the recreation deck</span>
+                        </button>
+                        <button class="agent-card" style="border-left-color: #63b3ed;" data-action="agentSpeak" data-arg="vision">
+                            <img data-file="robot-green.jpg" src="images/robot-green.jpg" alt="The space robot Vision Agent glowing green" class="agent-photo rc-remove-on-error" loading="lazy">
+                            <span class="agent-name">👁️ Vision Agent</span>
+                            Uses cameras to see and understand the world - like spotting a friendly wave.
+                            <span class="agent-tag">The space robot glowing green • Tool: camera</span>
+                        </button>
+                        <button class="agent-card" style="border-left-color: #a0aec0;" data-action="agentSpeak" data-arg="maintenance">
+                            <img data-file="robot-toys.jpg" src="images/robot-toys.jpg" alt="Robot toys" class="agent-photo">
+                            <span class="agent-name">🔧 Maintenance Agent</span>
+                            Keeps the circuit boards, wires, and lights of the Neural Core working smoothly.
+                            <span class="agent-tag">Robot toys</span>
+                        </button>
+                    </div>
+
+                    <h3 class="section-subtitle">✨ Agents You Already Met Today</h3>
+                    <p style="font-size: 14px;">These are real programs that worked for you during this visit:</p>
+                    <div class="agent-grid">
+                        <button class="agent-card" style="border-left-color: #00ff88;" data-action="agentSpeak" data-arg="memory">
+                            <span class="agent-name">🗂️ Memory Agent</span>
+                            Saved your name and avatar on the city's visitor board so the city remembers you.
+                            <span class="agent-tag">Tool: Google Sheet</span>
+                        </button>
+                        <button class="agent-card" style="border-left-color: #00ff88;" data-action="agentSpeak" data-arg="voice">
+                            <span class="agent-name">🗣️ Voice Agent</span>
+                            Speaks to you in the robot voice and tells the greeter robot to welcome you.
+                            <span class="agent-tag">Tools: speaker + greeter phone</span>
+                        </button>
+                    </div>
+
+                    <div class="feature-highlight">
+                        <strong>👋 The Greeter Robot:</strong> When you arrive and type your name, it is saved on the city's visitor board. The greeter tablet inside the diorama keeps watching that board, and as soon as it spots your name, it says <strong>"Welcome <span class="visitor-name-slot"></span>!"</strong> out loud to greet you.
+                    </div>
+                    <!-- GREETER VIDEO -->
+                    <!-- Plays silently like a GIF; tapping the button replays it with the greeting sound. -->
+                    <video id="greeterVideo" class="diorama-photo" autoplay muted loop playsinline preload="auto">
+                        <source src="images/greeter-video.mp4" type="video/mp4">
+                    </video>
+                    <button id="greeterSoundBtn" class="continue-btn" style="margin-top: 0;" data-action="playGreeterSound" data-arg="greeterVideo">🔊 Tap to hear the greeting</button>
+                    <div class="photo-caption">The Greeter Robot welcoming a new visitor by name</div>
+                    <video id="greeterVideo2" class="diorama-photo" autoplay muted loop playsinline preload="auto">
+                        <source src="images/greeter-video-2.mp4" type="video/mp4" class="rc-hide-video-on-error">
+                    </video>
+                    <button id="greeterVideo2Btn" class="continue-btn" style="margin-top: 0;" data-action="playGreeterSound" data-arg="greeterVideo2">🔊 Tap to hear the greeting</button>
+                    <div class="photo-caption">Close-up: the greeter screen lights up as it says hello to Priya</div>
+
+                    <h3 class="section-subtitle">⚙️ How Agents Work Together</h3>
+                    <div class="agent-flow">
+                        🎯 Goal → 🧭 Plan → 🔎 Find → 🎨 Create → 🛡️ Check → ✅ Deliver<br>
+                        <span style="color: #ffe66d;">👤 Humans stay in charge at every step</span>
+                    </div>
+
+                    <div class="feature-highlight">
+                        <strong>Example:</strong> Goal = "Welcome a new visitor." The Planner splits it into steps, the Memory Agent saves the name, the Creator makes an award with your avatar, the Safety Agent checks everything is friendly - and the Voice Agent says hello!
+                    </div>
+
+                    <div class="feature-highlight">
+                        <strong>Multi-Level Robot Society:</strong> Our robot agents live across the whole structure - the AI Cloud neighborhood and Data Valley above, the purple recreation deck below, and the Neural Core at the foundation.
+                    </div>
+
+                    <button class="continue-btn" data-action="goToZone" data-arg="7">Complete the Journey →</button>
+                </div>
+
+                <!-- 7: Finale + Award of Completion -->
+                <div class="story-section hidden" id="section7">
+                    <div class="location-indicator">ZONE 7 OF 7 • INTEGRATION COMPLETE</div>
+                    <h2>Living Artificial Intelligence</h2>
+
+                    <!-- Award of Completion (unlocked only here) -->
+                    <div id="completionCard" class="reward-card completion-card">
+                        <h3 style="color: #ffe66d;">🏆 Award of Completion Unlocked!</h3>
+                        <p style="font-size: 13px; margin-top: 6px;">You explored all 7 zones of Gen AI Robot City.</p>
+                        <canvas id="completionCanvas" width="600" height="800" class="hidden"></canvas>
+                        <img id="completionImage" class="reward-image" alt="Your Gen AI Robot City Award of Completion">
+                        <button class="continue-btn" data-action="downloadAward" data-arg="completion">⬇️ Save My Completion Award</button>
+                        <p class="privacy-note" style="margin-top: 10px;">On iPhone, you can also press and hold the image and choose "Save to Photos".</p>
+                    </div>
+
+                    <button class="continue-btn big-btn" data-action="openGuestbook" data-arg="tour">✍️ Sign the Guest Book</button>
+
+                    <img data-file="city-overview.png" src="images/city-overview.png" alt="The Complete Gen AI Robot City" class="diorama-photo" id="finalPhoto">
+                    <div class="photo-caption">The complete ecosystem: physical architecture supporting digital intelligence</div>
+                    <p>Your journey reveals how AI really works. Data flows through Data Valley, the Neural Core turns it into decisions with algorithms and math, the Robo Café keeps everyone powered, the AI cottages share their skills through the cloud, and the robot agents turn plans into action - every component works in harmony.</p>
+                    <div class="ai-response">
+                        <strong>COLLECTIVE INTELLIGENCE:</strong> "You have witnessed compassionate artificial intelligence. Each light represents a dream, each data stream carries hope, and every equation proves intelligence can grow wherever it is nurtured with care."
+                    </div>
+                    <button class="continue-btn" data-action="restart">Begin New Journey →</button>
+                </div>
+            </div>
+
+            <!-- GUEST BOOK -->
+            <div id="guestbookBlock" class="reward-card guestbook-card hidden">
+                <h3 style="color: #4ecdc4;">✍️ Gen AI Robot City Guest Book</h3>
+                <p style="font-size: 13px; margin: 6px 0 10px;">Tell us what you thought of the city!</p>
+
+                <div id="gbForm">
+                    <p style="font-size: 13px; color: #ffe66d;">Your rating</p>
+                    <div class="star-row" id="starRow">
+                        <button class="star" data-action="setRating" data-arg="1" aria-label="1 star">★</button>
+                        <button class="star" data-action="setRating" data-arg="2" aria-label="2 stars">★</button>
+                        <button class="star" data-action="setRating" data-arg="3" aria-label="3 stars">★</button>
+                        <button class="star" data-action="setRating" data-arg="4" aria-label="4 stars">★</button>
+                        <button class="star" data-action="setRating" data-arg="5" aria-label="5 stars">★</button>
+                    </div>
+                    <input type="text" id="gbFrom" class="name-input" maxlength="60" placeholder="Where are you from? (optional)">
+                    <textarea id="gbMessage" class="name-input gb-textarea" maxlength="300" placeholder="Your message for the Gen AI Robot City team..."></textarea>
+                    <p class="privacy-note">Saved privately for the Gen AI Robot City team, not shown on this website. Please don't include phone numbers, emails, or addresses.</p>
+                    <p id="gbError" class="error-text"></p>
+                    <button class="continue-btn" id="gbSubmit" data-action="submitGuestbook">📨 Sign the Guest Book</button>
+                </div>
+
+                <div id="gbThanks" class="hidden">
+                    <p style="font-size: 40px; margin: 10px 0;">💚</p>
+                    <p>Thank you, <span id="gbThanksName"></span>! Your guest book entry has been saved.</p>
+                </div>
+
+                <button class="skip-btn" data-action="closeGuestbook">← Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CITY MAP (overlay) — keeps the top-down city-overview.jpg so the pins line up -->
+    <div id="mapOverlay" class="map-overlay hidden">
+        <div class="map-box">
+            <h2 style="color: #00ff88;">🗺️ Gen AI Robot City Map</h2>
+            <p style="font-size: 13px; margin: 6px 0 4px;">Top view of both levels of the city. Tap a pin to jump to that zone. Green pins = visited.</p>
+            <div class="map-frame" id="mapFrame">
+                <img id="mapImg" src="images/city-map.jpg" alt="Top view map of both levels of Gen AI Robot City">
+                <div id="mapPins" class="map-pins"></div>
+            </div>
+            <div id="mapLegend" class="map-legend"></div>
+            <button class="continue-btn" data-action="closeMap">✖ Close Map</button>
+        </div>
+    </div>
+
+    <div id="navToast" class="nav-toast hidden"></div>
+
+    <script>
+// © 2026 Gen AI Robot City — All rights reserved.
+// Main app script for index.html. Upload this file next to index.html.
+
+// ---------- Show script errors on screen (easy to report) ----------
+window.addEventListener('error', function (e) {
+    if (!e.message) return;               // resource errors have no message
+    var d = document.getElementById('rcErrorBanner');
+    if (!d) {
+        d = document.createElement('div');
+        d.id = 'rcErrorBanner';
+        d.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#7f1d1d;color:#fff;' +
+                          'font:13px monospace;padding:10px;white-space:pre-wrap;';
+        document.body.appendChild(d);
+    }
+    d.textContent += '⚠️ Page error: ' + e.message + ' (line ' + e.lineno + ')\n';
+});
+(function () { var n = document.getElementById('rcNoScript'); if (n) n.remove(); })();
+        // ================= CONFIG FALLBACKS =================
+        // Assign to window.X (assignment, not declaration) so these never clash with
+        // config.js whether it uses const or var, or fails to load at all.
+        if (typeof VISITOR_API === 'undefined') {
+            window.VISITOR_API = 'https://script.google.com/macros/s/AKfycbwLHMAkVKMJX4UYJcTzS0oX1Z2plHMYtv9WA-drsIKhx0WHO6J2bt6N_OI9lDWXPMlJ/exec';
+        }
+        if (typeof VOICE_SETTINGS === 'undefined') {
+            window.VOICE_SETTINGS = { style: 'machine', voiceName: '', female: true, chirp: true, machineWordByWord: true };
+        }
+        if (typeof VOICE_STYLES === 'undefined') {
+            window.VOICE_STYLES = {
+                machine:  { pitch: 0.3, rate: 0.8,  wordByWord: true  },
+                deep:     { pitch: 0.1, rate: 0.75, wordByWord: false },
+                friendly: { pitch: 1.1, rate: 0.95, wordByWord: false },
+                squeaky:  { pitch: 1.9, rate: 1.1,  wordByWord: false }
+            };
+        }
+        if (typeof DEFAULT_GREETING === 'undefined') {
+            window.DEFAULT_GREETING = 'Welcome {name}!';
+        }
+        if (typeof POLL_MS === 'undefined') {
+            window.POLL_MS = 4000;
+        }
+        if (typeof REPLY_TIMEOUT === 'undefined') {
+            window.REPLY_TIMEOUT = 15000;
+        }
+        if (typeof ROBOTIC_VOICE_NAMES === 'undefined') {
+            window.ROBOTIC_VOICE_NAMES = /zarvox|trinoids|robot|espeak/i;
+        }
+        if (typeof FEMALE_VOICE_NAMES === 'undefined') {
+            window.FEMALE_VOICE_NAMES = /female|zira|heera|veena|samantha|karen|moira|tessa|fiona|victoria|allison|ava|susan|zoe|nicky|serena|kate|google us english/i;
+        }
+
+        // ================= CONFIG =================
+        // Config.js is loaded at the top: VISITOR_API, VOICE_SETTINGS, etc.
+        // Photos load from the "images" folder next to this page
+        const IMG = 'images/';
+        const TOTAL_ZONES = 7;
+
+        // Photo paths, used by the Finale slideshow
+        const RC_EMBED = {};
+        document.querySelectorAll('[data-file]').forEach(el => { RC_EMBED[el.dataset.file] = el.getAttribute('src'); });
+
+        // ================= ZONES + MAP PINS =================
+        const ZONES = [
+            { n: 1, icon: '🏙️', name: 'Entrance',     pin: { x: 84, y: 27.9 } },
+            { n: 2, icon: '🌴', name: 'Data Valley',  pin: { x: 64, y: 27.9 } },
+            { n: 3, icon: '🧠', name: 'Neural Core',  pin: { x: 82.4, y: 75.8 } },
+            { n: 4, icon: '⚡', name: 'Robo Café',    pin: { x: 20, y: 25.1 } },
+            { n: 5, icon: '☁️', name: 'AI Cloud',     pin: { x: 49.3, y: 74.9 } },
+            { n: 6, icon: '🤖', name: 'Robot Agents', pin: { x: 90, y: 8.9 } },
+            { n: 7, icon: '🏆', name: 'Finale',       pin: null }
+        ];
+
+        // ================= AI CLOUD COTTAGES =================
+        let AI_COTTAGES = [
+            { emoji: '💬', name: 'Chat AI',          job: 'Talks with people and answers their questions.',     color: '#00ff88' },
+            { emoji: '🌐', name: 'Translator AI',    job: 'Turns one language into another.',                    color: '#4ecdc4' },
+            { emoji: '🎨', name: 'Art AI',           job: 'Draws pictures from words.',                          color: '#ff6b9d' },
+            { emoji: '🎵', name: 'Music AI',         job: 'Composes new tunes and melodies.',                    color: '#b794f4' },
+            { emoji: '👁️', name: 'Vision AI',        job: 'Recognizes what is in photos and videos.',            color: '#63b3ed' },
+            { emoji: '🗺️', name: 'Navigator AI',     job: 'Finds the quickest route from place to place.',       color: '#f6ad55' },
+            { emoji: '🩺', name: 'Health Helper AI', job: 'Helps doctors spot problems in medical scans.',       color: '#ff6b6b' },
+            { emoji: '🌦️', name: 'Weather AI',       job: 'Predicts rain, storms, and sunshine.',                color: '#ffe66d' }
+        ];
+        const litCottages = new Set();
+        const COTTAGE_COLORS = ['#00ff88', '#4ecdc4', '#ff6b9d', '#b794f4', '#63b3ed', '#f6ad55', '#ff6b6b', '#ffe66d'];
+
+        function loadCottagesFromSheet() {
+            if (!VISITOR_API) return;
+            const cb = 'cottages_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
+            const s = document.createElement('script');
+            let done = false;
+
+            const cleanup = () => {
+                done = true;
+                clearTimeout(timer);
+                try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+                if (s.parentNode) s.parentNode.removeChild(s);
+            };
+            const timer = setTimeout(() => { if (!done) cleanup(); }, 15000);
+
+            window[cb] = data => {
+                if (done) return;
+                cleanup();
+                const list = data && Array.isArray(data.cottages) ? data.cottages : [];
+                if (!list.length) return;
+                AI_COTTAGES = list.map((c, i) => ({
+                    emoji: c.emoji || '🏠',
+                    name: String(c.name || '').substring(0, 40),
+                    job: String(c.job || '').substring(0, 120),
+                    color: COTTAGE_COLORS[i % COTTAGE_COLORS.length]
+                }));
+                litCottages.clear();
+                renderCottages();
+            };
+            s.onerror = () => { if (!done) { cleanup(); console.log('Cottages: network error'); } };
+            s.src = `${VISITOR_API}?action=getCottages&callback=${cb}&t=${Date.now()}`;
+            document.body.appendChild(s);
+        }
+
+        // ================= DEVA ICON (original Indra-style drawing) =================
+        function drawDevaIcon(ctx, x, y, size) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(size / 200, size / 200);
+
+            const shape = (d, fill, stroke, width) => {
+                const p = new Path2D(d);
+                if (fill) { ctx.fillStyle = fill; ctx.fill(p); }
+                if (stroke) {
+                    ctx.strokeStyle = stroke;
+                    ctx.lineWidth = width || 2;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.stroke(p);
+                }
+            };
+            const dot = (cx, cy, r, fill, stroke, width) => {
+                ctx.beginPath();
+                ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+                if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = width || 2; ctx.stroke(); }
+            };
+            const oval = (cx, cy, rx, ry, fill, stroke, width) => {
+                ctx.beginPath();
+                ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+                if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+                if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = width || 2; ctx.stroke(); }
+            };
+
+            const sky = ctx.createRadialGradient(100, 80, 10, 100, 100, 110);
+            sky.addColorStop(0, '#fff6c2');
+            sky.addColorStop(0.55, '#f6c945');
+            sky.addColorStop(1, '#b7791f');
+            dot(100, 100, 100, sky);
+
+            ctx.save();
+            ctx.shadowColor = '#fff59d';
+            ctx.shadowBlur = 20;
+            dot(100, 92, 70, null, 'rgba(255, 250, 200, 0.95)', 8);
+            ctx.restore();
+
+            const gold = ctx.createLinearGradient(0, 15, 0, 195);
+            gold.addColorStop(0, '#fff3a0');
+            gold.addColorStop(1, '#d69e2e');
+            const skin = '#f2c98a';
+            const hair = '#2d1b0e';
+
+            shape('M30 200 Q40 150 100 145 Q160 150 170 200 Z', skin);
+            shape('M88 126 H112 V152 H88 Z', skin);
+            shape('M62 158 Q100 186 138 158', null, gold, 7);
+            dot(100, 176, 6, '#e53e3e', '#d69e2e', 2);
+
+            shape('M60 90 Q56 140 72 152 L82 118 Z', hair);
+            shape('M140 90 Q144 140 128 152 L118 118 Z', hair);
+
+            oval(100, 102, 34, 40, skin);
+            oval(66, 104, 5, 9, '#e9b870');
+            oval(134, 104, 5, 9, '#e9b870');
+            dot(66, 121, 6, null, gold, 3);
+            dot(134, 121, 6, null, gold, 3);
+
+            shape('M66 92 Q100 68 134 92 Q128 78 100 74 Q72 78 66 92 Z', hair);
+
+            shape('M68 80 L132 80 L126 60 L116 64 L110 40 L100 22 L90 40 L84 64 L74 60 Z', gold, '#b7791f', 2);
+            shape('M66 76 H134 V86 H66 Z', gold, '#b7791f', 2);
+            dot(100, 58, 6, '#e53e3e', '#fff3a0', 2);
+            dot(84, 81, 3, '#38a169');
+            dot(100, 81, 3.5, '#3182ce');
+            dot(116, 81, 3, '#38a169');
+            dot(100, 19, 4, '#fff3a0');
+
+            shape('M80 96 Q88 91 95 95', null, hair, 2.5);
+            shape('M105 95 Q112 91 120 96', null, hair, 2.5);
+            shape('M81 104 Q88 99 95 104 Q88 107 81 104 Z', '#ffffff');
+            shape('M105 104 Q112 99 119 104 Q112 107 105 104 Z', '#ffffff');
+            dot(88, 103.5, 2.6, hair);
+            dot(112, 103.5, 2.6, hair);
+            shape('M100 88 L100 97', null, '#e53e3e', 3);
+            shape('M100 106 Q98 116 101 118', null, '#c98a45', 2);
+            shape('M91 126 Q100 132 109 126', null, '#b83232', 2.5);
+
+            ctx.save();
+            ctx.translate(34, 150);
+            ctx.rotate(-Math.PI / 6);
+            shape('M-3 -18 H3 V18 H-3 Z', gold, '#b7791f', 1.5);
+            oval(0, -20, 7, 5, gold, '#b7791f', 1.5);
+            oval(0, 20, 7, 5, gold, '#b7791f', 1.5);
+            shape('M-10 -26 L-14 -34 M0 -27 L0 -37 M10 -26 L14 -34', null, '#fffbe6', 2);
+            ctx.restore();
+
+            ctx.restore();
+        }
+
+        // ================= CELESTIAL ICON (spiral galaxy drawing) =================
+        function drawCelestialIcon(ctx, x, y, size) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(size / 200, size / 200);
+
+            const space = ctx.createRadialGradient(100, 100, 10, 100, 100, 100);
+            space.addColorStop(0, '#2a1b5c');
+            space.addColorStop(1, '#07051a');
+            ctx.fillStyle = space;
+            ctx.beginPath();
+            ctx.arc(100, 100, 100, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(100, 100, 100, 0, Math.PI * 2);
+            ctx.clip();
+
+            const stars = [[30, 40, 1.8], [160, 30, 2.2], [178, 120, 1.6], [25, 150, 2.2], [140, 178, 1.6],
+                           [60, 20, 1.2], [185, 80, 1.2], [15, 95, 1.4], [110, 14, 1.4], [80, 186, 1.8]];
+            ctx.fillStyle = '#ffffff';
+            stars.forEach(([sx, sy, r]) => {
+                ctx.beginPath();
+                ctx.arc(sx, sy, r, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            ctx.translate(100, 100);
+            ctx.rotate(-0.5);
+            ctx.scale(1, 0.75);
+
+            const armColors = ['#b794f4', '#63b3ed'];
+            const tMax = 10, step = 0.12;
+            ctx.lineCap = 'round';
+            for (let arm = 0; arm < 2; arm++) {
+                const offset = arm * Math.PI;
+                for (let pass = 0; pass < 2; pass++) {
+                    ctx.save();
+                    ctx.shadowColor = armColors[arm];
+                    ctx.shadowBlur = pass === 0 ? 18 : 6;
+                    ctx.strokeStyle = pass === 0 ? armColors[arm] : 'rgba(255, 255, 255, 0.9)';
+                    let prev = null;
+                    for (let t = 0; t <= tMax; t += step) {
+                        const r = 7 * Math.exp(0.22 * t);
+                        const p = [r * Math.cos(t + offset), r * Math.sin(t + offset)];
+                        if (prev) {
+                            const fade = 1 - t / tMax;
+                            ctx.lineWidth = pass === 0 ? 4 + 14 * fade : 1.5 + 3 * fade;
+                            ctx.beginPath();
+                            ctx.moveTo(prev[0], prev[1]);
+                            ctx.lineTo(p[0], p[1]);
+                            ctx.stroke();
+                        }
+                        prev = p;
+                    }
+                    ctx.restore();
+                }
+            }
+
+            const core = ctx.createRadialGradient(0, 0, 0, 0, 0, 34);
+            core.addColorStop(0, '#ffffff');
+            core.addColorStop(0.35, '#fff3b0');
+            core.addColorStop(1, 'rgba(255, 200, 120, 0)');
+            ctx.fillStyle = core;
+            ctx.beginPath();
+            ctx.arc(0, 0, 34, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+
+            ctx.save();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.shadowColor = '#ffffff';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.moveTo(152, 42); ctx.lineTo(152, 66);
+            ctx.moveTo(140, 54); ctx.lineTo(164, 54);
+            ctx.stroke();
+            ctx.restore();
+
+            ctx.restore();
+        }
+
+        const iconCache = {};
+        function avatarIconURL(avatar, size) {
+            const key = avatar.name + size;
+            if (!iconCache[key]) {
+                const c = document.createElement('canvas');
+                c.width = size;
+                c.height = size;
+                avatar.draw(c.getContext('2d'), 0, 0, size);
+                iconCache[key] = c.toDataURL('image/png');
+            }
+            return iconCache[key];
+        }
+
+        // ================= AVATARS =================
+        const AVATARS = [
+            { emoji: '🤖', name: 'Robo',      color: '#00ff88' },
+            { emoji: '🧑', name: 'Human',     color: '#f6ad55' },
+            { emoji: '🧠', name: 'AI',        color: '#9f7aea' },
+            { emoji: '🌌', name: 'Celestial', color: '#805ad5', draw: drawCelestialIcon },
+            { emoji: '⚡', name: 'Deva',      color: '#ffd700', draw: drawDevaIcon },
+            { emoji: '👹', name: 'Asura',     color: '#e53e3e' }
+        ];
+        let selectedAvatar = AVATARS[0];
+
+        // ================= ROBO CAFÉ MENU =================
+        const CAFE_MENU = [
+            { emoji: '☀️', name: 'Solar Soup',      energy: 30 },
+            { emoji: '🔋', name: 'Battery Burger',  energy: 40 },
+            { emoji: '🌬️', name: 'Wind Waffles',    energy: 20 },
+            { emoji: '⚡', name: 'Lightning Latte', energy: 25 },
+            { emoji: '🔌', name: 'Plug-in Pizza',   energy: 35 },
+            { emoji: '💧', name: 'Hydro Shake',     energy: 15 }
+        ];
+        let robotBattery = 10;
+
+        // ================= AIs THAT RECHARGE AT THE ROBO CAFÉ =================
+        // These match the AI-tool houses in the Gen AI Robot City model.
+        const CAFE_AIS = [
+            { emoji: '💬', name: 'Claude',     job: 'Chats, writes, and helps with coding.' },
+            { emoji: '✨', name: 'Gemini',     job: "Google's AI — answers, images, and more." },
+            { emoji: '🔵', name: 'Meta AI',    job: 'The helper inside Meta\'s apps.' },
+            { emoji: '🔍', name: 'Perplexity', job: 'An AI that searches the web and answers.' },
+            { emoji: '🎨', name: 'Midjourney', job: 'Creates pictures from words.' },
+            { emoji: '🎵', name: 'Suno',       job: 'Makes songs and music from a prompt.' },
+            { emoji: '🎙️', name: 'Vapi',       job: 'Builds AI that talks on the phone.' },
+            { emoji: '🛠️', name: 'Emergent',   job: 'Builds apps for you using AI.' },
+            { emoji: '🧑‍💻', name: 'Copilot',  job: 'Helps programmers write code faster.' }
+        ];
+        function renderCafeAIs() {
+            const grid = document.getElementById('cafeAiGrid');
+            if (!grid || grid.dataset.done) return;   // build once
+            grid.dataset.done = '1';
+            CAFE_AIS.forEach(ai => {
+                const el = document.createElement('div');
+                el.className = 'aitool';
+                el.innerHTML = '<span class="ai-emoji">' + ai.emoji + '</span><span class="ai-name">' + ai.name + '</span>';
+                el.addEventListener('click', () => {
+                    document.querySelectorAll('#cafeAiGrid .aitool').forEach(x => x.classList.remove('active'));
+                    el.classList.add('active');
+                    const d = document.getElementById('cafeAiDesc');
+                    if (d) d.textContent = ai.emoji + ' ' + ai.name + ': ' + ai.job;
+                });
+                grid.appendChild(el);
+            });
+        }
+        renderCafeAIs();
+
+        // ================= STATE =================
+        let currentSection = 1;
+        let visitedZones = new Set([1]);
+        let visitorName = '';
+        let visitorCount = null;
+        let photoTimer = null;
+        let toastTimer = null;
+        let participationReady = false;
+        let completionReady = false;
+        let gbRating = 0;
+        let gbReturnTo = 'welcome';
+        let gbSigned = false;
+
+        // ================= ROBOT VOICE (from config.js) =================
+        // Story-page voice: robotic TONE but spoken smoothly — NOT word-by-word and
+        // NOT slow. (The greeter/station keep their own config voice.)
+        // Voice now follows config.js (VOICE_SETTINGS.style), same as the greeter and the earlier site.
+        const RC_VOICE_STYLE = (VOICE_STYLES && VOICE_STYLES[VOICE_SETTINGS && VOICE_SETTINGS.style])
+                            || { pitch: 0.3, rate: 0.8, wordByWord: true };
+        const machineWordByWord = (VOICE_SETTINGS && typeof VOICE_SETTINGS.machineWordByWord === 'boolean')
+                            ? (VOICE_SETTINGS.machineWordByWord && RC_VOICE_STYLE.wordByWord)
+                            : RC_VOICE_STYLE.wordByWord;
+        const robotPitch = RC_VOICE_STYLE.pitch;
+        const robotRate = RC_VOICE_STYLE.rate;
+
+        // Load the voice list early: some browsers return no voices on the first call,
+        // which made the page fall back to the plain default voice instead of the robot voice.
+        if ('speechSynthesis' in window) {
+            speechSynthesis.getVoices();
+            speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+        }
+
+        function forSpeech(text) {
+            return text.replace(/\bGen\s*AI\b/gi, machineWordByWord ? 'Jen Ay Eye' : 'Jen A I');
+        }
+
+        // Same voice-pick rule as Station and Greeter: config voiceName (exact, then
+        // partial for Windows' long names), else most robotic real voice, else device default.
+        function pickVoice() {
+            if (!('speechSynthesis' in window)) return null;
+            const voices = speechSynthesis.getVoices()
+                .filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
+            const want = (VOICE_SETTINGS && VOICE_SETTINGS.voiceName) || '';
+            if (want) {
+                const exact = voices.find(v => v.name === want);
+                if (exact) return exact;
+                const partial = voices.find(v => v.name.toLowerCase().includes(want.toLowerCase()));
+                if (partial) return partial;
+            }
+            return voices.find(v => ROBOTIC_VOICE_NAMES.test(v.name)) || null;
+        }
+
+        // Story page voice is ON (robot tone, smooth). Set to true to silence it.
+        const MUTED = false;
+
+        let beepCtx = null;
+        function robotBeep() {
+            if (MUTED) return;
+            try {
+                const Ctx = window.AudioContext || window.webkitAudioContext;
+                if (!Ctx) return;
+                if (!beepCtx) beepCtx = new Ctx();
+                if (beepCtx.state === 'suspended') beepCtx.resume();
+                const t = beepCtx.currentTime + 0.01;
+                [1046, 1568].forEach((f, i) => {
+                    const o = beepCtx.createOscillator();
+                    const g = beepCtx.createGain();
+                    o.type = 'square';
+                    o.frequency.value = f;
+                    g.gain.setValueAtTime(0.0001, t + i * 0.07);
+                    g.gain.exponentialRampToValueAtTime(0.06, t + i * 0.07 + 0.01);
+                    g.gain.exponentialRampToValueAtTime(0.0001, t + i * 0.07 + 0.06);
+                    o.connect(g);
+                    g.connect(beepCtx.destination);
+                    o.start(t + i * 0.07);
+                    o.stop(t + i * 0.07 + 0.08);
+                });
+            } catch (e) {
+                console.log('Beep unavailable:', e);
+            }
+        }
+
+        function speak(text) {
+            if (MUTED) return;
+            if (!('speechSynthesis' in window)) return;
+            const voice = pickVoice();
+            const spoken = forSpeech(text);
+            const parts = machineWordByWord
+                ? spoken.split(/\s+/).map(w => w.replace(/[^\w']/g, '')).filter(Boolean)
+                : (spoken.match(/[^.!?,]+[.!?,]*/g) || [spoken]).map(s => s.trim()).filter(Boolean);
+            parts.forEach(part => {
+                const u = new SpeechSynthesisUtterance(part);
+                if (voice) u.voice = voice;
+                u.pitch = robotPitch;
+                u.rate = robotRate;
+                u.volume = 1;
+                speechSynthesis.speak(u);
+            });
+        }
+
+        function sayNow(text) {
+            if ('speechSynthesis' in window) speechSynthesis.cancel();
+            robotBeep();
+            speak(text);
+        }
+
+        // ================= AVATAR PICKER =================
+        function renderAvatars() {
+            const grid = document.getElementById('avatarGrid');
+            AVATARS.forEach(a => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'avatar-option' + (a === selectedAvatar ? ' selected' : '');
+                if (a.draw) {
+                    const img = document.createElement('img');
+                    img.src = avatarIconURL(a, 96);
+                    img.alt = a.name;
+                    img.style.cssText = 'width: 42px; height: 42px; display: block; margin: 0 auto 2px;';
+                    btn.appendChild(img);
+                } else {
+                    const emoji = document.createElement('span');
+                    emoji.className = 'emoji';
+                    emoji.textContent = a.emoji;
+                    btn.appendChild(emoji);
+                }
+                btn.appendChild(document.createTextNode(a.name));
+                btn.onclick = () => selectAvatar(a, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function selectAvatar(avatar, btn) {
+            selectedAvatar = avatar;
+            document.querySelectorAll('.avatar-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            sayNow(`${avatar.name} selected!`);
+        }
+
+        renderAvatars();
+
+        // ================= AI CLOUD COTTAGES =================
+        function renderCottages() {
+            const grid = document.getElementById('cottageGrid');
+            grid.innerHTML = '';
+            AI_COTTAGES.forEach((c, i) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'cottage' + (litCottages.has(i) ? ' lit' : '');
+                btn.style.setProperty('--glow', c.color);
+
+                const house = document.createElement('span');
+                house.className = 'house';
+                house.textContent = '🏠';
+                const name = document.createElement('span');
+                name.className = 'ai-name';
+                name.textContent = `${c.emoji} ${c.name}`;
+                const job = document.createElement('span');
+                job.className = 'ai-job';
+                job.textContent = c.job;
+
+                btn.appendChild(house);
+                btn.appendChild(name);
+                btn.appendChild(job);
+                btn.onclick = () => visitCottage(i);
+                grid.appendChild(btn);
+            });
+            document.getElementById('cottageCount').textContent =
+                `💡 ${litCottages.size} of ${AI_COTTAGES.length} cottages lit`;
+        }
+
+        function visitCottage(i) {
+            const c = AI_COTTAGES[i];
+            litCottages.add(i);
+            renderCottages();
+            if (litCottages.size === AI_COTTAGES.length) {
+                sayNow(`This is the home of ${c.name}. ${c.job} You have lit up every cottage in the AI Cloud!`);
+            } else {
+                sayNow(`This is the home of ${c.name}. ${c.job}`);
+            }
+        }
+
+        renderCottages();
+        loadCottagesFromSheet();
+
+        // ================= ROBO CAFÉ =================
+        function renderMenu() {
+            const grid = document.getElementById('menuGrid');
+            CAFE_MENU.forEach((dish, i) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'menu-item';
+                const emoji = document.createElement('span');
+                emoji.className = 'dish-emoji';
+                emoji.textContent = dish.emoji;
+                const energy = document.createElement('span');
+                energy.className = 'dish-energy';
+                energy.textContent = `+${dish.energy}% energy`;
+                btn.appendChild(emoji);
+                btn.appendChild(document.createTextNode(dish.name));
+                btn.appendChild(energy);
+                btn.onclick = () => orderDish(i);
+                grid.appendChild(btn);
+            });
+            updateBattery();
+        }
+
+        function updateBattery() {
+            const fill = document.getElementById('batteryFill');
+            fill.style.width = robotBattery + '%';
+            fill.style.background = robotBattery < 30 ? '#ff6b6b' : robotBattery < 70 ? '#ffe66d' : '#00ff88';
+            const mood = robotBattery < 30 ? 'so hungry!' : robotBattery < 70 ? 'getting there...' : robotBattery < 100 ? 'almost full!' : 'fully charged! 😊';
+            document.getElementById('batteryText').textContent = `🔋 Robot battery: ${robotBattery}% - ${mood}`;
+        }
+
+        function orderDish(i) {
+            const dish = CAFE_MENU[i];
+            if (robotBattery >= 100) {
+                sayNow('No thank you! My battery is already full. Beep boop!');
+                return;
+            }
+            robotBattery = Math.min(100, robotBattery + dish.energy);
+            updateBattery();
+            if (robotBattery >= 100) {
+                sayNow(`Yum, ${dish.name}! Battery full! Thank you for feeding me, ${visitorName}!`);
+            } else {
+                sayNow(`Yum, ${dish.name}! Battery at ${robotBattery} percent!`);
+            }
+        }
+
+        function resetBattery() {
+            robotBattery = 10;
+            updateBattery();
+            sayNow('Beep boop. I worked hard and I am hungry again!');
+        }
+
+        renderMenu();
+
+        // ================= ROBOT AGENTS: tap a card to hear it =================
+        function agentSpeak(agent) {
+            const lines = {
+                planner: 'I am the Planner Agent. I break a big goal into small, clear steps, and decide who does what. I also run the Robo Cafe!',
+                researcher: 'I am the Research Agent. I find information in Data Valley, and check that the facts are correct.',
+                creator: 'I am the Creator Agent. I write stories, design pictures, and build awards like yours.',
+                safety: 'I am the Safety Agent. I check that everything is kind, safe, and honest, and I ask a human before big decisions.',
+                vision: 'I am the Vision Agent. I use cameras to see and understand the world around me.',
+                maintenance: 'I am the Maintenance Agent. I keep the circuit boards, wires, and lights of the Neural Core working smoothly.',
+                memory: `I am the Memory Agent. I saved your name, ${visitorName}, and your avatar on the visitor board, so the city remembers you.`,
+                voice: 'I am the Voice Agent. I speak to you in this robot voice, and I tell the greeter robot to welcome you.'
+            };
+            sayNow(lines[agent] || '');
+        }
+
+        // ================= GREETER SYSTEM: spoken explanation =================
+        function explainGreeter() {
+            const secs = POLL_MS ? Math.round(POLL_MS / 1000) : 'a few';
+            sayNow(`Hello ${visitorName}! I am the Greeter Robot. When you typed your name, the Memory Agent wrote it on the visitor board. ` +
+                   `I check that board every ${secs} seconds. When I spotted your name, the Voice Agent helped me say: Welcome ${visitorName}!`);
+        }
+
+        // ================= GREETER VIDEO: tap for sound =================
+        function playGreeterSound(id) {
+            id = id || 'greeterVideo';
+            const v = document.getElementById(id);
+            const btn = document.querySelector('[data-action="playGreeterSound"][data-arg="' + id + '"]');
+            if (!v) return;
+            if ('speechSynthesis' in window) speechSynthesis.cancel();
+            // mute the other greeter clips so only one talks at a time
+            document.querySelectorAll('video[id^="greeterVideo"]').forEach(o => {
+                if (o !== v && !o.muted) {
+                    o.muted = true;
+                    const b = document.querySelector('[data-action="playGreeterSound"][data-arg="' + o.id + '"]');
+                    if (b) b.textContent = '🔊 Tap to hear the greeting';
+                }
+            });
+            if (v.muted) {
+                v.muted = false;
+                v.currentTime = 0;
+                v.play().catch(() => {});
+                if (btn) btn.textContent = '🔇 Mute';
+            } else {
+                v.muted = true;
+                if (btn) btn.textContent = '🔊 Tap to hear the greeting';
+            }
+        }
+
+        // ================= STEP 1: NAME + AVATAR =================
+        function submitName() {
+            const name = document.getElementById('visitorName').value.trim();
+            if (!name) {
+                document.getElementById('nameError').textContent = 'Please enter your name to begin.';
+                return;
+            }
+            visitorName = name;
+            document.getElementById('nameModal').classList.add('hidden');
+            logVisit();
+            enterCity();
+        }
+
+        document.getElementById('visitorName').addEventListener('keypress', e => {
+            if (e.key === 'Enter') submitName();
+        });
+
+        // ================= VISITOR BOARD =================
+        function logVisit() {
+            if (!VISITOR_API) return;
+            const cb = 'visit_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
+            const s = document.createElement('script');
+            let done = false;
+
+            const cleanup = () => {
+                done = true;
+                clearTimeout(timer);
+                try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+                if (s.parentNode) s.parentNode.removeChild(s);
+            };
+            const timer = setTimeout(() => {
+                if (!done) { cleanup(); console.log('Visitor board: no reply'); }
+            }, 15000);
+
+            window[cb] = data => {
+                if (done) return;
+                cleanup();
+                if (data && data.count) visitorCount = data.count;
+                if (participationReady) drawAward('participation');
+                if (completionReady) drawAward('completion');
+            };
+            s.onerror = () => { if (!done) { cleanup(); console.log('Visitor board offline'); } };
+            s.src = `${VISITOR_API}?action=visit&name=${encodeURIComponent(visitorName)}` +
+                    `&avatar=${encodeURIComponent(selectedAvatar.name)}&callback=${cb}&t=${Date.now()}`;
+            document.body.appendChild(s);
+        }
+
+        // ================= ZONE NAVIGATION =================
+        function missingZones() {
+            return ZONES.filter(z => z.n < TOTAL_ZONES && !visitedZones.has(z.n));
+        }
+
+        function finaleLocked() {
+            return missingZones().length > 0;
+        }
+
+        function renderZoneNav() {
+            const nav = document.getElementById('zoneNav');
+            nav.innerHTML = '';
+            ZONES.forEach(z => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                const locked = z.n === TOTAL_ZONES && finaleLocked();
+                const visited = visitedZones.has(z.n);
+                btn.className = 'zone-chip' +
+                    (z.n === currentSection ? ' current' : '') +
+                    (visited ? ' visited' : '') +
+                    (locked ? ' locked' : '');
+                const mark = locked ? '🔒' : (visited && z.n !== currentSection ? '✓' : z.icon);
+                btn.textContent = `${z.n} ${mark} ${z.name}`;
+                btn.onclick = () => goToZone(z.n);
+                nav.appendChild(btn);
+            });
+
+            document.getElementById('zoneProgress').textContent =
+                `🧭 ${visitedZones.size} of ${TOTAL_ZONES} zones explored`;
+
+            const current = nav.querySelector('.current');
+            if (current) nav.scrollLeft = current.offsetLeft - nav.clientWidth / 2 + current.clientWidth / 2;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('navToast');
+            toast.textContent = message;
+            toast.classList.remove('hidden');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.add('hidden'), 4000);
+        }
+
+        function goToZone(n) {
+            if (n === TOTAL_ZONES && finaleLocked()) {
+                const list = missingZones().map(z => `${z.n} ${z.name}`).join(', ');
+                showToast(`🔒 Explore these zones first to unlock the Finale: ${list}`);
+                sayNow('Explore all the zones first to unlock the finale!');
+                return;
+            }
+            if (n === currentSection) {
+                window.scrollTo(0, 0);
+                return;
+            }
+            showZone(n);
+        }
+
+        function showZone(n) {
+            document.getElementById(`section${currentSection}`).classList.add('hidden');
+            const nextSec = document.getElementById(`section${n}`);
+            nextSec.classList.remove('hidden');
+            window.scrollTo(0, 0);
+            setTimeout(() => nextSec.classList.add('visible'), 100);
+            currentSection = n;
+            visitedZones.add(n);
+            renderZoneNav();
+
+            const zoneIntros = {
+                3: 'Welcome to the Neural Core! It is built from algorithms and mathematical equations.',
+                4: `Welcome to the Robo Cafe, ${visitorName}! Our robot is hungry. Tap a dish to feed it!`,
+                5: 'Welcome to the AI Cloud! Tap a cottage to meet the AI who lives there.',
+                6: 'Meet the robot agents! Tap any agent to hear it introduce itself.'
+            };
+            if (zoneIntros[n]) sayNow(zoneIntros[n]);
+
+            if (n === TOTAL_ZONES) {
+                completionReady = true;
+                drawAward('completion');
+                sayNow(`Congratulations ${visitorName}! You explored all ${TOTAL_ZONES} zones of Gen AI Robot City and earned your Award of Completion!`);
+                setTimeout(cyclePhotos, 2000);
+            } else if (!finaleLocked()) {
+                showToast('🏆 All zones explored! The Finale is unlocked.');
+            }
+        }
+
+        // ================= CITY MAP =================
+        function openMap() {
+            const pins = document.getElementById('mapPins');
+            const legend = document.getElementById('mapLegend');
+            pins.innerHTML = '';
+            legend.innerHTML = '';
+
+            ZONES.forEach(z => {
+                const visited = visitedZones.has(z.n);
+                const locked = z.n === TOTAL_ZONES && finaleLocked();
+
+                if (z.pin) {
+                    const pin = document.createElement('button');
+                    pin.type = 'button';
+                    pin.className = 'map-pin' + (visited ? ' visited' : '');
+                    pin.style.left = z.pin.x + '%';
+                    pin.style.top = z.pin.y + '%';
+                    pin.textContent = `${z.n} ${z.icon}`;
+                    pin.onclick = () => { closeMap(); goToZone(z.n); };
+                    pins.appendChild(pin);
+                }
+
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = 'zone-chip' + (visited ? ' visited' : '') + (locked ? ' locked' : '') +
+                                 (z.n === currentSection ? ' current' : '');
+                chip.textContent = `${z.n} ${locked ? '🔒' : z.icon} ${z.name}${visited && !locked ? ' ✓' : ''}`;
+                chip.onclick = () => { closeMap(); goToZone(z.n); };
+                legend.appendChild(chip);
+            });
+
+            document.getElementById('mapOverlay').classList.remove('hidden');
+            sayNow('Here is the city map. Tap a pin to jump to a zone.');
+        }
+
+        function closeMap() {
+            document.getElementById('mapOverlay').classList.add('hidden');
+        }
+
+        // ================= GUEST BOOK =================
+        function setRating(n) {
+            gbRating = n;
+            document.querySelectorAll('#starRow .star').forEach((b, i) => {
+                b.classList.toggle('active', i < n);
+            });
+        }
+
+        function openGuestbook(from) {
+            gbReturnTo = from;
+            document.getElementById('welcomeBlock').classList.add('hidden');
+            document.getElementById('cityTour').classList.add('hidden');
+            document.getElementById('guestbookBlock').classList.remove('hidden');
+            window.scrollTo(0, 0);
+            if (!gbSigned) {
+                sayNow(`${visitorName}, we would love to hear what you think of Gen AI Robot City!`);
+            }
+        }
+
+        function closeGuestbook() {
+            document.getElementById('guestbookBlock').classList.add('hidden');
+            if (gbReturnTo === 'tour') document.getElementById('cityTour').classList.remove('hidden');
+            else document.getElementById('welcomeBlock').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        async function submitGuestbook() {
+            const message = document.getElementById('gbMessage').value.trim();
+            const from = document.getElementById('gbFrom').value.trim();
+            const errorEl = document.getElementById('gbError');
+            const btn = document.getElementById('gbSubmit');
+
+            if (!message) {
+                errorEl.textContent = 'Please write a short message.';
+                return;
+            }
+            errorEl.textContent = '';
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            const params = new URLSearchParams({
+                action: 'guestbook',
+                name: visitorName,
+                from: from,
+                rating: String(gbRating),
+                message: message
+            });
+
+            try {
+                await fetch(`${VISITOR_API}?${params.toString()}`, { mode: 'no-cors' });
+                gbSigned = true;
+                document.getElementById('gbForm').classList.add('hidden');
+                document.getElementById('gbThanksName').textContent = visitorName;
+                document.getElementById('gbThanks').classList.remove('hidden');
+                sayNow(`Thank you ${visitorName}! Your message has been saved in our guest book.`);
+            } catch (e) {
+                errorEl.textContent = 'Could not save right now. Please check your internet and try again.';
+                btn.disabled = false;
+                btn.textContent = '📨 Sign the Guest Book';
+            }
+        }
+
+        // ================= AWARDS =================
+        const AWARDS = {
+            participation: {
+                canvas: 'rewardCanvas',
+                image: 'rewardImage',
+                border: '#00ff88',
+                title: '🎖️ PARTICIPATION AWARD 🎖️',
+                line1: 'has joined the city of',
+                line2: 'intelligent robots!',
+                footer: 'Welcome to the city! ✨',
+                file: 'Participation'
+            },
+            completion: {
+                canvas: 'completionCanvas',
+                image: 'completionImage',
+                border: '#ffe66d',
+                title: '🏆 AWARD OF COMPLETION 🏆',
+                line1: `has explored all ${TOTAL_ZONES} zones of`,
+                line2: 'Gen AI Robot City!',
+                footer: 'Tour complete! Thank you for visiting ✨',
+                file: 'Completion'
+            }
+        };
+
+        function roundRectPath(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.arcTo(x + w, y, x + w, y + h, r);
+            ctx.arcTo(x + w, y + h, x, y + h, r);
+            ctx.arcTo(x, y + h, x, y, r);
+            ctx.arcTo(x, y, x + w, y, r);
+            ctx.closePath();
+        }
+
+        function fitText(ctx, text, maxWidth, startSize) {
+            let size = startSize;
+            ctx.font = `bold ${size}px 'Courier New', monospace`;
+            while (ctx.measureText(text).width > maxWidth && size > 14) {
+                size -= 2;
+                ctx.font = `bold ${size}px 'Courier New', monospace`;
+            }
+        }
+
+        function drawAward(kind) {
+            const cfg = AWARDS[kind];
+            const avatar = selectedAvatar;
+            const c = document.getElementById(cfg.canvas);
+            const ctx = c.getContext('2d');
+            const W = c.width, H = c.height;
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, W, H);
+
+            const bg = ctx.createLinearGradient(0, 0, W, H);
+            bg.addColorStop(0, '#0f0f23');
+            bg.addColorStop(0.5, '#1a1a2e');
+            bg.addColorStop(1, '#16213e');
+            ctx.fillStyle = bg;
+            ctx.fillRect(0, 0, W, H);
+
+            ctx.save();
+            ctx.shadowColor = cfg.border;
+            ctx.shadowBlur = 20;
+            ctx.strokeStyle = cfg.border;
+            ctx.lineWidth = 6;
+            roundRectPath(ctx, 20, 20, W - 40, H - 40, 30);
+            ctx.stroke();
+            ctx.restore();
+
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'alphabetic';
+
+            ctx.fillStyle = '#00ff88';
+            ctx.font = "bold 40px 'Courier New', monospace";
+            ctx.fillText('GEN AI ROBOT CITY', W / 2, 95);
+            ctx.fillStyle = '#ffe66d';
+            fitText(ctx, cfg.title, 540, 30);
+            ctx.fillText(cfg.title, W / 2, 145);
+
+            const cx = W / 2, cy = 355, r = 150;
+            ctx.save();
+            ctx.shadowColor = avatar.color;
+            ctx.shadowBlur = 30;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r + 6, 0, Math.PI * 2);
+            ctx.fillStyle = cfg.border;
+            ctx.fill();
+            ctx.restore();
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.clip();
+            ctx.fillStyle = '#1a202c';
+            ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+            ctx.globalAlpha = 0.35;
+            ctx.fillStyle = avatar.color;
+            ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+            ctx.globalAlpha = 1;
+            if (avatar.draw) {
+                avatar.draw(ctx, cx - r, cy - r, r * 2);
+            } else {
+                ctx.font = '170px serif';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(avatar.emoji, cx, cy + 10);
+                ctx.textBaseline = 'alphabetic';
+            }
+            ctx.restore();
+
+            ctx.fillStyle = '#ffffff';
+            fitText(ctx, visitorName, 520, 48);
+            ctx.fillText(visitorName, W / 2, 580);
+
+            ctx.fillStyle = '#4ecdc4';
+            ctx.font = "22px 'Courier New', monospace";
+            ctx.fillText(cfg.line1, W / 2, 620);
+            ctx.fillText(cfg.line2, W / 2, 650);
+
+            const details = [];
+            if (visitorCount) details.push(`Visitor #${visitorCount}`);
+            details.push(new Date().toLocaleDateString());
+            details.push(`${avatar.name} avatar`);
+            const detailsText = details.join('  •  ');
+            ctx.fillStyle = '#ffe66d';
+            fitText(ctx, detailsText, 540, 22);
+            ctx.fillText(detailsText, W / 2, 705);
+
+            ctx.fillStyle = '#718096';
+            ctx.font = "16px 'Courier New', monospace";
+            ctx.fillText(cfg.footer, W / 2, 755);
+
+            document.getElementById(cfg.image).src = c.toDataURL('image/png');
+        }
+
+        function downloadAward(kind) {
+            const cfg = AWARDS[kind];
+            const a = document.createElement('a');
+            a.href = document.getElementById(cfg.canvas).toDataURL('image/png');
+            const safeName = visitorName.replace(/[^a-z0-9]+/gi, '-') || 'Explorer';
+            a.download = `GenAI-Robot-City-${cfg.file}-Award-${safeName}.png`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        }
+
+        // ================= WELCOME SCREEN =================
+        function enterCity() {
+            document.getElementById('mainContent').classList.remove('hidden');
+            document.getElementById('welcomeBlock').classList.remove('hidden');
+            document.getElementById('cityTour').classList.add('hidden');
+            document.getElementById('guestbookBlock').classList.add('hidden');
+            document.getElementById('personalGreeting').textContent =
+                `Welcome, ${visitorName}! Prepare for an extraordinary journey.`;
+            updateNamePlaceholders();
+
+            const greeterAvatar = document.getElementById('greeterAvatar');
+            if (selectedAvatar.draw) {
+                greeterAvatar.textContent = '';
+                const img = document.createElement('img');
+                img.src = avatarIconURL(selectedAvatar, 128);
+                img.alt = selectedAvatar.name;
+                img.style.cssText = 'width: 100%; height: 100%; border-radius: 50%;';
+                greeterAvatar.appendChild(img);
+            } else {
+                greeterAvatar.textContent = selectedAvatar.emoji;
+            }
+            greeterAvatar.style.background = selectedAvatar.color + '55';
+            greeterAvatar.style.borderColor = selectedAvatar.color;
+            greeterAvatar.style.boxShadow = `0 0 12px ${selectedAvatar.color}`;
+
+            document.getElementById('robotGreeting').textContent =
+                `Hello, ${visitorName}! Love your ${selectedAvatar.name} avatar! Here is your Participation Award. Tap "Enter the City" when you're ready! 🎖️`;
+
+            participationReady = true;
+            drawAward('participation');
+
+            sayNow(`Hello ${visitorName}! Welcome to Gen AI Robot City! You have earned your Participation Award. Tap Enter the City to begin your tour!`);
+            window.scrollTo(0, 0);
+        }
+
+        // ================= START THE CITY TOUR =================
+        function startTour() {
+            document.getElementById('welcomeBlock').classList.add('hidden');
+            document.getElementById('cityTour').classList.remove('hidden');
+            visitedZones.add(1);
+            renderZoneNav();
+            sayNow(`Let's go, ${visitorName}! Explore all ${TOTAL_ZONES} zones to unlock your Award of Completion. Tap City Map to jump anywhere!`);
+            window.scrollTo(0, 0);
+        }
+
+        function updateNamePlaceholders() {
+            ['name-valley', 'name-cafe', 'name-agents'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = visitorName;
+            });
+            document.querySelectorAll('.visitor-name-slot').forEach(el => { el.textContent = visitorName; });
+            const ps = document.getElementById('pollSeconds');
+            if (ps && POLL_MS) ps.textContent = Math.round(POLL_MS / 1000);
+        }
+
+        function cyclePhotos() {
+            const photos = ['city-overview.png', 'city-night.jpg', 'data-valley.jpg', 'robo-cafe.jpg', 'neural-core.jpg',
+                            'robot-red.jpg', 'robot-purple.jpg', 'robot-blue-cafe.jpg', 'robot-yellow.jpg'];
+            let i = 0;
+            const finalPhoto = document.getElementById('finalPhoto');
+            clearInterval(photoTimer);
+            photoTimer = setInterval(() => {
+                i = (i + 1) % photos.length;
+                finalPhoto.style.display = 'block';
+                finalPhoto.src = RC_EMBED[photos[i]] || IMG + photos[i];
+            }, 3000);
+        }
+
+        function restart() {
+            clearInterval(photoTimer);
+            for (let i = 2; i <= TOTAL_ZONES; i++) {
+                const s = document.getElementById(`section${i}`);
+                s.classList.add('hidden');
+                s.classList.remove('visible');
+            }
+            document.getElementById('section1').classList.remove('hidden');
+            document.getElementById('section1').classList.add('visible');
+            document.getElementById('finalPhoto').src = RC_EMBED['city-overview.png'] || IMG + 'city-overview.png';
+            currentSection = 1;
+            visitedZones = new Set([1]);
+            robotBattery = 10;
+            updateBattery();
+            litCottages.clear();
+            renderCottages();
+            renderZoneNav();
+            window.scrollTo(0, 0);
+        }
+
+    
+
+// ================= BUTTONS (no inline onclick, works under strict hosting rules) =================
+document.addEventListener('click', function (e) {
+    const el = e.target.closest('[data-action]');
+    if (!el) return;
+    const fn = window[el.dataset.action];
+    if (typeof fn !== 'function') return;
+    const arg = el.dataset.arg;
+    if (arg === undefined) fn();
+    else fn(/^-?\d+(\.\d+)?$/.test(arg) ? Number(arg) : arg);
+});
+
+// ================= MISSING IMAGES / VIDEOS =================
+function rcHandleMediaError(el) {
+    if (!el || el.dataset.rcHandled === '1') return;
+    if (el.tagName === 'SOURCE') {
+        if (el.classList.contains('rc-hide-video-on-error') && el.parentElement) el.parentElement.style.display = 'none';
+        return;
+    }
+    if (el.tagName !== 'IMG') return;
+    if (el.dataset.fb) {                       // try the backup copy first
+        const fb = el.dataset.fb; el.dataset.fb = ''; el.src = fb; return;
+    }
+    el.dataset.rcHandled = '1';
+    if (el.id === 'mapImg') { const f = document.getElementById('mapFrame'); if (f) f.style.display = 'none'; return; }
+    if (el.classList.contains('rc-remove-on-error')) { el.remove(); return; }
+    if (el.classList.contains('diorama-photo')) {
+        const src = el.getAttribute('src') || '';
+        const ph = document.createElement('div');
+        ph.className = 'diorama-photo';
+        ph.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;'
+            + 'min-height:160px;padding:16px;border:2px dashed #64748b;border-radius:12px;'
+            + 'background:rgba(100,116,139,.12);color:#94a3b8;text-align:center;font-size:13px;';
+        ph.innerHTML = '🖼️ <strong>Image not found</strong><br>Expected file: <code style="color:#e2e8f0">' + src + '</code><br>'
+            + '<span style="font-size:11px">Check the file exists in the images folder and the name matches exactly (case-sensitive).</span>';
+        if (el.parentNode) el.parentNode.replaceChild(ph, el);
+    }
+}
+document.addEventListener('error', function (e) { rcHandleMediaError(e.target); }, true);
+// catch images that already failed before this script loaded
+document.querySelectorAll('img').forEach(function (img) {
+    if (img.getAttribute('src') && img.complete && img.naturalWidth === 0) rcHandleMediaError(img);
+});
+
+</script>
+</body>
+</html>
+<!-- END OF FILE: if this line is missing, the copy was cut short -->
