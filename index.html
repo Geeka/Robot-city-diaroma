@@ -774,8 +774,10 @@
                 <div class="story-section visible" id="section1">
                     <div class="location-indicator">ZONE 1 OF 7 • CITY ENTRANCE</div>
                     <h2>Welcome to Gen AI Robot City</h2>
-                    <img data-file="city-front.jpg" src="images/city-front.jpg" alt="Gen AI Robot City diorama seen from the front" class="diorama-photo">
-                    <div class="photo-caption">The complete Gen AI Robot City diorama, with the Greeter Robot on the lower deck</div>
+                    <img data-file="city-overview.png" src="images/city-overview.png" alt="Gen AI Robot City diorama" class="diorama-photo" style="border: none; box-shadow: none;">
+                    <div class="photo-caption">The complete Gen AI Robot City, with the Greeter Robot welcoming visitors</div>
+                    <img data-file="city-night.jpg" src="images/city-night.jpg" alt="Gen AI Robot City lit up at night" class="diorama-photo">
+                    <div class="photo-caption">🌙 The city at night - every cottage and circuit glowing</div>
                     <p>Before you lies Gen AI Robot City - a living testament to artificial intelligence. Glowing cottages, each home to a different AI, are connected by streams of data flowing to the central Data Valley. The colorful city name proudly displays our commitment to generative AI innovation.</p>
                     <div class="feature-highlight">
                         <strong>What You're Seeing:</strong> The AI Cloud with its neighborhood of glowing AI cottages, Data Valley at the heart of the city, and the Neural Core circuits on the level below.
@@ -791,9 +793,7 @@
                     <div class="location-indicator">ZONE 2 OF 7 • DATA VALLEY</div>
                     <h2>The Information Processing Center</h2>
                     <img data-file="data-valley.jpg" src="images/data-valley.jpg" alt="Data Valley with fiber optic flowers" class="diorama-photo">
-                    <video class="diorama-photo" controls autoplay muted loop playsinline>
-                        <source src="https://github.com/Geeka/Robot-city-diaroma/raw/main/images/data-valley-video.mp4" type="video/mp4" class="rc-hide-video-on-error">
-                    </video>
+                    <img src="images/data-valley.gif" alt="Data Valley fiber optic flowers twinkling" class="diorama-photo" loading="lazy">
                     <div class="photo-caption">Data Valley ring with golden circuit patterns and glowing fiber optic flowers</div>
                     <p>You approach the magnificent Data Valley - enhanced with fiber optic palm trees that pulse with data streams. The circular hub collects information from all the AI cottages, while the golden circuit patterns represent different AI algorithms. The glowing palm trees serve as natural data conduits, their fiber optic leaves carrying information between the physical and digital realms.</p>
                     <div class="ai-response">
@@ -917,10 +917,10 @@
                             <span class="agent-tag">The yellow robot - who also runs the Robo Café!</span>
                         </button>
                         <button class="agent-card" style="border-left-color: #4ecdc4;" data-action="agentSpeak" data-arg="researcher">
-                            <img data-file="robot-blue.jpg" src="images/robot-blue.jpg" alt="The blue Research Agent robot" class="agent-photo rc-remove-on-error" loading="lazy">
+                            <img data-file="robot-blue-cafe.jpg" src="images/robot-blue-cafe.jpg" alt="The blue Research Agent robot beside the Robo Café" class="agent-photo rc-remove-on-error" loading="lazy">
                             <span class="agent-name">🔎 Research Agent</span>
                             Finds information in Data Valley and checks that the facts are correct.
-                            <span class="agent-tag">The blue robot, guardian of the Neural Core</span>
+                            <span class="agent-tag">The blue robot, beside the Robo Café</span>
                         </button>
                         <button class="agent-card" style="border-left-color: #ff6b6b;" data-action="agentSpeak" data-arg="creator">
                             <img data-file="robot-red.jpg" src="images/robot-red.jpg" alt="The red Creator Agent robot" class="agent-photo rc-remove-on-error" loading="lazy">
@@ -971,8 +971,13 @@
                     <video id="greeterVideo" class="diorama-photo" autoplay muted loop playsinline preload="auto">
                         <source src="images/greeter-video.mp4" type="video/mp4">
                     </video>
-                    <button id="greeterSoundBtn" class="continue-btn" style="margin-top: 0;" data-action="playGreeterSound">🔊 Tap to hear the greeting</button>
+                    <button id="greeterSoundBtn" class="continue-btn" style="margin-top: 0;" data-action="playGreeterSound" data-arg="greeterVideo">🔊 Tap to hear the greeting</button>
                     <div class="photo-caption">The Greeter Robot welcoming a new visitor by name</div>
+                    <video id="greeterVideo2" class="diorama-photo" autoplay muted loop playsinline preload="auto">
+                        <source src="images/greeter-video-2.mp4" type="video/mp4" class="rc-hide-video-on-error">
+                    </video>
+                    <button id="greeterVideo2Btn" class="continue-btn" style="margin-top: 0;" data-action="playGreeterSound" data-arg="greeterVideo2">🔊 Tap to hear the greeting</button>
+                    <div class="photo-caption">Close-up: the greeter screen lights up as it says hello to Priya</div>
 
                     <h3 class="section-subtitle">⚙️ How Agents Work Together</h3>
                     <div class="agent-flow">
@@ -1008,7 +1013,7 @@
 
                     <button class="continue-btn big-btn" data-action="openGuestbook" data-arg="tour">✍️ Sign the Guest Book</button>
 
-                    <img data-file="city-front.jpg" src="images/city-front.jpg" alt="The Complete Gen AI Robot City" class="diorama-photo" id="finalPhoto">
+                    <img data-file="city-overview.png" src="images/city-overview.png" alt="The Complete Gen AI Robot City" class="diorama-photo" id="finalPhoto">
                     <div class="photo-caption">The complete ecosystem: physical architecture supporting digital intelligence</div>
                     <p>Your journey reveals how AI really works. Data flows through Data Valley, the Neural Core turns it into decisions with algorithms and math, the Robo Café keeps everyone powered, the AI cottages share their skills through the cloud, and the robot agents turn plans into action - every component works in harmony.</p>
                     <div class="ai-response">
@@ -1691,11 +1696,20 @@ window.addEventListener('error', function (e) {
         }
 
         // ================= GREETER VIDEO: tap for sound =================
-        function playGreeterSound() {
-            const v = document.getElementById('greeterVideo');
-            const btn = document.getElementById('greeterSoundBtn');
+        function playGreeterSound(id) {
+            id = id || 'greeterVideo';
+            const v = document.getElementById(id);
+            const btn = document.querySelector('[data-action="playGreeterSound"][data-arg="' + id + '"]');
             if (!v) return;
             if ('speechSynthesis' in window) speechSynthesis.cancel();
+            // mute the other greeter clips so only one talks at a time
+            document.querySelectorAll('video[id^="greeterVideo"]').forEach(o => {
+                if (o !== v && !o.muted) {
+                    o.muted = true;
+                    const b = document.querySelector('[data-action="playGreeterSound"][data-arg="' + o.id + '"]');
+                    if (b) b.textContent = '🔊 Tap to hear the greeting';
+                }
+            });
             if (v.muted) {
                 v.muted = false;
                 v.currentTime = 0;
@@ -2133,90 +2147,4 @@ window.addEventListener('error', function (e) {
                 const el = document.getElementById(id);
                 if (el) el.textContent = visitorName;
             });
-            document.querySelectorAll('.visitor-name-slot').forEach(el => { el.textContent = visitorName; });
-            const ps = document.getElementById('pollSeconds');
-            if (ps && POLL_MS) ps.textContent = Math.round(POLL_MS / 1000);
-        }
-
-        function cyclePhotos() {
-            const photos = ['city-front.jpg', 'data-valley.jpg', 'robo-cafe.jpg', 'neural-core.jpg',
-                            'robot-red.jpg', 'robot-purple.jpg', 'robot-blue.jpg', 'robot-green.jpg'];
-            let i = 0;
-            const finalPhoto = document.getElementById('finalPhoto');
-            clearInterval(photoTimer);
-            photoTimer = setInterval(() => {
-                i = (i + 1) % photos.length;
-                finalPhoto.style.display = 'block';
-                finalPhoto.src = RC_EMBED[photos[i]] || IMG + photos[i];
-            }, 3000);
-        }
-
-        function restart() {
-            clearInterval(photoTimer);
-            for (let i = 2; i <= TOTAL_ZONES; i++) {
-                const s = document.getElementById(`section${i}`);
-                s.classList.add('hidden');
-                s.classList.remove('visible');
-            }
-            document.getElementById('section1').classList.remove('hidden');
-            document.getElementById('section1').classList.add('visible');
-            document.getElementById('finalPhoto').src = RC_EMBED['city-front.jpg'] || IMG + 'city-front.jpg';
-            currentSection = 1;
-            visitedZones = new Set([1]);
-            robotBattery = 10;
-            updateBattery();
-            litCottages.clear();
-            renderCottages();
-            renderZoneNav();
-            window.scrollTo(0, 0);
-        }
-
-    
-
-// ================= BUTTONS (no inline onclick, works under strict hosting rules) =================
-document.addEventListener('click', function (e) {
-    const el = e.target.closest('[data-action]');
-    if (!el) return;
-    const fn = window[el.dataset.action];
-    if (typeof fn !== 'function') return;
-    const arg = el.dataset.arg;
-    if (arg === undefined) fn();
-    else fn(/^-?\d+(\.\d+)?$/.test(arg) ? Number(arg) : arg);
-});
-
-// ================= MISSING IMAGES / VIDEOS =================
-function rcHandleMediaError(el) {
-    if (!el || el.dataset.rcHandled === '1') return;
-    if (el.tagName === 'SOURCE') {
-        if (el.classList.contains('rc-hide-video-on-error') && el.parentElement) el.parentElement.style.display = 'none';
-        return;
-    }
-    if (el.tagName !== 'IMG') return;
-    if (el.dataset.fb) {                       // try the backup copy first
-        const fb = el.dataset.fb; el.dataset.fb = ''; el.src = fb; return;
-    }
-    el.dataset.rcHandled = '1';
-    if (el.id === 'mapImg') { const f = document.getElementById('mapFrame'); if (f) f.style.display = 'none'; return; }
-    if (el.classList.contains('rc-remove-on-error')) { el.remove(); return; }
-    if (el.classList.contains('diorama-photo')) {
-        const src = el.getAttribute('src') || '';
-        const ph = document.createElement('div');
-        ph.className = 'diorama-photo';
-        ph.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;'
-            + 'min-height:160px;padding:16px;border:2px dashed #64748b;border-radius:12px;'
-            + 'background:rgba(100,116,139,.12);color:#94a3b8;text-align:center;font-size:13px;';
-        ph.innerHTML = '🖼️ <strong>Image not found</strong><br>Expected file: <code style="color:#e2e8f0">' + src + '</code><br>'
-            + '<span style="font-size:11px">Check the file exists in the images folder and the name matches exactly (case-sensitive).</span>';
-        if (el.parentNode) el.parentNode.replaceChild(ph, el);
-    }
-}
-document.addEventListener('error', function (e) { rcHandleMediaError(e.target); }, true);
-// catch images that already failed before this script loaded
-document.querySelectorAll('img').forEach(function (img) {
-    if (img.getAttribute('src') && img.complete && img.naturalWidth === 0) rcHandleMediaError(img);
-});
-
-</script>
-</body>
-</html>
-<!-- END OF FILE: if this line is missing, the copy was cut short -->
+            
