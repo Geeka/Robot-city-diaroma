@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Visitors - Gen AI Robot City</title>
+    <script src="config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0f0f23, #1a1a2e, #16213e);
+            color: #e2e8f0; min-height: 100vh; padding: 16px;
+        }
+        .wrap { max-width: 900px; margin: 0 auto; }
+        h1 { color: #00ff88; text-align: center; margin: 8px 0 4px; text-shadow: 0 0 12px #00ff88; font-size: 22px; }
+        .sub { text-align: center; color: #718096; font-size: 12px; margin-bottom: 16px; }
+        .card { background: rgba(45, 55, 72, 0.8); border: 2px solid #4a5568; border-radius: 14px; padding: 16px; margin: 12px 0; }
+        input { width: 100%; background: rgba(15, 15, 35, 0.8); border: 2px solid #4a5568; border-radius: 8px; padding: 10px; color: #e2e8f0; font-family: inherit; font-size: 15px; }
+        input:focus { outline: none; border-color: #00ff88; }
+        .btn { background: linear-gradient(45deg, #00ff88, #4ecdc4); border: none; color: #0f0f23; padding: 10px 18px; border-radius: 20px; font-family: inherit; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn.grey { background: #4a5568; color: #e2e8f0; }
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+        .stat { background: rgba(15, 15, 35, 0.7); border-radius: 10px; padding: 10px 4px; }
+        .stat b { display: block; font-size: 24px; color: #ffe66d; }
+        .stat span { font-size: 11px; color: #a0aec0; }
+        .tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .tools input { flex: 1; min-width: 160px; }
+        .tools select { background: rgba(15, 15, 35, 0.8); border: 2px solid #4a5568; border-radius: 8px; padding: 10px; color: #e2e8f0; font-family: inherit; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 680px; }
+        th { color: #4ecdc4; text-align: left; padding: 8px 6px; border-bottom: 2px solid #4a5568; position: sticky; top: 0; background: #1a1a2e; }
+        td { padding: 8px 6px; border-bottom: 1px solid #2d3748; vertical-align: top; }
+        .yes { color: #00ff88; font-weight: bold; }
+        .no { color: #718096; }
+        .muted { color: #718096; font-size: 11px; }
+        .error { color: #ff6b6b; min-height: 16px; font-size: 13px; margin-top: 8px; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>🤖 Visitor Board</h1>
+    <p class="sub">Gen AI Robot City • private page for the city team</p>
+
+    <div id="loginCard" class="card">
+        <p style="margin-bottom: 8px;">🔑 Enter the team password</p>
+        <input type="password" id="key" placeholder="Password" autocomplete="current-password">
+        <button class="btn" id="loginBtn">Show visitors</button>
+        <p id="loginError" class="error"></p>
+    </div>
+
+    <div id="listCard" class="hidden">
+        <div class="card stats">
+            <div class="stat"><b id="sTotal">0</b><span>Visitors</span></div>
+            <div class="stat"><b id="sDone">0</b><span>Completed tour</span></div>
+            <div class="stat"><b id="sRate">0%</b><span>Completion rate</span></div>
+        </div>
+
+        <div class="card">
+            <div class="tools">
+                <input type="text" id="search" placeholder="Search name, avatar, IP or city">
+                <select id="filter">
+                    <option value="all">All</option>
+                    <option value="done">Completed</option>
+                    <option value="notdone">Not completed</option>
+                </select>
+                <button class="btn grey" id="refreshBtn" style="margin-top: 0;">🔄 Refresh</button>
+                <button class="btn grey" id="logoutBtn" style="margin-top: 0;">🔒 Lock</button>
+            </div>
+            <p class="muted" id="updated" style="margin-top: 8px;"></p>
+            <p id="listError" class="error"></p>
+        </div>
+
+        <div class="card table-wrap">
+            <table>
+                <thead>
+                    <tr><th>#</th><th>Started</th><th>Name</th><th>Avatar</th><th>IP address</th><th>City (approx.)</th><th>Completed</th></tr>
+                </thead>
+                <tbody id="rows"></tbody>
+            </table>
+            <p id="empty" class="muted hidden" style="text-align: center; padding: 14px;">No visitors yet.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    'use strict';
+    var API = (typeof VISITOR_API !== 'undefined') ? VISITOR_API :
+        'https://script.google.com/macros/s/AKfycbwLHMAkVKMJX4UYJcTzS0oX1Z2plHMYtv9WA-drsIKhx0WHO6J2bt6N_OI9lDWXPMlJ/exec';
+    var AVATAR_ICONS = { Robo: '🤖', Human: '🧑', AI: '🧠', Celestial: '🌌', Deva: '⚡', Asura: '👹' };
+    var visitors = [];
+    var key = '';
+    var refreshTimer = null;
+
+    function $(id) { return document.getElementById(id); }
+
+    function jsonp(url) {
+        return new Promise(function (resolve, reject) {
+            var cb = 'vl_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
+            var s = document.createElement('script');
+            var done = false;
+            var cleanup = function () {
+                done = true; clearTimeout(timer);
+                try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+                if (s.parentNode) s.parentNode.removeChild(s);
+            };
+            var timer = setTimeout(function () { if (!done) { cleanup(); reject(new Error('No reply from the visitor board (timeout).')); } }, 20000);
+            window[cb] = function (data) { if (!done) { cleanup(); resolve(data); } };
+            s.onerror = function () { if (!done) { cleanup(); reject(new Error('Could not reach the visitor board.')); } };
+            s.src = url + (url.indexOf('?') === -1 ? '?' : '&') + 'callback=' + cb + '&t=' + Date.now();
+            document.body.appendChild(s);
+        });
+    }
+
+    function load(fromLogin) {
+        var errEl = fromLogin ? $('loginError') : $('listError');
+        errEl.textContent = '⏳ Loading…';
+        return jsonp(API + '?action=visitors&key=' + encodeURIComponent(key)).then(function (data) {
+            if (!data || !data.ok) {
+                var msg = (data && data.error) || 'Unexpected reply.';
+                if (data && !('visitors' in data) && !data.error) msg = 'The Apps Script is not updated yet (VisitorLog.gs missing).';
+                throw new Error(msg);
+            }
+            errEl.textContent = '';
+            visitors = data.visitors || [];
+            try { sessionStorage.setItem('rcVisitorsKey', key); } catch (e) {}
+            $('loginCard').classList.add('hidden');
+            $('listCard').classList.remove('hidden');
+            $('updated').textContent = 'Last updated ' + new Date().toLocaleTimeString() + ' • refreshes every 30 seconds • newest first';
+            render();
+            clearInterval(refreshTimer);
+            refreshTimer = setInterval(function () { load(false).catch(function () {}); }, 30000);
+        }).catch(function (e) {
+            errEl.textContent = '⚠️ ' + e.message;
+            throw e;
+        });
+    }
+
+    function render() {
+        var q = $('search').value.trim().toLowerCase();
+        var f = $('filter').value;
+        var total = visitors.length;
+        var done = visitors.filter(function (v) { return v.completed; }).length;
+        $('sTotal').textContent = total;
+        $('sDone').textContent = done;
+        $('sRate').textContent = total ? Math.round(done * 100 / total) + '%' : '0%';
+
+        var tbody = $('rows');
+        tbody.innerHTML = '';
+        var shown = visitors.filter(function (v) {
+            if (f === 'done' && !v.completed) return false;
+            if (f === 'notdone' && v.completed) return false;
+            if (!q) return true;
+            return (v.name + ' ' + v.avatar + ' ' + v.ip + ' ' + (v.city || '')).toLowerCase().indexOf(q) !== -1;
+        });
+        shown.forEach(function (v, i) {
+            var tr = document.createElement('tr');
+            var cells = [
+                String(total - visitors.indexOf(v)),
+                v.started,
+                v.name || '—',
+                (AVATAR_ICONS[v.avatar] ? AVATAR_ICONS[v.avatar] + ' ' : '') + (v.avatar || '—'),
+                v.ip || '—',
+                v.city || '—'
+            ];
+            cells.forEach(function (c) { var td = document.createElement('td'); td.textContent = c; tr.appendChild(td); });
+            var td = document.createElement('td');
+            if (v.completed) {
+                td.innerHTML = '<span class="yes">✅ Yes</span><br><span class="muted"></span>';
+                td.querySelector('.muted').textContent = v.completedAt;
+            } else {
+                td.innerHTML = '<span class="no">— Not yet</span>';
+            }
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+        });
+        $('empty').classList.toggle('hidden', shown.length > 0);
+    }
+
+    function login() {
+        key = $('key').value.trim();
+        if (!key) { $('loginError').textContent = 'Please enter the password.'; return; }
+        load(true).catch(function () {});
+    }
+
+    $('loginBtn').addEventListener('click', login);
+    $('key').addEventListener('keydown', function (e) { if (e.key === 'Enter') login(); });
+    $('refreshBtn').addEventListener('click', function () { load(false).catch(function () {}); });
+    $('search').addEventListener('input', render);
+    $('filter').addEventListener('change', render);
+    $('logoutBtn').addEventListener('click', function () {
+        clearInterval(refreshTimer);
+        try { sessionStorage.removeItem('rcVisitorsKey'); } catch (e) {}
+        key = ''; visitors = [];
+        $('key').value = '';
+        $('listCard').classList.add('hidden');
+        $('loginCard').classList.remove('hidden');
+    });
+
+    try {
+        var saved = sessionStorage.getItem('rcVisitorsKey');
+        if (saved) { key = saved; load(true).catch(function () {}); }
+    } catch (e) {}
+})();
+</script>
+</body>
+</html>
