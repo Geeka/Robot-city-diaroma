@@ -968,12 +968,12 @@
                     </div>
                     <!-- GREETER VIDEO -->
                     <!-- Plays silently like a GIF; tapping the button replays it with the greeting sound. -->
-                    <video id="greeterVideo" class="diorama-photo" autoplay muted loop playsinline preload="auto">
+                    <video id="greeterVideo" class="diorama-photo" muted playsinline preload="auto">
                         <source src="images/greeter-video.mp4" type="video/mp4">
                     </video>
                     <button id="greeterSoundBtn" class="continue-btn" style="margin-top: 0;" data-action="playGreeterSound" data-arg="greeterVideo">🔊 Tap to hear the greeting</button>
                     <div class="photo-caption">The Greeter Robot welcoming a new visitor by name</div>
-                    <video id="greeterVideo2" class="diorama-photo" autoplay muted loop playsinline preload="auto">
+                    <video id="greeterVideo2" class="diorama-photo" muted playsinline preload="auto">
                         <source src="images/greeter-video-2.mp4" type="video/mp4" class="rc-hide-video-on-error">
                     </video>
                     <button id="greeterVideo2Btn" class="continue-btn" style="margin-top: 0;" data-action="playGreeterSound" data-arg="greeterVideo2">🔊 Tap to hear the greeting</button>
@@ -1077,6 +1077,9 @@
 // ---------- Show script errors on screen (easy to report) ----------
 window.addEventListener('error', function (e) {
     if (!e.message) return;               // resource errors have no message
+    // "Script error." at line 0 comes from the Google visitor-board reply (another website),
+    // usually a brief hiccup on Google's side. It is retried automatically, so don't show it.
+    if (!e.lineno && /^script error\.?$/i.test(String(e.message).trim())) return;
     var d = document.getElementById('rcErrorBanner');
     if (!d) {
         d = document.createElement('div');
@@ -1700,29 +1703,45 @@ window.addEventListener('error', function (e) {
         }
 
         // ================= GREETER VIDEO: tap for sound =================
+        // Plays each greeter clip once (silently) when the Robot Agents zone opens, then stops.
+        function playGreeterVideosOnce() {
+            document.querySelectorAll('video[id^="greeterVideo"]').forEach(v => {
+                v.muted = true;
+                try { v.currentTime = 0; } catch (e) {}
+                v.play().catch(() => {});
+            });
+        }
+        document.querySelectorAll('video[id^="greeterVideo"]').forEach(v => {
+            v.addEventListener('ended', () => {
+                v.muted = true;
+                const b = document.querySelector('[data-action="playGreeterSound"][data-arg="' + v.id + '"]');
+                if (b) b.textContent = '🔊 Tap to hear the greeting';
+            });
+        });
+
         function playGreeterSound(id) {
             id = id || 'greeterVideo';
             const v = document.getElementById(id);
             const btn = document.querySelector('[data-action="playGreeterSound"][data-arg="' + id + '"]');
             if (!v) return;
             if ('speechSynthesis' in window) speechSynthesis.cancel();
-            // mute the other greeter clips so only one talks at a time
+            // stop the other greeter clip so only one plays with sound
             document.querySelectorAll('video[id^="greeterVideo"]').forEach(o => {
-                if (o !== v && !o.muted) {
-                    o.muted = true;
+                if (o !== v) {
+                    o.pause(); o.muted = true;
                     const b = document.querySelector('[data-action="playGreeterSound"][data-arg="' + o.id + '"]');
                     if (b) b.textContent = '🔊 Tap to hear the greeting';
                 }
             });
-            if (v.muted) {
-                v.muted = false;
-                v.currentTime = 0;
-                v.play().catch(() => {});
-                if (btn) btn.textContent = '🔇 Mute';
-            } else {
-                v.muted = true;
+            if (!v.paused && !v.muted) {          // tapped while playing with sound: stop
+                v.pause(); v.muted = true;
                 if (btn) btn.textContent = '🔊 Tap to hear the greeting';
+                return;
             }
+            v.muted = false;
+            try { v.currentTime = 0; } catch (e) {}
+            v.play().catch(() => {});
+            if (btn) btn.textContent = '⏹ Stop';
         }
 
         // ================= STEP 1: NAME + AVATAR =================
@@ -1882,6 +1901,7 @@ window.addEventListener('error', function (e) {
                 6: 'Meet the robot agents! Tap any agent to hear it introduce itself.'
             };
             if (zoneIntros[n]) sayNow(zoneIntros[n]);
+            if (n === 6) playGreeterVideosOnce();
 
             if (n === TOTAL_ZONES) {
                 completionReady = true;
